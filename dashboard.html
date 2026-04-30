@@ -98,7 +98,7 @@
       
       userData = doc.data();
       
-      if (!userData.whatsapp) {
+     if (!userData.whatsapp_numero) {
         document.getElementById('whatsappCard').style.display = 'block';
       } else if (!userData.sheet_id) {
         document.getElementById('whatsappCard').style.display = 'none';
@@ -112,8 +112,8 @@
       const whatsapp = document.getElementById('whatsappInput').value.trim();
       if (!whatsapp) return;
       
-      await db.collection('users').doc(currentUser.email).update({ whatsapp });
-      userData.whatsapp = whatsapp; // Actualizar local
+      await db.collection('users').doc(currentUser.email).update({ whatsapp_numero: whatsapp });
+      userData.whatsapp_numero = whatsapp;
       document.getElementById('whatsappCard').style.display = 'none';
       document.getElementById('sheetCard').style.display = 'block';
     });
@@ -220,7 +220,7 @@
       document.getElementById('whatsappCard').style.display = 'none';
       document.getElementById('sheetCard').style.display = 'none';
       document.getElementById('listoCard').style.display = 'block';
-      document.getElementById('wsFinal').textContent = userData.whatsapp || 'No cargado';
+      document.getElementById('wsFinal').textContent = userData.whatsapp_numero || 'No cargado';
       document.getElementById('sheetLink').href = userData.sheet_url;
     }
 
