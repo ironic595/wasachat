@@ -443,11 +443,11 @@ const firebaseConfig = {
         });
         console.log("Usuario nuevo creado en Firestore");
         // Acá después lo mandás a /onboarding para que cargue su WhatsApp
-        window.location.href = "/dashboard.html"; 
+        window.location.href = "dashboard.html"; 
       } else {
         // Usuario existente
         console.log("Usuario ya existe:", doc.data());
-        window.location.href = "/dashboard.html";
+        window.location.href = "dashboard.html";
       }
       
       cerrarModal();
@@ -462,7 +462,7 @@ const firebaseConfig = {
     if (user) {
       // Usuario logueado: cambiar botón a "Ir al Dashboard"
       btnLogin.textContent = "Mi Dashboard";
-      btnLogin.onclick = () => window.location.href = "/dashboard.html";
+      btnLogin.onclick = () => window.location.href = "dashboard.html";
     }
   });
 
