@@ -1,165 +1,220 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | MiBot IA</title>
+  <title>MiBot IA - Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://accounts.google.com/gsi/client"></script>
   <style>
-    :root{--primary:#3B5BFF;--dark:#0F172A;--grey:#475569;--light:#FFFFFF;--bg:#EDF2F7;--border:#CBD5E1;--green:#10B981;--red:#EF4444;}
-    *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
-    body{background:var(--bg);color:var(--dark);}
-    nav{display:flex;justify-content:space-between;align-items:center;padding:1rem 5%;background:#1A202C;color:white;}
-    .logo{font-size:1.3rem;font-weight:700;color:var(--primary);}
-    .container{max-width:800px;margin:40px auto;padding:0 20px;}
-    .card{background:white;padding:2rem;border-radius:20px;border:1px solid var(--border);margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.04);}
-    h2{margin-bottom:1.5rem;}
-    .estado{display:inline-block;padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.9rem;}
-    .estado.gratis{background:rgba(239,68,68,0.1);color:var(--red);}
-    .estado.activo{background:rgba(16,185,129,0.1);color:var(--green);}
-    input{width:100%;padding:0.8rem;border:1px solid var(--border);border-radius:10px;font-size:1rem;margin:10px 0;}
-    button{padding:0.8rem 1.5rem;background:var(--primary);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;}
-    button:hover{background:#2E46CC;}
-    button:disabled{background:var(--grey);cursor:not-allowed;}
-    .hidden{display:none;}
-    #loader{text-align:center;padding:20px;}
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    .card { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    input { padding: 10px; width: 300px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+    .success { color: green; }
+    .error { color: red; }
+    #status { margin: 15px 0; }
   </style>
 </head>
 <body>
-  <nav>
-    <div class="logo">MiBot<span>IA</span></div>
-    <button id="logoutBtn">Cerrar sesión</button>
-  </nav>
-
-  <div class="container">
-    <div id="loader">Cargando datos...</div>
-    
-    <div id="dashboard" class="hidden">
-      <div class="card">
-        <h2>Bienvenido, <span id="userName"></span></h2>
-        <p>Estado de tu cuenta: <span id="userEstado" class="estado"></span></p>
-        <p style="margin-top:10px;color:var(--grey)">Email: <span id="userEmail"></span></p>
-      </div>
-
-      <div class="card" id="setupCard">
-        <h2>Configurá tu bot</h2>
-        <p style="color:var(--grey);margin-bottom:15px;">Paso 1: Vinculá tu WhatsApp</p>
-        <input type="text" id="whatsappInput" placeholder="Ej: +54911xxxxxxx">
-        <button id="guardarWppBtn">Guardar número</button>
-      </div>
-
-      <div class="card" id="sheetCard" style="display:none;">
-        <h2>Tu base de datos</h2>
-        <p id="sheetStatus" style="color:var(--grey);margin-bottom:15px;"></p>
-        <button id="crearSheetBtn">Crear mi Google Sheet</button>
-        <a id="verSheetLink" target="_blank" style="display:none;margin-left:10px;color:var(--primary);font-weight:600;">Ver Sheet</a>
-      </div>
-
-      <div class="card">
-        <h2>Activar plan</h2>
-        <p style="color:var(--grey);margin-bottom:15px;">Tu bot está en modo gratis. Activá un plan para empezar a vender 24/7.</p>
-        <button onclick="window.location.href='/#precios'">Ver planes</button>
-      </div>
-    </div>
+  <h1>MiBot IA - Dashboard</h1>
+  <div id="userInfo"></div>
+  
+  <div class="card" id="whatsappCard" style="display:none;">
+    <h3>1. Conectá tu WhatsApp</h3>
+    <input type="text" id="whatsappInput" placeholder="Ej: 5491123456789">
+    <button id="guardarWsBtn">Guardar número</button>
+    <div id="status"></div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <div class="card" id="sheetCard" style="display:none;">
+    <h3>2. Creá tu base de datos</h3>
+    <p>Vamos a crear un Google Sheet en tu Drive para gestionar productos y pedidos.</p>
+    <button id="crearSheetBtn">Crear mi Google Sheet</button>
+    <div id="sheetStatus"></div>
+  </div>
+
+  <div class="card" id="listoCard" style="display:none;">
+    <h3 class="success">✅ Todo listo</h3>
+    <p>WhatsApp: <span id="wsFinal"></span></p>
+    <p>Google Sheet: <a id="sheetLink" target="_blank">Abrir mi Sheet</a></p>
+    <p>Ya podés cargar productos en la pestaña "productos" y tu bot va a responder automático.</p>
+  </div>
+
+  <button id="logoutBtn" style="background:#db4437;">Cerrar sesión</button>
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
+      apiKey: "AIzaSyAsijWNnO1s2dJz9f8wqQJwJ",
       authDomain: "dbwasa-f07b6.firebaseapp.com",
       projectId: "dbwasa-f07b6",
-      storageBucket: "dbwasa-f07b6.firebasestorage.app",
-      messagingSenderId: "849916257157",
-      appId: "1:849916257157:web:886d9c31dce6bfc82f1aec"
+      storageBucket: "dbwasa-f07b6.appspot.com",
+      messagingSenderId: "594633226854",
+      appId: "1:594633226854:web:aa2a54a5d3"
     };
-
+    
+    const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com'; // Reemplazar con tu Client ID completo
+    
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
+    
     let currentUser = null;
     let userData = null;
+    let tokenClient;
+    let gapi_inited = false;
+
+    // Inicializar Google API
+    gapi.load('client', async () => {
+      await gapi.client.init({});
+      gapi_inited = true;
+    });
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      callback: '', // Se define dinámicamente
+    });
 
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        window.location.href = "/wasachat/";
+        window.location.href = 'index.html';
         return;
       }
       
       currentUser = user;
-      await cargarDatosUsuario();
-    });
-
-    async function cargarDatosUsuario() {
-      const doc = await db.collection('users').doc(currentUser.email).get();
-      if (!doc.exists) {
-        alert("Error: usuario no encontrado");
-        return;
-      }
+      document.getElementById('userInfo').innerHTML = `<p>Hola, ${user.displayName} | ${user.email}</p>`;
       
+      const doc = await db.collection('users').doc(user.email).get();
       userData = doc.data();
       
-      // Mostrar datos
-      document.getElementById('userName').textContent = userData.nombre;
-      document.getElementById('userEmail').textContent = userData.email;
-      const estadoEl = document.getElementById('userEstado');
-      estadoEl.textContent = userData.estado.toUpperCase();
-      estadoEl.className = 'estado ' + userData.estado;
-      
-      // Si ya tiene WhatsApp, mostrar card de Sheet
-      if (userData.whatsapp_numero) {
-        document.getElementById('setupCard').style.display = 'none';
+      if (!userData.whatsapp) {
+        document.getElementById('whatsappCard').style.display = 'block';
+      } else if (!userData.sheet_id) {
+        document.getElementById('whatsappCard').style.display = 'none';
         document.getElementById('sheetCard').style.display = 'block';
-        document.getElementById('whatsappInput').value = userData.whatsapp_numero;
-        
-        if (userData.sheet_id) {
-          document.getElementById('sheetStatus').textContent = 'Tu Sheet ya está creado y vinculado.';
-          document.getElementById('crearSheetBtn').style.display = 'none';
-          document.getElementById('verSheetLink').href = userData.sheet_url;
-          document.getElementById('verSheetLink').style.display = 'inline-block';
-        } else {
-          document.getElementById('sheetStatus').textContent = 'Creá tu base de datos para empezar.';
-        }
+      } else {
+        mostrarListo();
       }
-      
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('dashboard').classList.remove('hidden');
-    }
-
-    document.getElementById('guardarWppBtn').addEventListener('click', async () => {
-      const numero = document.getElementById('whatsappInput').value.trim();
-      if (!numero) return alert('Ingresá un número válido');
-      
-      await db.collection('users').doc(currentUser.email).update({
-        whatsapp_numero: numero
-      });
-      
-      alert('Número guardado');
-      location.reload();
     });
 
-    document.getElementById('crearSheetBtn').addEventListener('click', async () => {
-      document.getElementById('crearSheetBtn').disabled = true;
-      document.getElementById('crearSheetBtn').textContent = 'Creando...';
+    document.getElementById('guardarWsBtn').addEventListener('click', async () => {
+      const whatsapp = document.getElementById('whatsappInput').value.trim();
+      if (!whatsapp) return;
       
-      // Acá después conectamos con Google Apps Script para crear el Sheet
-      // Por ahora simulamos
-      setTimeout(async () => {
-        const fakeSheetId = 'sheet_' + Date.now();
-        const fakeUrl = 'https://docs.google.com/spreadsheets/d/' + fakeSheetId;
+      await db.collection('users').doc(currentUser.email).update({ whatsapp });
+      document.getElementById('whatsappCard').style.display = 'none';
+      document.getElementById('sheetCard').style.display = 'block';
+    });
+
+    document.getElementById('crearSheetBtn').addEventListener('click', () => {
+      tokenClient.callback = async (resp) => {
+        if (resp.error) {
+          document.getElementById('sheetStatus').innerHTML = '<p class="error">Error: ' + resp.error + '</p>';
+          return;
+        }
+        await crearSheet(resp.access_token);
+      };
+      
+      tokenClient.requestAccessToken({prompt: 'consent'});
+    });
+
+    async function crearSheet(accessToken) {
+      const btn = document.getElementById('crearSheetBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creando en tu Drive...';
+      
+      try {
+        // 1. Crear Sheet vacío con Drive API
+        const metadata = {
+          name: `MiBot IA - ${userData.nombre}`,
+          mimeType: 'application/vnd.google-apps.spreadsheet'
+        };
         
-        await db.collection('users').doc(currentUser.email).update({
-          sheet_id: fakeSheetId,
-          sheet_url: fakeUrl
+        const driveRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(metadata)
         });
         
-        alert('Sheet creado. Próximo paso: conectar con Google Apps Script real.');
-        location.reload();
-      }, 1500);
-    });
+        const file = await driveRes.json();
+        const sheetId = file.id;
+        
+        // 2. Agregar pestañas y datos con Sheets API
+        const requests = [
+          { addSheet: { properties: { title: 'productos' } } },
+          { addSheet: { properties: { title: 'config' } } },
+          { addSheet: { properties: { title: 'pedidos' } } },
+          { deleteSheet: { sheetId: 0 } } // Borrar Hoja1
+        ];
+        
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ requests })
+        });
+        
+        // 3. Cargar datos iniciales
+        const values = {
+          'productos!A1:F2': [
+            ['sku', 'nombre', 'precio', 'stock', 'descripcion', 'foto_url'],
+            ['SKU001', 'Producto ejemplo', 1500, 10, 'Cambiá esto por tus productos', '']
+          ],
+          'config!A1:B4': [
+            ['clave', 'valor'],
+            ['nombre_negocio', userData.nombre],
+            ['moneda', 'ARS'],
+            ['mensaje_bienvenida', 'Hola! Soy el bot de ' + userData.nombre]
+          ],
+          'pedidos!A1:F1': [
+            ['fecha', 'cliente_numero', 'cliente_nombre', 'productos', 'total', 'estado']
+          ]
+        };
+        
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            valueInputOption: 'RAW',
+            data: Object.entries(values).map(([range, vals]) => ({ range, values: vals }))
+          })
+        });
+        
+        // 4. Guardar en Firestore
+        await db.collection('users').doc(currentUser.email).update({
+          sheet_id: sheetId,
+          sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`
+        });
+        
+        document.getElementById('sheetStatus').innerHTML = '<p class="success">¡Sheet creado en tu Drive!</p>';
+        setTimeout(() => location.reload(), 1500);
+        
+      } catch (error) {
+        document.getElementById('sheetStatus').innerHTML = '<p class="error">Error: ' + error.message + '</p>';
+        btn.disabled = false;
+        btn.textContent = 'Crear mi Google Sheet';
+      }
+    }
+
+    function mostrarListo() {
+      document.getElementById('whatsappCard').style.display = 'none';
+      document.getElementById('sheetCard').style.display = 'none';
+      document.getElementById('listoCard').style.display = 'block';
+      document.getElementById('wsFinal').textContent = userData.whatsapp;
+      document.getElementById('sheetLink').href = userData.sheet_url;
+    }
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       auth.signOut();
