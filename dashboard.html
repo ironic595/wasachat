@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>MiBot IA - Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <style>
@@ -47,16 +47,18 @@
   <button id="logoutBtn" style="background:#db4437;">Cerrar sesión</button>
 
   <script>
+    // MISMA CONFIG QUE INDEX.HTML
     const firebaseConfig = {
-      apiKey: "AIzaSyAsijWNnO1s2dJz9f8wqQJwJ",
+      apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
       authDomain: "dbwasa-f07b6.firebaseapp.com",
       projectId: "dbwasa-f07b6",
-      storageBucket: "dbwasa-f07b6.appspot.com",
-      messagingSenderId: "594633226854",
-      appId: "1:594633226854:web:aa2a54a5d3"
+      storageBucket: "dbwasa-f07b6.firebasestorage.app",
+      messagingSenderId: "849916257157",
+      appId: "1:849916257157:web:886d9c31dce6bfc82f1aec",
+      measurementId: "G-S27J09LLF7"
     };
     
-    const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com'; // Reemplazar con tu Client ID completo
+    const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
     
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -65,22 +67,21 @@
     let currentUser = null;
     let userData = null;
     let tokenClient;
-    let gapi_inited = false;
 
-    // Inicializar Google API
     gapi.load('client', async () => {
       await gapi.client.init({});
-      gapi_inited = true;
     });
 
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: 'https://www.googleapis.com/auth/drive.file',
-      callback: '', // Se define dinámicamente
+      callback: '',
     });
 
     auth.onAuthStateChanged(async (user) => {
+      console.log('Auth state:', user); // Para debug
       if (!user) {
+        console.log('No hay usuario, volviendo al index');
         window.location.href = 'index.html';
         return;
       }
@@ -89,6 +90,12 @@
       document.getElementById('userInfo').innerHTML = `<p>Hola, ${user.displayName} | ${user.email}</p>`;
       
       const doc = await db.collection('users').doc(user.email).get();
+      if (!doc.exists) {
+        console.log('Usuario no existe en Firestore');
+        window.location.href = 'index.html';
+        return;
+      }
+      
       userData = doc.data();
       
       if (!userData.whatsapp) {
@@ -106,6 +113,7 @@
       if (!whatsapp) return;
       
       await db.collection('users').doc(currentUser.email).update({ whatsapp });
+      userData.whatsapp = whatsapp; // Actualizar local
       document.getElementById('whatsappCard').style.display = 'none';
       document.getElementById('sheetCard').style.display = 'block';
     });
@@ -128,7 +136,6 @@
       btn.textContent = 'Creando en tu Drive...';
       
       try {
-        // 1. Crear Sheet vacío con Drive API
         const metadata = {
           name: `MiBot IA - ${userData.nombre}`,
           mimeType: 'application/vnd.google-apps.spreadsheet'
@@ -146,12 +153,11 @@
         const file = await driveRes.json();
         const sheetId = file.id;
         
-        // 2. Agregar pestañas y datos con Sheets API
         const requests = [
           { addSheet: { properties: { title: 'productos' } } },
           { addSheet: { properties: { title: 'config' } } },
           { addSheet: { properties: { title: 'pedidos' } } },
-          { deleteSheet: { sheetId: 0 } } // Borrar Hoja1
+          { deleteSheet: { sheetId: 0 } }
         ];
         
         await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
@@ -163,7 +169,6 @@
           body: JSON.stringify({ requests })
         });
         
-        // 3. Cargar datos iniciales
         const values = {
           'productos!A1:F2': [
             ['sku', 'nombre', 'precio', 'stock', 'descripcion', 'foto_url'],
@@ -192,16 +197,19 @@
           })
         });
         
-        // 4. Guardar en Firestore
         await db.collection('users').doc(currentUser.email).update({
           sheet_id: sheetId,
           sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`
         });
         
+        userData.sheet_id = sheetId;
+        userData.sheet_url = `https://docs.google.com/spreadsheets/d/${sheetId}`;
+        
         document.getElementById('sheetStatus').innerHTML = '<p class="success">¡Sheet creado en tu Drive!</p>';
-        setTimeout(() => location.reload(), 1500);
+        setTimeout(() => mostrarListo(), 1500);
         
       } catch (error) {
+        console.error(error);
         document.getElementById('sheetStatus').innerHTML = '<p class="error">Error: ' + error.message + '</p>';
         btn.disabled = false;
         btn.textContent = 'Crear mi Google Sheet';
@@ -212,12 +220,14 @@
       document.getElementById('whatsappCard').style.display = 'none';
       document.getElementById('sheetCard').style.display = 'none';
       document.getElementById('listoCard').style.display = 'block';
-      document.getElementById('wsFinal').textContent = userData.whatsapp;
+      document.getElementById('wsFinal').textContent = userData.whatsapp || 'No cargado';
       document.getElementById('sheetLink').href = userData.sheet_url;
     }
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      auth.signOut();
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
     });
   </script>
 </body>
