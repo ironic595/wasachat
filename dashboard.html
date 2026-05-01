@@ -45,6 +45,8 @@
    .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
    .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
     input[type="file"] { padding: 5px; }
+       .estado-activo { color: #28a745; font-weight: bold; }
+   .estado-inactivo { color: #dc3545; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -88,7 +90,12 @@
         </div>
         <button class="danger" onclick="confirmarRecrearSheet()">Recrear Sheet</button>
       </div>
-
+  <div class="info-row">
+        <div>
+          <strong>Estado del Bot:</strong> <span id="estadoBot"></span>
+        </div>
+        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
+      </div>
       <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
       <button class="big success" onclick="abrirEditor('productos')">
         📦 Editar Tabla de Productos
@@ -280,6 +287,24 @@
       panelPrincipal.classList.remove('hidden');
       document.getElementById('wsActual').textContent = userData.whatsapp_numero;
       document.getElementById('sheetLink').href = userData.sheet_url;
+
+      // NUEVO: MOSTRAR ESTADO DEL BOT
+      const estadoBotSpan = document.getElementById('estadoBot');
+      const btnComprar = document.getElementById('btnComprarPlan');
+      
+      if (userData.estado === 'activo' || userData.estado === 'pago') {
+        estadoBotSpan.textContent = '✅ Activo';
+        estadoBotSpan.className = 'estado-activo';
+        btnComprar.classList.add('hidden');
+      } else {
+        estadoBotSpan.textContent = '⚠️ Inactivo - Requiere suscripción';
+        estadoBotSpan.className = 'estado-inactivo';
+        btnComprar.classList.remove('hidden');
+      }
+    }
+
+    function irAComprar() {
+      window.location.href = 'index.html#precios';
     }
 
     // WhatsApp
