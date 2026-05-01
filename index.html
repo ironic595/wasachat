@@ -251,7 +251,7 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
                 <li>WhatsApp 24/7</li>
                 <li>Base de Datos en Sheets</li>
             </ul>
-            <button class="btn-buy" style="background: var(--grey);">Elegir Mensual</button>
+            <button class="btn-buy" style="background: var(--grey);" onclick="elegirPlan('mensual', 25)">Elegir Mensual</button>
         </div>
         <!-- Plan Semestral -->
         <div class="card">
@@ -263,7 +263,7 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
                 <li>Soporte prioritario</li>
                 <li>Menor costo por mes</li>
             </ul>
-            <button class="btn-buy">Elegir Semestral</button>
+           <button class="btn-buy" onclick="elegirPlan('semestral', 125)">Elegir Semestral</button>
         </div>
         <!-- Plan Anual DESTACADO -->
         <div class="card destacada-anual">
@@ -276,7 +276,7 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
                 <li>Configuración asistida</li>
                 <li><strong>Ahorro máximo garantizado</strong></li>
             </ul>
-            <button class="btn-buy" style="background: #ff3b30;">Elegir Anual</button>
+            <button class="btn-buy" style="background: #ff3b30;" onclick="elegirPlan('anual', 225)">Elegir Anual</button>
         </div>
     </div>
 </section>
@@ -475,6 +475,16 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
       cerrarModal();
     }
   });
+
+    function elegirPlan(tipo, precio) {
+  // Guardamos el plan elegido para el checkout
+  localStorage.setItem('planElegido', JSON.stringify({
+    tipo: tipo,
+    precio: precio,
+    nombre: tipo === 'mensual' ? 'Plan Mensual' : tipo === 'semestral' ? 'Plan Semestral' : 'Plan Anual'
+  }));
+  window.location.href = 'checkout.html';
+}
 </script>
 
 </body>
