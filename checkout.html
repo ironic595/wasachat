@@ -10,24 +10,36 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
     body{background:#EDF2F7;color:#0F172A;}
-    .container{max-width:600px;margin:60px auto;padding:20px;}
+    .container{max-width:650px;margin:60px auto;padding:20px;}
     .card{background:white;padding:40px;border-radius:30px;box-shadow:0 4px 12px rgba(0,0,0.08);}
     h1{font-size:2rem;font-weight:800;margin-bottom:10px;}
     .plan-box{border:2px solid #3B5BFF;border-radius:20px;padding:25px;margin:30px 0;background:#F8FAFC;}
     .plan-box h3{color:#3B5BFF;font-size:1.3rem;margin-bottom:10px;}
     .price{font-size:3rem;font-weight:800;color:#0F172A;}
     .price span{font-size:1rem;color:#475569;font-weight:500;}
-    .btn-pago{width:100%;padding:1.2rem;border:none;border-radius:18px;font-weight:700;font-size:1.1rem;cursor:pointer;margin:10px 0;transition:all 0.3s;}
+    .btn-pago{width:100%;padding:1.2rem;border:none;border-radius:18px;font-weight:700;font-size:1.1rem;cursor:pointer;margin:10px 0;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;}
     .btn-mp{background:#009EE3;color:white;}
     .btn-mp:hover{background:#0082B8;transform:translateY(-2px);}
-    .btn-stripe{background:#635BFF;color:white;}
-    .btn-stripe:hover{background:#5249E8;transform:translateY(-2px);}
+    .btn-paypal{background:#003087;color:white;}
+    .btn-paypal:hover{background:#00256B;transform:translateY(-2px);}
+    .btn-crypto{background:#F7931A;color:white;}
+    .btn-crypto:hover{background:#E6840E;transform:translateY(-2px);}
+    .btn-usdt{background:#26A17B;color:white;}
+    .btn-usdt:hover{background:#1F8A68;transform:translateY(-2px);}
     .btn-transf{background:#10B981;color:white;}
     .btn-transf:hover{background:#059669;transform:translateY(-2px);}
-    .divider{text-align:center;margin:20px 0;color:#94A3B8;font-size:0.9rem;}
+    .divider{text-align:center;margin:25px 0;color:#94A3B8;font-size:0.9rem;position:relative;}
+    .divider span{background:white;padding:0 15px;position:relative;z-index:1;}
+    .divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:#E2E8F0;}
     .back{color:#3B5BFF;text-decoration:none;font-weight:600;display:inline-block;margin-bottom:20px;}
     .back:hover{text-decoration:underline;}
     #userEmail{color:#475569;margin-bottom:20px;font-size:0.95rem;}
+    .modal-fondo{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;}
+    .modal-box{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:40px;border-radius:20px;max-width:500px;width:90%;}
+    .wallet-address{background:#F1F5F9;padding:15px;border-radius:10px;font-family:monospace;font-size:0.85rem;word-break:break-all;margin:15px 0;border:2px dashed #CBD5E1;}
+    .copy-btn{background:#3B5BFF;color:white;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;font-weight:600;margin-top:10px;}
+    .copy-btn:hover{background:#2A47E0;}
+    .region-badge{display:inline-block;background:#FEF3C7;color:#92400E;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;margin-bottom:15px;}
   </style>
 </head>
 <body>
@@ -50,23 +62,64 @@
 
       <h3 style="margin:30px 0 20px;font-size:1.2rem;">Elegí tu medio de pago</h3>
       
-      <button class="btn-pago btn-mp" onclick="pagarMercadoPago()">
-        💳 Pagar con Mercado Pago
+      <!-- SOLO ARGENTINA -->
+      <div id="mercadoPagoSection">
+        <div class="region-badge">🇦🇷 SOLO ARGENTINA</div>
+        <button class="btn-pago btn-mp" onclick="pagarMercadoPago()">
+          💳 Mercado Pago - Pesos ARS
+        </button>
+      </div>
+      
+      <div class="divider"><span>INTERNACIONAL</span></div>
+      
+      <button class="btn-pago btn-paypal" onclick="pagarPayPal()">
+        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" width="60" alt="PayPal">
+        PayPal - USD
       </button>
       
-      <button class="btn-pago btn-stripe" onclick="pagarStripe()">
-        💳 Pagar con Tarjeta - Stripe
+      <button class="btn-pago btn-crypto" onclick="mostrarCrypto('BTC')">
+        ₿ Bitcoin (BTC)
       </button>
       
-      <div class="divider">o</div>
+      <button class="btn-pago btn-usdt" onclick="mostrarCrypto('USDT')">
+        💵 USDT (Tether) - TRC20/ERC20
+      </button>
+      
+      <div class="divider"><span>OTROS</span></div>
       
       <button class="btn-pago btn-transf" onclick="pagarTransferencia()">
         🏦 Transferencia Bancaria
       </button>
       
       <p style="margin-top:30px;font-size:0.85rem;color:#64748B;text-align:center;">
-        Al completar el pago tu bot se activará automáticamente en 5 minutos
+        Al completar el pago tu bot se activará automáticamente. Crypto se confirma en 1-2 bloques.
       </p>
+    </div>
+  </div>
+
+  <!-- MODAL CRYPTO -->
+  <div id="modalCrypto" class="modal-fondo">
+    <div class="modal-box">
+      <h3 id="cryptoTitle">Pagar con Crypto</h3>
+      <p style="margin:15px 0;color:#64748B;">Enviá exactamente el monto a esta dirección:</p>
+      
+      <div style="text-align:center;margin:20px 0;">
+        <img id="qrCode" src="" alt="QR Code" style="max-width:200px;border:2px solid #E2E8F0;border-radius:10px;">
+      </div>
+      
+      <div class="wallet-address" id="walletAddress"></div>
+      <button class="copy-btn" onclick="copiarWallet()">📋 Copiar dirección</button>
+      
+      <div style="background:#FEF3C7;padding:15px;border-radius:10px;margin:20px 0;">
+        <strong style="color:#92400E;">⚠️ Importante:</strong>
+        <p style="color:#92400E;font-size:0.9rem;margin-top:5px;">
+          1. Enviá solo <span id="cryptoRed"></span><br>
+          2. Monto exacto: <strong id="cryptoMonto"></strong><br>
+          3. Envía captura a soporte@mibotia.com
+        </p>
+      </div>
+      
+      <button onclick="cerrarModalCrypto()" style="width:100%;padding:12px;background:#E2E8F0;border:none;border-radius:10px;cursor:pointer;font-weight:600;margin-top:10px;">Cerrar</button>
     </div>
   </div>
 
@@ -87,6 +140,13 @@
     let currentUser = null;
     let planData = null;
 
+    // CAMBIÁ ESTAS DIRECCIONES POR LAS TUYAS
+    const WALLETS = {
+      BTC: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
+      USDT_TRC20: 'TYDzsYUEpvnYmQk4zGP9sWWcTEdMoJwAkJ',
+      USDT_ERC20: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'
+    };
+
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
         window.location.href = 'index.html';
@@ -96,7 +156,6 @@
       document.getElementById('userEmail').textContent = `Cuenta: ${user.email}`;
     });
 
-    // Cargar datos del plan desde localStorage
     window.onload = () => {
       const plan = localStorage.getItem('planElegido');
       if (!plan) {
@@ -108,24 +167,72 @@
       planData = JSON.parse(plan);
       document.getElementById('planNombre').textContent = planData.nombre;
       document.getElementById('planPrecio').innerHTML = `$${planData.precio}<span>/${planData.tipo === 'mensual' ? 'mes' : planData.tipo === 'semestral' ? '6 meses' : 'año'}</span>`;
+
+      // Detectar si es de Argentina por timezone - oculta MP si no
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (!timezone.includes('Argentina') && !timezone.includes('Buenos_Aires')) {
+        document.getElementById('mercadoPagoSection').style.display = 'none';
+      }
     };
 
     function pagarMercadoPago() {
-      // ACÁ INTEGRÁS TU LINK DE MERCADOPAGO
-      // Ejemplo: window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=TU_PREFERENCE_ID`;
-      alert(`Redirigiendo a MercadoPago para pagar $${planData.precio}...\n\nAcá ponés tu link de MP con el preference_id`);
-      
-      // Después del pago exitoso, actualizás Firestore:
-      // await db.collection('users').doc(currentUser.email).update({ estado: 'activo', plan: planData.tipo });
+      // REEMPLAZÁ CON TU LINK DE MERCADOPAGO
+      const linksMP = {
+        mensual: 'https://mpago.la/XXXXXX',
+        semestral: 'https://mpago.la/YYYYYY',
+        anual: 'https://mpago.la/ZZZZZZ'
+      };
+      window.location.href = linksMP[planData.tipo];
     }
 
-    function pagarStripe() {
-      // ACÁ INTEGRÁS TU LINK DE STRIPE CHECKOUT
-      alert(`Redirigiendo a Stripe para pagar $${planData.precio}...\n\nAcá ponés tu link de Stripe`);
+    function pagarPayPal() {
+      // REEMPLAZÁ CON TUS LINKS DE PAYPAL
+      const linksPayPal = {
+        mensual: 'https://www.paypal.com/paypalme/mibotia/25',
+        semestral: 'https://www.paypal.com/paypalme/mibotia/125',
+        anual: 'https://www.paypal.com/paypalme/mibotia/225'
+      };
+      window.open(linksPayPal[planData.tipo], '_blank');
+      alert('Después de pagar en PayPal, enviá el comprobante a soporte@mibotia.com para activar tu bot.');
+    }
+
+    function mostrarCrypto(moneda) {
+      const modal = document.getElementById('modalCrypto');
+      const title = document.getElementById('cryptoTitle');
+      const address = document.getElementById('walletAddress');
+      const red = document.getElementById('cryptoRed');
+      const monto = document.getElementById('cryptoMonto');
+      const qr = document.getElementById('qrCode');
+
+      if (moneda === 'BTC') {
+        title.textContent = 'Pagar con Bitcoin (BTC)';
+        address.textContent = WALLETS.BTC;
+        red.textContent = 'Red Bitcoin';
+        monto.textContent = `~${(planData.precio / 60000).toFixed(6)} BTC`; // Aproximado
+        qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bitcoin:${WALLETS.BTC}?amount=${(planData.precio / 60000).toFixed(6)}`;
+      } else {
+        title.textContent = 'Pagar con USDT';
+        address.textContent = WALLETS.USDT_TRC20;
+        red.textContent = 'Red TRON (TRC20) - Menos fees';
+        monto.textContent = `${planData.precio} USDT`;
+        qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${WALLETS.USDT_TRC20}`;
+      }
+
+      modal.style.display = 'block';
+    }
+
+    function copiarWallet() {
+      const address = document.getElementById('walletAddress').textContent;
+      navigator.clipboard.writeText(address);
+      alert('Dirección copiada al portapapeles');
+    }
+
+    function cerrarModalCrypto() {
+      document.getElementById('modalCrypto').style.display = 'none';
     }
 
     function pagarTransferencia() {
-      alert(`Transferí $${planData.precio} al CBU:\n\nXXXXXXXXXXXX\nAlias: MIBOT.IA\n\nEnvía el comprobante a soporte@mibotia.com\n\nActivaremos tu bot en 24hs hábiles.`);
+      alert(`Transferí $${planData.precio} USD al CBU:\n\nCBU: XXXXXXXXXXXXXXX\nAlias: MIBOT.IA\nTitular: Tu Nombre\nEnvía el comprobante a soporte@mibotia.com\n\nActivaremos tu bot en 24hs hábiles.`);
     }
   </script>
 </body>
