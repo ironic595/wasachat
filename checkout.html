@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - MiBot IA</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+    body{background:#EDF2F7;color:#0F172A;}
+    .container{max-width:600px;margin:60px auto;padding:20px;}
+    .card{background:white;padding:40px;border-radius:30px;box-shadow:0 4px 12px rgba(0,0,0.08);}
+    h1{font-size:2rem;font-weight:800;margin-bottom:10px;}
+    .plan-box{border:2px solid #3B5BFF;border-radius:20px;padding:25px;margin:30px 0;background:#F8FAFC;}
+    .plan-box h3{color:#3B5BFF;font-size:1.3rem;margin-bottom:10px;}
+    .price{font-size:3rem;font-weight:800;color:#0F172A;}
+    .price span{font-size:1rem;color:#475569;font-weight:500;}
+    .btn-pago{width:100%;padding:1.2rem;border:none;border-radius:18px;font-weight:700;font-size:1.1rem;cursor:pointer;margin:10px 0;transition:all 0.3s;}
+    .btn-mp{background:#009EE3;color:white;}
+    .btn-mp:hover{background:#0082B8;transform:translateY(-2px);}
+    .btn-stripe{background:#635BFF;color:white;}
+    .btn-stripe:hover{background:#5249E8;transform:translateY(-2px);}
+    .btn-transf{background:#10B981;color:white;}
+    .btn-transf:hover{background:#059669;transform:translateY(-2px);}
+    .divider{text-align:center;margin:20px 0;color:#94A3B8;font-size:0.9rem;}
+    .back{color:#3B5BFF;text-decoration:none;font-weight:600;display:inline-block;margin-bottom:20px;}
+    .back:hover{text-decoration:underline;}
+    #userEmail{color:#475569;margin-bottom:20px;font-size:0.95rem;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="index.html" class="back">← Volver a planes</a>
+    
+    <div class="card">
+      <h1>Finalizar compra</h1>
+      <div id="userEmail"></div>
+      
+      <div class="plan-box">
+        <h3 id="planNombre">Cargando...</h3>
+        <div class="price" id="planPrecio">$0<span>/mes</span></div>
+        <ul style="margin-top:20px;list-style:none;">
+          <li style="margin:8px 0;">✓ Bot Llama 3 Personalizado</li>
+          <li style="margin:8px 0;">✓ WhatsApp 24/7</li>
+          <li style="margin:8px 0;">✓ Base de Datos en Sheets</li>
+        </ul>
+      </div>
+
+      <h3 style="margin:30px 0 20px;font-size:1.2rem;">Elegí tu medio de pago</h3>
+      
+      <button class="btn-pago btn-mp" onclick="pagarMercadoPago()">
+        💳 Pagar con Mercado Pago
+      </button>
+      
+      <button class="btn-pago btn-stripe" onclick="pagarStripe()">
+        💳 Pagar con Tarjeta - Stripe
+      </button>
+      
+      <div class="divider">o</div>
+      
+      <button class="btn-pago btn-transf" onclick="pagarTransferencia()">
+        🏦 Transferencia Bancaria
+      </button>
+      
+      <p style="margin-top:30px;font-size:0.85rem;color:#64748B;text-align:center;">
+        Al completar el pago tu bot se activará automáticamente en 5 minutos
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
+      authDomain: "dbwasa-f07b6.firebaseapp.com",
+      projectId: "dbwasa-f07b6",
+      storageBucket: "dbwasa-f07b6.firebasestorage.app",
+      messagingSenderId: "849916257157",
+      appId: "1:849916257157:web:886d9c31dce6bfc82f1aec"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let planData = null;
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+      currentUser = user;
+      document.getElementById('userEmail').textContent = `Cuenta: ${user.email}`;
+    });
+
+    // Cargar datos del plan desde localStorage
+    window.onload = () => {
+      const plan = localStorage.getItem('planElegido');
+      if (!plan) {
+        alert('No seleccionaste ningún plan');
+        window.location.href = 'index.html#precios';
+        return;
+      }
+      
+      planData = JSON.parse(plan);
+      document.getElementById('planNombre').textContent = planData.nombre;
+      document.getElementById('planPrecio').innerHTML = `$${planData.precio}<span>/${planData.tipo === 'mensual' ? 'mes' : planData.tipo === 'semestral' ? '6 meses' : 'año'}</span>`;
+    };
+
+    function pagarMercadoPago() {
+      // ACÁ INTEGRÁS TU LINK DE MERCADOPAGO
+      // Ejemplo: window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=TU_PREFERENCE_ID`;
+      alert(`Redirigiendo a MercadoPago para pagar $${planData.precio}...\n\nAcá ponés tu link de MP con el preference_id`);
+      
+      // Después del pago exitoso, actualizás Firestore:
+      // await db.collection('users').doc(currentUser.email).update({ estado: 'activo', plan: planData.tipo });
+    }
+
+    function pagarStripe() {
+      // ACÁ INTEGRÁS TU LINK DE STRIPE CHECKOUT
+      alert(`Redirigiendo a Stripe para pagar $${planData.precio}...\n\nAcá ponés tu link de Stripe`);
+    }
+
+    function pagarTransferencia() {
+      alert(`Transferí $${planData.precio} al CBU:\n\nXXXXXXXXXXXX\nAlias: MIBOT.IA\n\nEnvía el comprobante a soporte@mibotia.com\n\nActivaremos tu bot en 24hs hábiles.`);
+    }
+  </script>
+</body>
+</html>
