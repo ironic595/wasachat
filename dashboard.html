@@ -290,7 +290,7 @@
       cerrarModales();
     }
 
-    // Crear Sheet
+    // Crear Sheet - CON VALIDACIONES
     document.getElementById('crearSheetBtn').addEventListener('click', () => {
       tokenClient.callback = async (resp) => {
         if (resp.error) {
@@ -307,8 +307,10 @@
       showLoading(true);
       const btn = document.getElementById('crearSheetBtn');
       btn.disabled = true;
+      document.getElementById('sheetStatus').innerHTML = '';
       
       try {
+        // 1. Crear archivo
         const metadata = {
           name: `MiBot IA - ${userData.nombre}`,
           mimeType: 'application/vnd.google-apps.spreadsheet'
@@ -320,21 +322,41 @@
           body: JSON.stringify(metadata)
         });
         
-        const file = await driveRes.json();
-        const sheetId = file.id;
+        if (!driveRes.ok) {
+          const err = await driveRes.json();
+          throw new Error('Error de Drive API: ' + (err.error?.message || JSON.stringify(err)));
+        }
         
+        const file = await driveRes.json();
+        console.log('Respuesta de Drive:', file);
+        
+        // VALIDACIÓN CRÍTICA: Si no hay ID, no seguir
+        if (!file.id) {
+          throw new Error('Google Drive no devolvió el ID del archivo. Verificá que Drive API esté habilitada.');
+        }
+        
+        const sheetId = file.id;
+        console.log('Sheet ID obtenido:', sheetId);
+        
+        // 2. Crear hojas
         const requests = [
           { addSheet: { properties: { title: 'productos' } } },
           { addSheet: { properties: { title: 'config' } } },
           { deleteSheet: { sheetId: 0 } }
         ];
         
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
+        const batchRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ requests })
         });
         
+        if (!batchRes.ok) {
+          const err = await batchRes.json();
+          throw new Error('Error al crear pestañas: ' + (err.error?.message || JSON.stringify(err)));
+        }
+        
+        // 3. Headers
         const values = {
           'productos!A1:F1': [['nombre', 'precio', 'stock', 'descripcion', 'foto_url', 'url_producto']],
           'config!A1:C2': [
@@ -343,7 +365,7 @@
           ]
         };
         
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
+        const valuesRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -352,6 +374,12 @@
           })
         });
         
+        if (!valuesRes.ok) {
+          const err = await valuesRes.json();
+          throw new Error('Error al escribir headers: ' + (err.error?.message || JSON.stringify(err)));
+        }
+        
+        // 4. Guardar en Firestore SOLO si todo salió bien
         await db.collection('users').doc(currentUser.email).update({
           sheet_id: sheetId,
           sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`
@@ -365,7 +393,7 @@
         
       } catch (error) {
         showLoading(false);
-        console.error(error);
+        console.error('Error completo en crearSheet:', error);
         document.getElementById('sheetStatus').innerHTML = '<p class="error-msg">Error: ' + error.message + '</p>';
         btn.disabled = false;
       }
@@ -439,7 +467,7 @@
       } catch(e) {
         showLoading(false);
         console.error(e);
-        alert('Error al cargar datos');
+        alert('Error al cargar datos: ' + e.message);
       }
     }
 
