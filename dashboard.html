@@ -9,53 +9,168 @@
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-    .card { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    body { font-family: sans-serif; margin: 0; background: #f5f5f5; }
+    .container { max-width: 900px; margin: 50px auto; padding: 20px; }
+    .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #333; }
+    h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
+    button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; }
     button:disabled { background: #ccc; cursor: not-allowed; }
-    input { padding: 10px; width: 300px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
-    .success { color: green; }
-    .error { color: red; }
-    #status { margin: 15px 0; }
+    button.danger { background: #dc3545; }
+    button.success { background: #28a745; }
+    button.big { width: 100%; padding: 20px; font-size: 18px; margin: 10px 0; }
+    input, textarea { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    .success-msg { color: green; font-weight: bold; }
+    .error-msg { color: red; }
+    .hidden { display: none !important; }
+    #userInfo { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 20px; }
+    .step { opacity: 0.4; }
+    .step.active { opacity: 1; }
+    .step.completed { opacity: 1; }
+    .step.completed h3::after { content: " ✅"; color: green; }
+    
+    /* Editor de tablas */
+    #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
+    #editor-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    #editor-header h2 { margin: 0; border: none; color: white; }
+    #editor-body { display: flex; flex: 1; overflow: hidden; }
+    #editor-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4f4; overflow-y: auto; }
+    #editor-resizer { width: 10px; cursor: col-resize; background: #ccc; }
+    #editor-tabla { flex: 1; padding: 20px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; cursor: pointer; }
+    tr.seleccionada { background-color: #d1ecf1 !important; }
+    .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
+    #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: none; justify-content: center; align-items: center; z-index: 200; font-size: 20px; }
+    .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
+    .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; }
   </style>
 </head>
 <body>
-  <h1>MiBot IA - Dashboard</h1>
-  <div id="userInfo"></div>
+  <div id="loading">Cargando...</div>
   
-  <div class="card" id="whatsappCard" style="display:none;">
-    <h3>1. Conectá tu WhatsApp</h3>
-    <input type="text" id="whatsappInput" placeholder="Ej: 5491123456789">
-    <button id="guardarWsBtn">Guardar número</button>
-    <div id="status"></div>
+  <div class="container">
+    <h1>MiBot IA - Panel de Control</h1>
+    <div id="userInfo"></div>
+
+    <!-- PASO 1: WhatsApp -->
+    <div class="card step" id="stepWhatsapp">
+      <h3>1. Conectá tu WhatsApp</h3>
+      <input type="text" id="whatsappInput" placeholder="Ej: 5491123456789">
+      <button id="guardarWsBtn" class="success">Guardar número</button>
+      <div id="wsStatus"></div>
+    </div>
+
+    <!-- PASO 2: Google Sheet -->
+    <div class="card step" id="stepSheet">
+      <h3>2. Creá tu base de datos</h3>
+      <p>Vamos a crear un Google Sheet en tu Drive con 2 pestañas: Productos y Preguntas Frecuentes.</p>
+      <button id="crearSheetBtn">Crear mi Google Sheet</button>
+      <div id="sheetStatus"></div>
+    </div>
+
+    <!-- PASO 3: Editor - Solo aparece cuando todo está listo -->
+    <div class="card step" id="stepEditor">
+      <h3>3. Gestioná tu contenido</h3>
+      <p class="success-msg">✅ Todo configurado. Ya podés editar tus datos.</p>
+      <p>WhatsApp: <strong id="wsFinal"></strong></p>
+      <p>Google Sheet: <a id="sheetLink" target="_blank">Ver en Google Drive</a></p>
+      
+      <button class="big success" onclick="abrirEditor('productos')">
+        📦 Editar Tabla de Productos
+      </button>
+      <button class="big success" onclick="abrirEditor('config')">
+        ❓ Editar Preguntas y Respuestas
+      </button>
+    </div>
+
+    <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
   </div>
 
-  <div class="card" id="sheetCard" style="display:none;">
-    <h3>2. Creá tu base de datos</h3>
-    <p>Vamos a crear un Google Sheet en tu Drive para gestionar productos y pedidos.</p>
-    <button id="crearSheetBtn">Crear mi Google Sheet</button>
-    <div id="sheetStatus"></div>
+  <!-- EDITOR DE TABLAS - Fullscreen -->
+  <div id="editor">
+    <div id="editor-header">
+      <h2 id="editor-titulo">Editor</h2>
+      <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
+    </div>
+    
+    <div id="editor-body">
+      <div id="editor-form">
+        <!-- Form Productos -->
+        <div id="form-productos" class="hidden">
+          <h3>Agregar/Editar Producto</h3>
+          <input type="text" id="inputProducto" placeholder="Nombre del producto *">
+          <input type="number" id="inputPrecio" placeholder="Precio *">
+          <input type="number" id="inputStock" placeholder="Stock *">
+          <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
+          <input type="text" id="inputFoto" placeholder="URL de foto">
+          <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
+          <div class="help-text">* Campos obligatorios</div>
+          <button id="btnGuardar" class="btn success">Agregar Producto</button>
+          <button id="btnBorrar" class="btn danger" disabled>Borrar Seleccionado</button>
+          <button id="btnSync" class="btn">💾 Sincronizar con Google Sheets</button>
+        </div>
+        
+        <!-- Form Config -->
+        <div id="form-config" class="hidden">
+          <h3>Agregar Pregunta Frecuente</h3>
+          <input type="text" id="inputPregunta" placeholder="Pregunta *">
+          <div class="help-text">Ej: ¿Cuáles son los horarios de atención?</div>
+          <textarea id="inputRespuesta" placeholder="Respuesta *" rows="4"></textarea>
+          <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs, Sábados de 9 a 13hs</div>
+          <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
+          <div class="help-text">Ej: horario, abierto, atender, hora, cuando</div>
+          <button id="btnGuardarConfig" class="btn success">Agregar Pregunta</button>
+          <button id="btnBorrarConfig" class="btn danger" disabled>Borrar Seleccionado</button>
+          <button id="btnSyncConfig" class="btn">💾 Sincronizar con Google Sheets</button>
+        </div>
+      </div>
+
+      <div id="editor-resizer"></div>
+
+      <div id="editor-tabla">
+        <!-- Tabla Productos -->
+        <div id="tabla-productos" class="hidden">
+          <h3>Productos Cargados</h3>
+          <table id="miTabla">
+            <thead>
+              <tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        
+        <!-- Tabla Config -->
+        <div id="tabla-config" class="hidden">
+          <h3>Base de Conocimiento del Bot</h3>
+          <table id="miTablaConfig">
+            <thead>
+              <tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="card" id="listoCard" style="display:none;">
-    <h3 class="success">✅ Todo listo</h3>
-    <p>WhatsApp: <span id="wsFinal"></span></p>
-    <p>Google Sheet: <a id="sheetLink" target="_blank">Abrir mi Sheet</a></p>
-    <p>Ya podés cargar productos en la pestaña "productos" y tu bot va a responder automático.</p>
+  <!-- Modal Borrado -->
+  <div id="modal-borrar" class="modal-fondo">
+    <div class="modal-box">
+      <h3>¿Borrar fila seleccionada?</h3>
+      <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
+      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
+    </div>
   </div>
-
-  <button id="logoutBtn" style="background:#db4437;">Cerrar sesión</button>
 
   <script>
-    // MISMA CONFIG QUE INDEX.HTML
     const firebaseConfig = {
       apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
       authDomain: "dbwasa-f07b6.firebaseapp.com",
       projectId: "dbwasa-f07b6",
       storageBucket: "dbwasa-f07b6.firebasestorage.app",
       messagingSenderId: "849916257157",
-      appId: "1:849916257157:web:886d9c31dce6bfc82f1aec",
-      measurementId: "G-S27J09LLF7"
+      appId: "1:849916257157:web:886d9c31dce6bfc82f1aec"
     };
     
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
@@ -67,6 +182,11 @@
     let currentUser = null;
     let userData = null;
     let tokenClient;
+    let accessToken = null;
+    let currentTab = 'productos';
+    let filaSeleccionada = null;
+    let datosProductos = [];
+    let datosConfig = [];
 
     gapi.load('client', async () => {
       await gapi.client.init({});
@@ -74,66 +194,80 @@
 
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
       callback: '',
     });
 
     auth.onAuthStateChanged(async (user) => {
-      console.log('Auth state:', user); // Para debug
       if (!user) {
-        console.log('No hay usuario, volviendo al index');
         window.location.href = 'index.html';
         return;
       }
       
       currentUser = user;
-      document.getElementById('userInfo').innerHTML = `<p>Hola, ${user.displayName} | ${user.email}</p>`;
-      
       const doc = await db.collection('users').doc(user.email).get();
       if (!doc.exists) {
-        console.log('Usuario no existe en Firestore');
         window.location.href = 'index.html';
         return;
       }
       
       userData = doc.data();
+      document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
       
-     if (!userData.whatsapp_numero) {
-        document.getElementById('whatsappCard').style.display = 'block';
-      } else if (!userData.sheet_id) {
-        document.getElementById('whatsappCard').style.display = 'none';
-        document.getElementById('sheetCard').style.display = 'block';
-      } else {
-        mostrarListo();
-      }
+      actualizarPasos();
     });
 
+    function actualizarPasos() {
+      const stepWs = document.getElementById('stepWhatsapp');
+      const stepSheet = document.getElementById('stepSheet');
+      const stepEditor = document.getElementById('stepEditor');
+      
+      // Paso 1: WhatsApp
+      if (userData.whatsapp_numero) {
+        stepWs.classList.add('completed');
+        document.getElementById('wsFinal').textContent = userData.whatsapp_numero;
+      } else {
+        stepWs.classList.add('active');
+        return;
+      }
+      
+      // Paso 2: Sheet
+      if (userData.sheet_id) {
+        stepSheet.classList.add('completed');
+        document.getElementById('sheetLink').href = userData.sheet_url;
+        stepEditor.classList.add('active');
+      } else {
+        stepSheet.classList.add('active');
+        return;
+      }
+    }
+
+    // PASO 1: WhatsApp
     document.getElementById('guardarWsBtn').addEventListener('click', async () => {
       const whatsapp = document.getElementById('whatsappInput').value.trim();
-      if (!whatsapp) return;
-      
+      if (!whatsapp) return alert("Ingresá un número");
       await db.collection('users').doc(currentUser.email).update({ whatsapp_numero: whatsapp });
       userData.whatsapp_numero = whatsapp;
-      document.getElementById('whatsappCard').style.display = 'none';
-      document.getElementById('sheetCard').style.display = 'block';
+      actualizarPasos();
     });
 
+    // PASO 2: Crear Sheet
     document.getElementById('crearSheetBtn').addEventListener('click', () => {
       tokenClient.callback = async (resp) => {
         if (resp.error) {
-          document.getElementById('sheetStatus').innerHTML = '<p class="error">Error: ' + resp.error + '</p>';
+          document.getElementById('sheetStatus').innerHTML = '<p class="error-msg">Error: ' + resp.error + '</p>';
           return;
         }
+        accessToken = resp.access_token;
         await crearSheet(resp.access_token);
       };
-      
       tokenClient.requestAccessToken({prompt: 'consent'});
     });
 
-    async function crearSheet(accessToken) {
+    async function crearSheet(token) {
+      showLoading(true);
       const btn = document.getElementById('crearSheetBtn');
       btn.disabled = true;
-      btn.textContent = 'Creando en tu Drive...';
       
       try {
         const metadata = {
@@ -143,10 +277,7 @@
         
         const driveRes = await fetch('https://www.googleapis.com/drive/v3/files', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(metadata)
         });
         
@@ -156,41 +287,27 @@
         const requests = [
           { addSheet: { properties: { title: 'productos' } } },
           { addSheet: { properties: { title: 'config' } } },
-          { addSheet: { properties: { title: 'pedidos' } } },
           { deleteSheet: { sheetId: 0 } }
         ];
         
         await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ requests })
         });
         
+        // Headers: productos sin SKU, config con 3 columnas
         const values = {
-          'productos!A1:F2': [
-            ['sku', 'nombre', 'precio', 'stock', 'descripcion', 'foto_url'],
-            ['SKU001', 'Producto ejemplo', 1500, 10, 'Cambiá esto por tus productos', '']
-          ],
-          'config!A1:B4': [
-            ['clave', 'valor'],
-            ['nombre_negocio', userData.nombre],
-            ['moneda', 'ARS'],
-            ['mensaje_bienvenida', 'Hola! Soy el bot de ' + userData.nombre]
-          ],
-          'pedidos!A1:F1': [
-            ['fecha', 'cliente_numero', 'cliente_nombre', 'productos', 'total', 'estado']
+          'productos!A1:F1': [['nombre', 'precio', 'stock', 'descripcion', 'foto_url', 'url_producto']],
+          'config!A1:C2': [
+            ['pregunta', 'respuesta', 'palabras_clave'],
+            ['¿Cuáles son los horarios?', 'Lunes a Viernes de 9 a 18hs', 'horario, abierto, atender, hora']
           ]
         };
         
         await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
             valueInputOption: 'RAW',
             data: Object.entries(values).map(([range, vals]) => ({ range, values: vals }))
@@ -205,30 +322,234 @@
         userData.sheet_id = sheetId;
         userData.sheet_url = `https://docs.google.com/spreadsheets/d/${sheetId}`;
         
-        document.getElementById('sheetStatus').innerHTML = '<p class="success">¡Sheet creado en tu Drive!</p>';
-        setTimeout(() => mostrarListo(), 1500);
+        showLoading(false);
+        actualizarPasos();
         
       } catch (error) {
+        showLoading(false);
         console.error(error);
-        document.getElementById('sheetStatus').innerHTML = '<p class="error">Error: ' + error.message + '</p>';
+        document.getElementById('sheetStatus').innerHTML = '<p class="error-msg">Error: ' + error.message + '</p>';
         btn.disabled = false;
-        btn.textContent = 'Crear mi Google Sheet';
       }
     }
 
-    function mostrarListo() {
-      document.getElementById('whatsappCard').style.display = 'none';
-      document.getElementById('sheetCard').style.display = 'none';
-      document.getElementById('listoCard').style.display = 'block';
-      document.getElementById('wsFinal').textContent = userData.whatsapp_numero || 'No cargado';
-      document.getElementById('sheetLink').href = userData.sheet_url;
+    // EDITOR
+    async function obtenerToken() {
+      return new Promise((resolve) => {
+        tokenClient.callback = (resp) => {
+          accessToken = resp.access_token;
+          resolve(resp.access_token);
+        };
+        tokenClient.requestAccessToken({prompt: ''});
+      });
     }
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      auth.signOut().then(() => {
-        window.location.href = 'index.html';
+    async function abrirEditor(tab) {
+      currentTab = tab;
+      document.getElementById('editor').style.display = 'flex';
+      document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
+      
+      if (tab === 'productos') {
+        document.getElementById('form-productos').classList.remove('hidden');
+        document.getElementById('form-config').classList.add('hidden');
+        document.getElementById('tabla-productos').classList.remove('hidden');
+        document.getElementById('tabla-config').classList.add('hidden');
+      } else {
+        document.getElementById('form-productos').classList.add('hidden');
+        document.getElementById('form-config').classList.remove('hidden');
+        document.getElementById('tabla-productos').classList.add('hidden');
+        document.getElementById('tabla-config').classList.remove('hidden');
+      }
+      
+      await cargarDatosDeSheet();
+    }
+
+    function cerrarEditor() {
+      document.getElementById('editor').style.display = 'none';
+      filaSeleccionada = null;
+    }
+
+    async function cargarDatosDeSheet() {
+      showLoading(true);
+      if (!accessToken) await obtenerToken();
+      
+      try {
+        const resProd = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/productos!A2:F`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        const dataProd = await resProd.json();
+        datosProductos = dataProd.values || [];
+        renderTablaProductos();
+        
+        const resConf = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/config!A2:C`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        const dataConf = await resConf.json();
+        datosConfig = dataConf.values || [];
+        renderTablaConfig();
+        
+        showLoading(false);
+      } catch(e) {
+        showLoading(false);
+        console.error(e);
+        alert('Error al cargar datos');
+      }
+    }
+
+    function renderTablaProductos() {
+      const tbody = document.querySelector('#miTabla tbody');
+      tbody.innerHTML = '';
+      datosProductos.forEach((row, i) => {
+        const tr = tbody.insertRow();
+        tr.innerHTML = `<td>${row[0]||''}</td><td>${row[1]||''}</td><td>${row[2]||''}</td><td>${row[3]||''}</td><td>${row[5]||''}</td>`;
+        tr.onclick = () => seleccionarFila(tr, i, 'productos');
       });
+    }
+
+    function renderTablaConfig() {
+      const tbody = document.querySelector('#miTablaConfig tbody');
+      tbody.innerHTML = '';
+      datosConfig.forEach((row, i) => {
+        const tr = tbody.insertRow();
+        tr.innerHTML = `<td>${row[0]||''}</td><td>${row[1]||''}</td><td>${row[2]||''}</td>`;
+        tr.onclick = () => seleccionarFila(tr, i, 'config');
+      });
+    }
+
+    // CRUD PRODUCTOS
+    document.getElementById('btnGuardar').addEventListener('click', () => {
+      const prod = document.getElementById('inputProducto').value;
+      const precio = document.getElementById('inputPrecio').value;
+      const stock = document.getElementById('inputStock').value;
+      const desc = document.getElementById('inputDesc').value;
+      const foto = document.getElementById('inputFoto').value;
+      const urlProd = document.getElementById('inputUrlProd').value;
+      if(!prod || !precio || !stock) return alert("Completá nombre, precio y stock");
+      
+      datosProductos.push([prod, precio, stock, desc, foto, urlProd]);
+      renderTablaProductos();
+      document.querySelectorAll('#form-productos input, #form-productos textarea').forEach(i => i.value = "");
     });
+
+    document.getElementById('btnSync').addEventListener('click', async () => {
+      showLoading(true);
+      if (!accessToken) await obtenerToken();
+      try {
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/productos!A2:F:clear`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (datosProductos.length > 0) {
+          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/productos!A2:F?valueInputOption=RAW`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ values: datosProductos })
+          });
+        }
+        showLoading(false);
+        alert('✅ Productos sincronizados');
+      } catch(e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
+    });
+
+    // CRUD CONFIG
+    document.getElementById('btnGuardarConfig').addEventListener('click', () => {
+      const pregunta = document.getElementById('inputPregunta').value;
+      const respuesta = document.getElementById('inputRespuesta').value;
+      const claves = document.getElementById('inputClaves').value;
+      if(!pregunta || !respuesta || !claves) return alert("Completá los 3 campos");
+      
+      datosConfig.push([pregunta, respuesta, claves]);
+      renderTablaConfig();
+      document.getElementById('inputPregunta').value = "";
+      document.getElementById('inputRespuesta').value = "";
+      document.getElementById('inputClaves').value = "";
+    });
+
+    document.getElementById('btnSyncConfig').addEventListener('click', async () => {
+      showLoading(true);
+      if (!accessToken) await obtenerToken();
+      try {
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/config!A2:C:clear`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (datosConfig.length > 0) {
+          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/config!A2:C?valueInputOption=RAW`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ values: datosConfig })
+          });
+        }
+        showLoading(false);
+        alert('✅ FAQs sincronizadas');
+      } catch(e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
+    });
+
+    // BORRAR
+    function seleccionarFila(row, index, tipo) {
+      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
+      row.classList.add('seleccionada');
+      filaSeleccionada = {index, tipo};
+      if (tipo === 'productos') {
+        document.getElementById('btnBorrar').disabled = false;
+        document.getElementById('btnBorrar').classList.add('activo');
+      } else {
+        document.getElementById('btnBorrarConfig').disabled = false;
+        document.getElementById('btnBorrarConfig').classList.add('activo');
+      }
+    }
+
+    document.getElementById('btnBorrar').addEventListener('click', () => {
+      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
+    });
+    document.getElementById('btnBorrarConfig').addEventListener('click', () => {
+      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
+    });
+
+    document.getElementById('confirmar-si').addEventListener('click', () => {
+      if (filaSeleccionada.tipo === 'productos') {
+        datosProductos.splice(filaSeleccionada.index, 1);
+        renderTablaProductos();
+        document.getElementById('btnBorrar').disabled = true;
+        document.getElementById('btnBorrar').classList.remove('activo');
+      } else {
+        datosConfig.splice(filaSeleccionada.index, 1);
+        renderTablaConfig();
+        document.getElementById('btnBorrarConfig').disabled = true;
+        document.getElementById('btnBorrarConfig').classList.remove('activo');
+      }
+      cerrarModales();
+      filaSeleccionada = null;
+    });
+
+    function cerrarModales() { 
+      document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none'); 
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').style.display = show ? 'flex' : 'none';
+    }
+
+    function logout() {
+      auth.signOut().then(() => window.location.href = 'index.html');
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Resizer
+    const resizer = document.getElementById('editor-resizer');
+    const leftSide = document.getElementById('editor-form');
+    resizer.addEventListener('mousedown', (e) => {
+      document.addEventListener('mousemove', resize);
+      document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize));
+    });
+    function resize(e) { leftSide.style.width = e.clientX + 'px'; }
   </script>
 </body>
 </html>
