@@ -404,6 +404,10 @@ const firebaseConfig = {
 
   // 4. Login con Google usando Firebase
   const provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({
+  prompt: 'select_account'  // <- Esta línea es la clave
+});
+firebase.auth().signInWithPopup(provider)
   
   // Agregá un botón dentro del modal para login con Firebase
   // Reemplazá tu div de Google Sign-In por este botón:
