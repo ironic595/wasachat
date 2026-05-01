@@ -366,16 +366,15 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
 
 <script>
   // 1. PEGÁ TU firebaseConfig ACÁ
-const firebaseConfig = {
-  apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
-  authDomain: "dbwasa-f07b6.firebaseapp.com",
-  projectId: "dbwasa-f07b6",
-  storageBucket: "dbwasa-f07b6.firebasestorage.app",
-  messagingSenderId: "849916257157",
-  appId: "1:849916257157:web:886d9c31dce6bfc82f1aec",
-  measurementId: "G-S27J09LLF7"
-};
-
+  const firebaseConfig = {
+    apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
+    authDomain: "dbwasa-f07b6.firebaseapp.com",
+    projectId: "dbwasa-f07b6",
+    storageBucket: "dbwasa-f07b6.firebasestorage.app",
+    messagingSenderId: "849916257157",
+    appId: "1:849916257157:web:886d9c31dce6bfc82f1aec",
+    measurementId: "G-S27J09LLF7"
+  };
 
   // 2. Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
@@ -402,15 +401,13 @@ const firebaseConfig = {
     document.body.style.overflow = 'auto';
   }
 
-  // 4. Login con Google usando Firebase
+  // 4. Login con Google - SOLO CUANDO HACE CLIC EN EL BOTÓN
   const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({
-  prompt: 'select_account'  // <- Esta línea es la clave
-});
-firebase.auth().signInWithPopup(provider)
+  provider.setCustomParameters({
+    prompt: 'select_account'  // <- Fuerza selector de cuentas
+  });
   
-  // Agregá un botón dentro del modal para login con Firebase
-  // Reemplazá tu div de Google Sign-In por este botón:
+  // Crear el botón de login dentro del modal
   document.querySelector('.modal-body').innerHTML = `
     <button id="googleLoginBtn" style="width:100%;padding:1rem;background:#fff;border:1px solid #ddd;border-radius:25px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-weight:600;">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
@@ -432,7 +429,6 @@ firebase.auth().signInWithPopup(provider)
       const doc = await userRef.get();
       
       if (!doc.exists) {
-        // Usuario nuevo: creamos ficha + estado gratis
         await userRef.set({
           email: user.email,
           nombre: user.displayName,
@@ -446,27 +442,30 @@ firebase.auth().signInWithPopup(provider)
           sheet_url: ""
         });
         console.log("Usuario nuevo creado en Firestore");
-        // Acá después lo mandás a /onboarding para que cargue su WhatsApp
-        window.location.href = "dashboard.html"; 
       } else {
-        // Usuario existente
         console.log("Usuario ya existe:", doc.data());
-        window.location.href = "dashboard.html";
       }
       
       cerrarModal();
+      window.location.href = "dashboard.html";
+      
     } catch (error) {
       console.error("Error en login:", error);
       alert("Error al iniciar sesión. Intentá de nuevo.");
     }
   });
 
-  // 6. Detectar si ya está logueado
+  // 6. Detectar si ya está logueado - Cambiar texto del botón
   auth.onAuthStateChanged((user) => {
     if (user) {
-      // Usuario logueado: cambiar botón a "Ir al Dashboard"
       btnLogin.textContent = "Mi Dashboard";
       btnLogin.onclick = () => window.location.href = "dashboard.html";
+    } else {
+      btnLogin.textContent = "Acceso Clientes";
+      btnLogin.onclick = () => {
+        modalLogin.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      };
     }
   });
 
