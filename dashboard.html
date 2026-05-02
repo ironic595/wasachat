@@ -543,78 +543,85 @@
       showToast('📋 Código copiado');
     }
 
-    function abrirEditorWidget() {
-      const cfg = userData.config || {};
-      document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
-      document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
-      document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-      document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
-      document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
+function abrirEditorWidget() {
+  const cfg = userData.config || {};
+  document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
+  document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
+  document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+  document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
+  document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
 
-      if (cfg.avatar) {
-        document.getElementById('avatarPreview').innerHTML =
-          `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
-      } else {
-        document.getElementById('avatarPreview').innerHTML = '💬';
-      }
+  if (cfg.avatar) {
+    document.getElementById('avatarPreview').innerHTML =
+      `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+  } else {
+    document.getElementById('avatarPreview').innerHTML = '💬';
+  }
 
-      document.getElementById('editor-widget').style.display = 'flex';
-      generarCodigoWidget();
-      renderizarPreviewWidget();
+  // PEDIR TOKEN ACÁ, NO EN EL CHANGE DEL INPUT
+  asegurarTokenDrive().catch(err => {
+    showToast('Necesitás autorizar Google Drive para subir avatares', 'error');
+  });
 
-      document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-      document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
-      document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-      document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-      document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('editor-widget').style.display = 'flex';
+  generarCodigoWidget();
+  renderizarPreviewWidget();
+
+  document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
+  document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+}
+  
+async function subirAvatarADrive(file) {
+  if (!file) return null;
+  if (file.size > 2 * 1024) {
+    throw new Error('La imagen debe pesar menos de 2MB');
+  }
+
+  if (!accessToken) throw new Error('No hay token de acceso');
+
+  showLoading(true);
+  try {
+    const metadata = {
+      name: `wasa_avatar_${Date.now()}.${file.name.split('.').pop()}`,
+      mimeType: file.type
+    };
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', file);
+
+    const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${accessToken}` },
+      body: form
+    });
+
+    if (!uploadRes.ok) {
+      const err = await uploadRes.text();
+      throw new Error('Error al subir: ' + err);
     }
+    const fileData = await uploadRes.json();
+    const fileId = fileData.id;
 
-    // FUNCIÓN ÚNICA - NO DUPLICAR
-    async function subirAvatarADrive(file) {
-      if (!file) return null;
-      if (file.size > 2 * 1024 * 1024) {
-        throw new Error('La imagen debe pesar menos de 2MB');
-      }
+    await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ role: 'reader', type: 'anyone' })
+    });
 
-      if (!accessToken) await obtenerToken();
-
-      showLoading(true);
-      try {
-        const metadata = {
-          name: `wasa_avatar_${Date.now()}.${file.name.split('.').pop()}`,
-          mimeType: file.type
-        };
-
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', file);
-
-        const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-          body: form
-        });
-
-        if (!uploadRes.ok) throw new Error('Error al subir a Drive');
-        const fileData = await uploadRes.json();
-        const fileId = fileData.id;
-
-        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ role: 'reader', type: 'anyone' })
-        });
-
-        showLoading(false);
-        return `https://drive.google.com/uc?id=${fileId}`;
-      } catch (e) {
-        showLoading(false);
-        throw e;
-      }
-    }
+    showLoading(false);
+    return `https://drive.google.com/uc?id=${fileId}`;
+  } catch (e) {
+    showLoading(false);
+    throw e;
+  }
+}
 
     function cerrarEditorWidget() {
       document.getElementById('editor-widget').style.display = 'none';
@@ -734,45 +741,38 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Resizer widget
-      const resizer = document.getElementById('editor-widget-resizer');
-      const leftSide = document.getElementById('editor-widget-form');
-      if (resizer && leftSide) {
-        resizer.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          document.addEventListener('mousemove', resizeWidget);
-          document.addEventListener('mouseup', () => {
-            document.removeEventListener('mousemove', resizeWidget);
-          });
-        });
+  const fileInput = document.getElementById('avatarWidgetFile');
+  if (fileInput) {
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!accessToken) {
+        showToast('Autorizá Google Drive primero', 'error');
+        document.getElementById('avatarPreview').innerHTML = '💬';
+        e.target.value = '';
+        return;
       }
 
-      // File input avatar - LISTENER ÚNICO
-      const fileInput = document.getElementById('avatarWidgetFile');
-      if (fileInput) {
-        fileInput.addEventListener('change', async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('avatarPreview').innerHTML =
+          `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+      };
+      reader.readAsDataURL(file);
 
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            document.getElementById('avatarPreview').innerHTML =
-              `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-          };
-          reader.readAsDataURL(file);
-
-          try {
-            const url = await subirAvatarADrive(file);
-            document.getElementById('avatarWidgetEdit').value = url;
-            renderizarPreviewWidget();
-            showToast('✅ Avatar subido');
-          } catch (err) {
-            showToast('Error: ' + err.message, 'error');
-            document.getElementById('avatarPreview').innerHTML = '💬';
-          }
-        });
+      try {
+        const url = await subirAvatarADrive(file);
+        document.getElementById('avatarWidgetEdit').value = url;
+        renderizarPreviewWidget();
+        showToast('✅ Avatar subido');
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+        document.getElementById('avatarPreview').innerHTML = '💬';
       }
     });
+  }
+});
 
     function resizeWidget(e) {
       const container = document.getElementById('editor-widget-form').parentElement;
