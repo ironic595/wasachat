@@ -708,7 +708,7 @@
       if (previewMini) {
         previewMini.style.background = color;
         if (cfg.avatar) {
-          previewMini.innerHTML = `<img src="${cfg.avatar}&t=${Date.now()}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`; // ← & no ?
+          previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`; // Sin &t=
         } else {
           previewMini.innerHTML = '💬';
         }
@@ -730,7 +730,7 @@
       const avatar = document.getElementById('avatarWidgetEdit').value;
 
       const container = document.getElementById('preview-container-widget');
-      const avatarUrl = avatar? `${avatar}&t=${Date.now()}` : '';
+      const avatarUrl = avatar || ''; // Sin &t=
 
       const btnContent = avatarUrl
       ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
