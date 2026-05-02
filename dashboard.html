@@ -231,7 +231,6 @@
       <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
     </div>
   </div>
-
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
@@ -276,18 +275,32 @@
       }
 
       currentUser = user;
-      const doc = await db.collection('bots').doc(user.email).get();
+      const docRef = db.collection('bots').doc(user.email);
+      let doc = await docRef.get();
+
+      // MIGRACIÓN: Si no existe en 'bots', buscá en 'users' y copiá
       if (!doc.exists) {
-        await db.collection('bots').doc(user.email).set({
-          email: user.email,
-          estado: 'inactivo',
-          created_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        userData = { email: user.email, estado: 'inactivo' };
-      } else {
-        userData = doc.data();
+        const oldDoc = await db.collection('users').doc(user.email).get();
+        if (oldDoc.exists) {
+          const oldData = oldDoc.data();
+          await docRef.set({
+            email: user.email,
+            estado: oldData.estado || 'inactivo',
+            created_at: oldData.created_at || firebase.firestore.FieldValue.serverTimestamp(),
+           ...oldData
+          });
+          doc = await docRef.get();
+        } else {
+          await docRef.set({
+            email: user.email,
+            estado: 'inactivo',
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          doc = await docRef.get();
+        }
       }
 
+      userData = doc.data();
       document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
       mostrarPanelCorrecto();
       cargarConfigWidget();
@@ -336,17 +349,27 @@
       window.location.href = 'index.html#precios';
     }
 
-    // DOMINIO
+    // DOMINIO - ARREGLADO CON MERGE
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
       let dominio = document.getElementById('dominioInput').value.trim();
       dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
       if (!dominio) return alert("Ingresá un dominio válido");
 
       showLoading(true);
-      await db.collection('bots').doc(currentUser.email).update({ domain: dominio });
-      userData.domain = dominio;
-      showLoading(false);
-      mostrarPanelCorrecto();
+      try {
+        await db.collection('bots').doc(currentUser.email).set({
+          domain: dominio
+        }, { merge: true });
+
+        userData.domain = dominio;
+        showLoading(false);
+        showToast('✅ Dominio guardado');
+        mostrarPanelCorrecto();
+      } catch (e) {
+        showLoading(false);
+        console.error(e);
+        alert('Error al guardar: ' + e.message);
+      }
     });
 
     function mostrarCambiarDominio() {
@@ -360,15 +383,21 @@
       if (!nuevo) return alert("Ingresá un dominio");
 
       showLoading(true);
-      await db.collection('bots').doc(currentUser.email).update({ domain: nuevo });
-      userData.domain = nuevo;
-      document.getElementById('dominioActual').textContent = nuevo;
-      showLoading(false);
-      cerrarModales();
-      generarCodigoWidget();
+      try {
+        await db.collection('bots').doc(currentUser.email).set({ domain: nuevo }, { merge: true });
+        userData.domain = nuevo;
+        document.getElementById('dominioActual').textContent = nuevo;
+        showLoading(false);
+        cerrarModales();
+        generarCodigoWidget();
+        showToast('✅ Dominio actualizado');
+      } catch (e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
     }
 
-    // CONFIG WIDGET
+    // CONFIG WIDGET - ARREGLADO CON MERGE
     async function cargarConfigWidget() {
       const cfg = userData.config || {};
       document.getElementById('colorWidget').value = cfg.color || '#25D366';
@@ -385,10 +414,15 @@
       };
 
       showLoading(true);
-      await db.collection('bots').doc(currentUser.email).update({ config: config });
-      userData.config = config;
-      showLoading(false);
-      showToast('✅ Configuración guardada');
+      try {
+        await db.collection('bots').doc(currentUser.email).set({ config: config }, { merge: true });
+        userData.config = config;
+        showLoading(false);
+        showToast('✅ Configuración guardada');
+      } catch (e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
     }
 
     function generarCodigoWidget() {
@@ -468,11 +502,11 @@
           })
         });
 
-        await db.collection('bots').doc(currentUser.email).update({
+        await db.collection('bots').doc(currentUser.email).set({
           sheet_id: sheetId,
           sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`,
           hojas: { productos: 'Productos', faq: 'FAQ' }
-        });
+        }, { merge: true });
 
         userData.sheet_id = sheetId;
         userData.sheet_url = `https://docs.google.com/spreadsheets/d/${sheetId}`;
@@ -491,10 +525,10 @@
 
     async function confirmarRecrearSheet() {
       if (!confirm('¿Seguro? Se va a crear un Sheet nuevo y perderás la referencia al anterior.')) return;
-      await db.collection('bots').doc(currentUser.email).update({
+      await db.collection('bots').doc(currentUser.email).set({
         sheet_id: firebase.firestore.FieldValue.delete(),
         sheet_url: firebase.firestore.FieldValue.delete()
-      });
+      }, { merge: true });
       location.reload();
     }
 
@@ -737,7 +771,7 @@
         document.getElementById('inputFoto').value = datos[4] || '';
         document.getElementById('inputUrlProd').value = datos[5] || '';
         document.getElementById('btnGuardar').textContent = '✏️ Actualizar Producto';
-                document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
         document.getElementById('modoEdicionProd').classList.remove('hidden');
         document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
         document.getElementById('btnBorrar').disabled = false;
@@ -856,6 +890,7 @@
       document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize));
     });
     function resize(e) { leftSide.style.width = e.clientX + 'px'; }
-  </script>
+</script>
+
 </body>
 </html>
