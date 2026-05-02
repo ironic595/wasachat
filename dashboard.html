@@ -232,6 +232,73 @@
     </div>
   </div>
 
+<!-- EDITOR WIDGET PANTALLA DIVIDIDA -->
+<div id="editor-widget" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
+  <div style="width:95%; max-width:1400px; height:90vh; background:white; border-radius:12px; display:flex; overflow:hidden; position:relative;">
+    
+    <!-- PANEL IZQUIERDA: CONFIG -->
+    <div id="editor-widget-form" style="width:380px; padding:24px; border-right:1px solid #eee; overflow-y:auto; background:#fafafa;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h3 style="margin:0; font-size:20px;">🎨 Personalizar Widget</h3>
+        <button onclick="cerrarEditorWidget()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#999; line-height:1;">×</button>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
+        <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
+        <select id="posWidgetEdit" class="input-field">
+          <option value="right">Abajo derecha</option>
+          <option value="left">Abajo izquierda</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
+        <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
+        <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar URL <small style="font-weight:400; color:#666;">(opcional)</small></label>
+        <input type="url" id="avatarWidgetEdit" class="input-field" placeholder="https://ejemplo.com/avatar.png">
+      </div>
+
+      <button class="btn-primary" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px; padding:12px;">
+        💾 Guardar cambios
+      </button>
+
+      <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+        <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
+        <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">
+          📋 Copiar código
+        </button>
+      </div>
+    </div>
+
+    <!-- RESIZER -->
+    <div id="editor-widget-resizer" style="width:4px; background:#ddd; cursor:col-resize; transition:background 0.2s;"></div>
+
+    <!-- PANEL DERECHA: PREVIEW -->
+    <div style="flex:1; background:#e5e5e5; position:relative; overflow:hidden; display:flex; flex-direction:column;">
+      <div style="padding:16px; background:white; border-bottom:1px solid #ddd; font-weight:600; font-size:14px; color:#666;">
+        Vista previa en tiempo real
+      </div>
+      <div id="preview-container-widget" style="flex:1; position:relative; background:white;">
+        <!-- Acá se inyecta el preview -->
+      </div>
+    </div>
+  </div>
+</div>
+  
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
@@ -429,158 +496,247 @@
       }
     }
 
-    // CONFIG WIDGET - ARREGLADO CON MERGE + PREVIEW
-    async function cargarConfigWidget() {
-      const cfg = userData.config || {};
-      document.getElementById('colorWidget').value = cfg.color || '#25D366';
-      document.getElementById('posWidget').value = cfg.pos || 'right';
-      document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-      generarCodigoWidget();
-      renderizarPreview();
-    }
+// CONFIG WIDGET - MODAL PANTALLA DIVIDIDA
+async function cargarConfigWidget() {
+  const cfg = userData.config || {};
+  document.getElementById('colorWidget').value = cfg.color || '#25D366';
+  document.getElementById('posWidget').value = cfg.pos || 'right';
+  document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+  generarCodigoWidget();
+}
 
-    async function guardarConfigWidget() {
-      const config = {
-        color: document.getElementById('colorWidget').value,
-        pos: document.getElementById('posWidget').value,
-        saludo: document.getElementById('saludoWidget').value
-      };
+async function guardarConfigWidget() {
+  abrirEditorWidget();
+}
 
-      showLoading(true);
-      try {
-        await db.collection('bots').doc(currentUser.email).set({ config: config }, { merge: true });
-        userData.config = config;
-        showLoading(false);
-        showToast('✅ Configuración guardada');
-        renderizarPreview();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
+function generarCodigoWidget() {
+  const botId = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+  const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot="${botId}"><\/script>`;
+  document.getElementById('codigoWidget').value = codigo;
+  if (document.getElementById('codigoWidgetModal')) {
+    document.getElementById('codigoWidgetModal').value = codigo;
+  }
+}
+
+function copiarCodigo() {
+  const textarea = document.getElementById('codigoWidget');
+  textarea.select();
+  document.execCommand('copy');
+  showToast('📋 Código copiado');
+}
+
+function abrirEditorWidget() {
+  const cfg = userData.config || {};
+  document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
+  document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
+  document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+  document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
+  document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
+  
+  document.getElementById('editor-widget').style.display = 'flex';
+  generarCodigoWidget();
+  renderizarPreviewWidget();
+  
+  document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
+  document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+  document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+}
+
+function cerrarEditorWidget() {
+  document.getElementById('editor-widget').style.display = 'none';
+}
+
+async function guardarConfigWidgetModal() {
+  const config = {
+    color: document.getElementById('colorWidgetEdit').value,
+    pos: document.getElementById('posWidgetEdit').value,
+    saludo: document.getElementById('saludoWidgetEdit').value,
+    nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
+    avatar: document.getElementById('avatarWidgetEdit').value
+  };
+
+  showLoading(true);
+  try {
+    await db.collection('bots').doc(currentUser.email).set({ config: config }, { merge: true });
+    userData.config = config;
+    
+    document.getElementById('colorWidget').value = config.color;
+    document.getElementById('posWidget').value = config.pos;
+    document.getElementById('saludoWidget').value = config.saludo;
+    
+    showLoading(false);
+    showToast('✅ Widget actualizado');
+    cerrarEditorWidget();
+  } catch (e) {
+    showLoading(false);
+    alert('Error: ' + e.message);
+  }
+}
+
+function copiarCodigoModal() {
+  const textarea = document.getElementById('codigoWidgetModal');
+  textarea.select();
+  document.execCommand('copy');
+  showToast('📋 Código copiado');
+}
+
+function renderizarPreviewWidget() {
+  const color = document.getElementById('colorWidgetEdit').value;
+  const pos = document.getElementById('posWidgetEdit').value;
+  const saludo = document.getElementById('saludoWidgetEdit').value;
+  const nombre = document.getElementById('nombreWidgetEdit').value || 'WasaChat';
+  const avatar = document.getElementById('avatarWidgetEdit').value;
+  
+  const container = document.getElementById('preview-container-widget');
+  const avatarHtml = avatar ? `<img src="${avatar}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">` : '💬';
+  
+  container.innerHTML = `
+    <style>
+      #preview-container-widget {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       }
-    }
-
-    function generarCodigoWidget() {
-      const botId = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot="${botId}"><\/script>`;
-      document.getElementById('codigoWidget').value = codigo;
-    }
-
-    function copiarCodigo() {
-      const textarea = document.getElementById('codigoWidget');
-      textarea.select();
-      document.execCommand('copy');
-      showToast('📋 Código copiado');
-    }
-
-    // PREVIEW DEL WIDGET
-    function renderizarPreview() {
-      const cfg = userData.config || {};
-      const color = cfg.color || '#25D366';
-      const pos = cfg.pos || 'right';
-      const saludo = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-
-      let preview = document.getElementById('widget-preview');
-      if (!preview) {
-        preview = document.createElement('div');
-        preview.id = 'widget-preview';
-        document.body.appendChild(preview);
+      .wasa-demo-page {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        padding: 40px;
       }
-
-      preview.innerHTML = `
-        <style>
-          #widget-preview {
-            position: fixed;
-            bottom: 20px;
-            ${pos}: 20px;
-            z-index: 9999;
-            font-family: sans-serif;
-          }
-         .wasa-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: ${color};
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-            transition: transform 0.2s;
-          }
-         .wasa-btn:hover { transform: scale(1.1); }
-         .wasa-ventana {
-            position: absolute;
-            bottom: 70px;
-            ${pos}: 0;
-            width: 350px;
-            height: 500px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-          }
-         .wasa-ventana.activo { display: flex; }
-         .wasa-header {
-            background: ${color};
-            color: white;
-            padding: 15px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-         .wasa-body {
-            flex: 1;
-            padding: 15px;
-            background: #f5f5f5;
-            overflow-y: auto;
-          }
-         .wasa-msg {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            max-width: 80%;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-          }
-         .wasa-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            line-height: 1;
-          }
-        </style>
-        <div class="wasa-ventana" id="wasa-ventana">
-          <div class="wasa-header">
-            <span>WasaChat</span>
-            <button class="wasa-close" onclick="toggleWidget()">×</button>
-          </div>
-          <div class="wasa-body">
-            <div class="wasa-msg">${saludo}</div>
-          </div>
+      .wasa-demo-page h2 {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      .wasa-demo-page p {
+        font-size: 16px;
+        opacity: 0.9;
+      }
+      .wasa-widget {
+        position: absolute;
+        bottom: 20px;
+        ${pos}: 20px;
+        z-index: 9999;
+      }
+      .wasa-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: ${color};
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        transition: transform 0.2s;
+      }
+      .wasa-btn:hover { transform: scale(1.1); }
+      .wasa-ventana {
+        position: absolute;
+        bottom: 70px;
+        ${pos}: 0;
+        width: 350px;
+        height: 500px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .wasa-ventana.activo { display: flex; }
+      .wasa-header {
+        background: ${color};
+        color: white;
+        padding: 16px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+      }
+      .wasa-body {
+        flex: 1;
+        padding: 16px;
+        background: #f5f5f5;
+        overflow-y: auto;
+      }
+      .wasa-msg {
+        background: white;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        max-width: 80%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+      .wasa-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        margin-left: auto;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+    <div class="wasa-demo-page">
+      <div>
+        <h2>Tu Sitio Web</h2>
+        <p>Así se verá el widget en tu página</p>
+      </div>
+    </div>
+    <div class="wasa-widget">
+      <div class="wasa-ventana" id="wasa-ventana-preview">
+        <div class="wasa-header">
+          ${avatarHtml}
+          <span>${nombre}</span>
+          <button class="wasa-close" onclick="document.getElementById('wasa-ventana-preview').classList.remove('activo')">×</button>
         </div>
-        <button class="wasa-btn" onclick="toggleWidget()">💬</button>
-      `;
-    }
+        <div class="wasa-body">
+          <div class="wasa-msg">${saludo}</div>
+        </div>
+      </div>
+      <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">💬</button>
+    </div>
+  `;
+}
 
-    window.toggleWidget = function() {
-      const ventana = document.getElementById('wasa-ventana');
-      if (ventana) ventana.classList.toggle('activo');
-    }
-
-    // Preview en vivo cuando cambiás valores
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('colorWidget').addEventListener('input', renderizarPreview);
-      document.getElementById('posWidget').addEventListener('change', renderizarPreview);
-      document.getElementById('saludoWidget').addEventListener('input', renderizarPreview);
+// Resizer para el editor widget
+document.addEventListener('DOMContentLoaded', () => {
+  const resizer = document.getElementById('editor-widget-resizer');
+  const leftSide = document.getElementById('editor-widget-form');
+  if (resizer && leftSide) {
+    resizer.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      document.addEventListener('mousemove', resizeWidget);
+      document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', resizeWidget);
+      });
     });
+  }
+});
+
+function resizeWidget(e) {
+  const container = document.getElementById('editor-widget-form').parentElement;
+  const containerRect = container.getBoundingClientRect();
+  const newWidth = e.clientX - containerRect.left;
+  if (newWidth > 300 && newWidth < 600) {
+    document.getElementById('editor-widget-form').style.width = newWidth + 'px';
+  }
+}
 
     // Crear Sheet
     document.getElementById('crearSheetBtn').addEventListener('click', () => {
