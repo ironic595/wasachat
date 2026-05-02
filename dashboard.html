@@ -554,8 +554,10 @@ async function asegurarTokenDrive() {
         return;
       }
       accessToken = resp.access_token;
+      console.log('Token con scopes:', resp.scope);
       resolve(true);
     };
+    // ACÁ VA - ESTA ES LA LÍNEA QUE PREGUNTÁS ↓
     tokenClient.requestAccessToken({prompt: 'consent'});
   });
 }
@@ -624,7 +626,7 @@ function abrirEditorWidget() {
   
 async function subirAvatarADrive(file) {
   if (!file) return null;
-  if (file.size > 2 * 1024) {
+  if (file.size > 2 * 1024 * 1024) {
     throw new Error('La imagen debe pesar menos de 2MB');
   }
 
