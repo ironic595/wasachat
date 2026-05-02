@@ -269,42 +269,50 @@
     });
 
     auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = 'index.html';
-        return;
-      }
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
 
-      currentUser = user;
-      const docRef = db.collection('bots').doc(user.email);
-      let doc = await docRef.get();
+  currentUser = user;
+  const botDocRef = db.collection('bots').doc(user.email);
+  let botDoc = await botDocRef.get();
 
-      // MIGRACIÓN: Si no existe en 'bots', buscá en 'users' y copiá
-      if (!doc.exists) {
-        const oldDoc = await db.collection('users').doc(user.email).get();
-        if (oldDoc.exists) {
-          const oldData = oldDoc.data();
-          await docRef.set({
-            email: user.email,
-            estado: oldData.estado || 'inactivo',
-            created_at: oldData.created_at || firebase.firestore.FieldValue.serverTimestamp(),
-           ...oldData
-          });
-          doc = await docRef.get();
-        } else {
-          await docRef.set({
-            email: user.email,
-            estado: 'inactivo',
-            created_at: firebase.firestore.FieldValue.serverTimestamp()
-          });
-          doc = await docRef.get();
-        }
-      }
+  // MIGRACIÓN: Si no existe en 'bots' pero sí en 'users', copiá todo
+  if (!botDoc.exists) {
+    const userDocRef = db.collection('users').doc(user.email);
+    const userDoc = await userDocRef.get();
+    
+    if (userDoc.exists) {
+      const oldData = userDoc.data();
+      await botDocRef.set({
+        email: user.email,
+        estado: oldData.estado || 'inactivo',
+        domain: null,
+        config: {},
+        hojas: { productos: 'Productos', faq: 'FAQ' },
+        created_at: oldData.fecha_registro || firebase.firestore.FieldValue.serverTimestamp(),
+        ...oldData
+      }, { merge: true });
+      console.log('Migrado de users a bots');
+    } else {
+      await botDocRef.set({
+        email: user.email,
+        estado: 'inactivo',
+        domain: null,
+        config: {},
+        hojas: { productos: 'Productos', faq: 'FAQ' },
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+    botDoc = await botDocRef.get();
+  }
 
-      userData = doc.data();
-      document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
-      mostrarPanelCorrecto();
-      cargarConfigWidget();
-    });
+  userData = botDoc.data();
+  document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
+  mostrarPanelCorrecto();
+  cargarConfigWidget();
+});
 
     function mostrarPanelCorrecto() {
       const stepDominio = document.getElementById('stepDominio');
