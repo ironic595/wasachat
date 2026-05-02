@@ -316,7 +316,6 @@
     </div>
   </div>
 
-
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
@@ -389,7 +388,7 @@
             },
             hojas: { productos: 'Productos', faq: 'FAQ' },
             created_at: oldData.fecha_registro || firebase.firestore.FieldValue.serverTimestamp(),
-          ...oldData
+         ...oldData
           }, { merge: true });
         } else {
           await botDocRef.set({
@@ -543,135 +542,122 @@
       showToast('📋 Código copiado');
     }
 
-// NUEVA FUNCIÓN - pegala acá arriba de abrirEditorWidget
-async function asegurarTokenDrive() {
-  if (accessToken) return true;
-  
-  return new Promise((resolve, reject) => {
-    tokenClient.callback = (resp) => {
-      if (resp.error) {
-        reject(new Error('No autorizaste Google Drive'));
-        return;
-      }
-      accessToken = resp.access_token;
-      console.log('Token con scopes:', resp.scope);
-      resolve(true);
-    };
-    // ACÁ VA - ESTA ES LA LÍNEA QUE PREGUNTÁS ↓
-    tokenClient.requestAccessToken({prompt: 'consent'});
-  });
-}
+    // FUNCIÓN PARA PEDIR TOKEN CON DRIVE
+    async function asegurarTokenDrive() {
+      if (accessToken) return true;
 
-function abrirEditorWidget() {
-  const cfg = userData.config || {};
-  document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
-  document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
-  document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-  document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
-  document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
-
-  if (cfg.avatar) {
-    document.getElementById('avatarPreview').innerHTML =
-      `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
-  } else {
-    document.getElementById('avatarPreview').innerHTML = '💬';
-  }
-
-  // Pedir token al abrir el modal
-  asegurarTokenDrive().catch(err => {
-    showToast('Necesitás autorizar Google Drive para subir avatares', 'error');
-  });
-
-  document.getElementById('editor-widget').style.display = 'flex';
-  generarCodigoWidget();
-  renderizarPreviewWidget();
-
-  document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-  document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
-  document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-  document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-  document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-}
-  
-function abrirEditorWidget() {
-  const cfg = userData.config || {};
-  document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
-  document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
-  document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-  document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
-  document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
-
-  if (cfg.avatar) {
-    document.getElementById('avatarPreview').innerHTML =
-      `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
-  } else {
-    document.getElementById('avatarPreview').innerHTML = '💬';
-  }
-
-  // PEDIR TOKEN ACÁ, NO EN EL CHANGE DEL INPUT
-  asegurarTokenDrive().catch(err => {
-    showToast('Necesitás autorizar Google Drive para subir avatares', 'error');
-  });
-
-  document.getElementById('editor-widget').style.display = 'flex';
-  generarCodigoWidget();
-  renderizarPreviewWidget();
-
-  document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-  document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
-  document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-  document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-  document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-}
-  
-async function subirAvatarADrive(file) {
-  if (!file) return null;
-  if (file.size > 2 * 1024 * 1024) {
-    throw new Error('La imagen debe pesar menos de 2MB');
-  }
-
-  if (!accessToken) throw new Error('No hay token de acceso');
-
-  showLoading(true);
-  try {
-    const metadata = {
-      name: `wasa_avatar_${Date.now()}.${file.name.split('.').pop()}`,
-      mimeType: file.type
-    };
-
-    const form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-    form.append('file', file);
-
-    const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${accessToken}` },
-      body: form
-    });
-
-    if (!uploadRes.ok) {
-      const err = await uploadRes.text();
-      throw new Error('Error al subir: ' + err);
+      return new Promise((resolve, reject) => {
+        tokenClient.callback = (resp) => {
+          if (resp.error) {
+            reject(new Error('No autorizaste Google Drive'));
+            return;
+          }
+          accessToken = resp.access_token;
+          console.log('Token con scopes:', resp.scope);
+          resolve(true);
+        };
+        tokenClient.requestAccessToken({prompt: 'consent'});
+      });
     }
-    const fileData = await uploadRes.json();
-    const fileId = fileData.id;
 
-    await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ role: 'reader', type: 'anyone' })
-    });
+    function abrirEditorWidget() {
+      const cfg = userData.config || {};
+      document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
+      document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
+      document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+      document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
+      document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
 
-    showLoading(false);
-    return `https://drive.google.com/uc?id=${fileId}`;
-  } catch (e) {
-    showLoading(false);
-    throw e;
-  }
-}
+      if (cfg.avatar) {
+        document.getElementById('avatarPreview').innerHTML =
+          `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+      } else {
+        document.getElementById('avatarPreview').innerHTML = '💬';
+      }
+
+      // Pedir token al abrir el modal
+      asegurarTokenDrive().catch(err => {
+        showToast('Necesitás autorizar Google Drive para subir avatares', 'error');
+      });
+
+      document.getElementById('editor-widget').style.display = 'flex';
+      generarCodigoWidget();
+      renderizarPreviewWidget();
+
+      document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
+      document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+    }
+
+    // SUBIR AVATAR A DRIVE + GUARDAR EN FIREBASE ← ACÁ ESTÁ EL FIX
+    async function subirAvatarADrive(file) {
+      if (!file) return null;
+
+      // Validación correcta: 2MB
+      if (file.size > 2 * 1024) {
+        throw new Error('La imagen debe pesar menos de 2MB');
+      }
+
+      if (!accessToken) throw new Error('No hay token de acceso. Autorizá Google Drive primero');
+
+      showLoading(true);
+      try {
+        // 1. Subir archivo a Drive
+        const metadata = {
+          name: `wasa_avatar_${currentUser.uid}_${Date.now()}.${file.name.split('.').pop()}`,
+          mimeType: file.type
+        };
+
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', file);
+
+        const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+          body: form
+        });
+
+        if (!uploadRes.ok) {
+          const err = await uploadRes.text();
+          throw new Error('Error al subir: ' + err);
+        }
+        const fileData = await uploadRes.json();
+        const fileId = fileData.id;
+
+        // 2. Hacer público el archivo
+        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ role: 'reader', type: 'anyone' })
+        });
+
+        // 3. URL directa para usar en <img>
+        const url = `https://drive.google.com/uc?id=${fileId}`;
+
+        // 4. GUARDAR EN FIRESTORE ← ESTO FALTABA
+        await db.collection('bots').doc(currentUser.email).update({
+          'config.avatar': url,
+          'config.avatarUpdated': firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Actualizar userData local
+        if (!userData.config) userData.config = {};
+        userData.config.avatar = url;
+
+        showLoading(false);
+        return url;
+      } catch (e) {
+        showLoading(false);
+        console.error('ERROR subirAvatarADrive:', e);
+        throw e;
+      }
+    }
 
     function cerrarEditorWidget() {
       document.getElementById('editor-widget').style.display = 'none';
@@ -722,7 +708,7 @@ async function subirAvatarADrive(file) {
       if (previewMini) {
         previewMini.style.background = color;
         if (cfg.avatar) {
-          previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+          previewMini.innerHTML = `<img src="${cfg.avatar}?t=${Date.now()}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
         } else {
           previewMini.innerHTML = '💬';
         }
@@ -744,30 +730,31 @@ async function subirAvatarADrive(file) {
       const avatar = document.getElementById('avatarWidgetEdit').value;
 
       const container = document.getElementById('preview-container-widget');
+      const avatarUrl = avatar? `${avatar}?t=${Date.now()}` : '';
 
-      const btnContent = avatar
-       ? `<img src="${avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+      const btnContent = avatarUrl
+      ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : '💬';
 
-      const avatarHeader = avatar
-       ? `<img src="${avatar}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+      const avatarHeader = avatarUrl
+      ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
         : '💬';
 
       container.innerHTML = `
         <style>
           #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-        .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-        .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-        .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-        .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-        .wasa-btn:hover { transform: scale(1.1); }
-        .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-        .wasa-ventana.activo { display: flex; }
-        .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-        .wasa-body { flex: 1; padding: 16px; background: #f5f5f5; overflow-y: auto; }
-        .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-        .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+       .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+       .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+       .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+       .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+       .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+       .wasa-btn:hover { transform: scale(1.1); }
+       .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+       .wasa-ventana.activo { display: flex; }
+       .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+       .wasa-body { flex: 1; padding: 16px; background: #f5f5f5; overflow-y: auto; }
+       .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+       .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
         <div class="wasa-demo-page">
           <div>
@@ -790,39 +777,42 @@ async function subirAvatarADrive(file) {
       `;
     }
 
+    // EVENTO PARA SUBIR AVATAR
     document.addEventListener('DOMContentLoaded', () => {
-  const fileInput = document.getElementById('avatarWidgetFile');
-  if (fileInput) {
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+      const fileInput = document.getElementById('avatarWidgetFile');
+      if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
 
-      if (!accessToken) {
-        showToast('Autorizá Google Drive primero', 'error');
-        document.getElementById('avatarPreview').innerHTML = '💬';
-        e.target.value = '';
-        return;
-      }
+          if (!accessToken) {
+            showToast('Autorizá Google Drive primero', 'error');
+            document.getElementById('avatarPreview').innerHTML = '💬';
+            e.target.value = '';
+            return;
+          }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        document.getElementById('avatarPreview').innerHTML =
-          `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-      };
-      reader.readAsDataURL(file);
+          // Preview local inmediato
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById('avatarPreview').innerHTML =
+              `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+          };
+          reader.readAsDataURL(file);
 
-      try {
-        const url = await subirAvatarADrive(file);
-        document.getElementById('avatarWidgetEdit').value = url;
-        renderizarPreviewWidget();
-        showToast('✅ Avatar subido');
-      } catch (err) {
-        showToast('Error: ' + err.message, 'error');
-        document.getElementById('avatarPreview').innerHTML = '💬';
+          try {
+            const url = await subirAvatarADrive(file);
+            document.getElementById('avatarWidgetEdit').value = url;
+            renderizarPreviewWidget();
+            actualizarPreviewMini();
+            showToast('✅ Avatar subido y guardado');
+          } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+            document.getElementById('avatarPreview').innerHTML = '💬';
+          }
+        });
       }
     });
-  }
-});
 
     function resizeWidget(e) {
       const container = document.getElementById('editor-widget-form').parentElement;
@@ -1188,7 +1178,8 @@ async function subirAvatarADrive(file) {
     document.getElementById('btnBorrarConfig').addEventListener('click', () => {
       if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
     });
-document.getElementById('confirmar-si').addEventListener('click', async () => {
+
+    document.getElementById('confirmar-si').addEventListener('click', async () => {
       showLoading(true);
       if (filaSeleccionada.tipo === 'productos') {
         datosProductos.splice(filaSeleccionada.index, 1);
