@@ -596,7 +596,7 @@
       if (!file) return null;
 
       // Validación correcta: 2MB
-      if (file.size > 2 * 1024) {
+      if (file.size > 2 * 1024 * 1024) {
         throw new Error('La imagen debe pesar menos de 2MB');
       }
 
