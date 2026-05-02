@@ -51,7 +51,7 @@
   </style>
 </head>
 <body>
-  <div id="loading">Guardando...</div>
+<div id="loading">Guardando...</div>
   <div class="toast" id="toast"></div>
 
   <div class="container">
@@ -101,26 +101,38 @@
         <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
       </div>
 
-      <h3 style="margin-top: 30px;">Personalizá tu chat</h3>
+      <!-- Configuración del Widget - NUEVA VERSIÓN -->
+      <div class="card" style="margin-top:30px;">
+        <h3 class="card-title">🎨 Configuración del Widget</h3>
+        
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+            💬
+          </div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
+            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+          </div>
+        </div>
 
-      <label>Color principal</label>
-      <input type="color" id="colorWidget" value="#25D366">
+        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">
+          ✏️ Personalizar apariencia
+        </button>
 
-      <label>Posición del botón</label>
-      <select id="posWidget">
-        <option value="right">Derecha</option>
-        <option value="left">Izquierda</option>
-      </select>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">
+            📋 Copiar código
+          </button>
+        </div>
+        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
 
-      <label>Mensaje de bienvenida</label>
-      <input type="text" id="saludoWidget" value="Hola 👋 ¿En qué te ayudo?" maxlength="100">
-
-      <button onclick="guardarConfigWidget()" class="success" style="width:100%; margin-top:10px">Guardar cambios</button>
-
-      <h3 style="margin-top: 30px;">Tu código de instalación</h3>
-      <textarea id="codigoWidget" readonly rows="2" style="font-family:monospace"></textarea>
-      <button onclick="copiarCodigo()" class="big">📋 Copiar código</button>
-      <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+        <!-- Campos ocultos para mantener compatibilidad -->
+        <input type="hidden" id="colorWidget">
+        <input type="hidden" id="posWidget">
+        <input type="hidden" id="saludoWidget">
+      </div>
 
       <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
       <button class="big success" onclick="abrirEditor('productos')">
@@ -232,73 +244,72 @@
     </div>
   </div>
 
-<!-- EDITOR WIDGET PANTALLA DIVIDIDA -->
-<div id="editor-widget" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-  <div style="width:95%; max-width:1400px; height:90vh; background:white; border-radius:12px; display:flex; overflow:hidden; position:relative;">
-    
-    <!-- PANEL IZQUIERDA: CONFIG -->
-    <div id="editor-widget-form" style="width:380px; padding:24px; border-right:1px solid #eee; overflow-y:auto; background:#fafafa;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h3 style="margin:0; font-size:20px;">🎨 Personalizar Widget</h3>
-        <button onclick="cerrarEditorWidget()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#999; line-height:1;">×</button>
-      </div>
+  <!-- EDITOR WIDGET PANTALLA DIVIDIDA -->
+  <div id="editor-widget" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
+    <div style="width:95%; max-width:1400px; height:90vh; background:white; border-radius:12px; display:flex; overflow:hidden; position:relative;">
+      
+      <!-- PANEL IZQUIERDA: CONFIG -->
+      <div id="editor-widget-form" style="width:380px; padding:24px; border-right:1px solid #eee; overflow-y:auto; background:#fafafa;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+          <h3 style="margin:0; font-size:20px;">🎨 Personalizar Widget</h3>
+          <button onclick="cerrarEditorWidget()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#999; line-height:1;">×</button>
+        </div>
 
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
-        <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
-      </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
+          <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
+        </div>
 
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
-        <select id="posWidgetEdit" class="input-field">
-          <option value="right">Abajo derecha</option>
-          <option value="left">Abajo izquierda</option>
-        </select>
-      </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
+          <select id="posWidgetEdit" class="input-field">
+            <option value="right">Abajo derecha</option>
+            <option value="left">Abajo izquierda</option>
+          </select>
+        </div>
 
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
-        <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
-      </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
+          <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
+        </div>
 
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
-        <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
-      </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
+          <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
+        </div>
 
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar URL <small style="font-weight:400; color:#666;">(opcional)</small></label>
-        <input type="url" id="avatarWidgetEdit" class="input-field" placeholder="https://ejemplo.com/avatar.png">
-      </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar URL <small style="font-weight:400; color:#666;">(opcional)</small></label>
+          <input type="url" id="avatarWidgetEdit" class="input-field" placeholder="https://ejemplo.com/avatar.png">
+        </div>
 
-      <button class="btn-primary" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px; padding:12px;">
-        💾 Guardar cambios
-      </button>
-
-      <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-        <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
-        <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">
-          📋 Copiar código
+        <button class="btn-primary" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px; padding:12px;">
+          💾 Guardar cambios
         </button>
-      </div>
-    </div>
 
-    <!-- RESIZER -->
-    <div id="editor-widget-resizer" style="width:4px; background:#ddd; cursor:col-resize; transition:background 0.2s;"></div>
-
-    <!-- PANEL DERECHA: PREVIEW -->
-    <div style="flex:1; background:#e5e5e5; position:relative; overflow:hidden; display:flex; flex-direction:column;">
-      <div style="padding:16px; background:white; border-bottom:1px solid #ddd; font-weight:600; font-size:14px; color:#666;">
-        Vista previa en tiempo real
+        <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">
+            📋 Copiar código
+          </button>
+        </div>
       </div>
-      <div id="preview-container-widget" style="flex:1; position:relative; background:white;">
-        <!-- Acá se inyecta el preview -->
+
+      <!-- RESIZER -->
+      <div id="editor-widget-resizer" style="width:4px; background:#ddd; cursor:col-resize; transition:background 0.2s;"></div>
+
+      <!-- PANEL DERECHA: PREVIEW -->
+      <div style="flex:1; background:#e5e5e5; position:relative; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="padding:16px; background:white; border-bottom:1px solid #ddd; font-weight:600; font-size:14px; color:#666;">
+          Vista previa en tiempo real
+        </div>
+        <div id="preview-container-widget" style="flex:1; position:relative; background:white;">
+          <!-- Acá se inyecta el preview -->
+        </div>
       </div>
     </div>
   </div>
-</div>
-  
 
 <script>
     const firebaseConfig = {
