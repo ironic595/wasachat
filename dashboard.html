@@ -8,153 +8,153 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
-<style>
-  body { font-family: sans-serif; margin: 0; background: #f5f5f5; }
-  .container { max-width: 900px; margin: 50px auto; padding: 20px; }
-  .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  h1 { text-align: center; color: #333; }
-  h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
-  button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; }
-  button:disabled { background: #ccc; cursor: not-allowed; }
-  button.danger { background: #dc3545; }
-  button.success { background: #28a745; }
-  button.warning { background: #ff9500; }
-  button.big { width: 100%; padding: 20px; font-size: 18px; margin: 10px 0; }
-  input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-  .success-msg { color: green; font-weight: bold; }
-  .error-msg { color: red; }
-  .hidden { display: none!important; }
-  #userInfo { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 20px; }
-  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-  .info-row:last-child { border-bottom: none; }
+  <style>
+    body { font-family: sans-serif; margin: 0; background: #f5f5; }
+    .container { max-width: 900px; margin: 50px auto; padding: 20px; }
+    .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #333; }
+    h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
+    button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    button.danger { background: #dc3545; }
+    button.success { background: #28a745; }
+    button.warning { background: #ff9500; }
+    button.big { width: 100%; padding: 20px; font-size: 18px; margin: 10px 0; }
+    input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    .success-msg { color: green; font-weight: bold; }
+    .error-msg { color: red; }
+    .hidden { display: none!important; }
+    #userInfo { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 20px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .info-row:last-child { border-bottom: none; }
 
-  /* === EDITOR DE TABLAS - FULLSCREEN === */
-  #editor { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: white; 
-    z-index: 100; 
-    display: none; 
-    flex-direction: column; 
-  }
-  #editor.active { display: flex; }
-  #editor-header { 
-    background: #333; 
-    color: white; 
-    padding: 15px 20px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-  }
-  #editor-header h2 { margin: 0; border: none; color: white; }
-  #editor-body { display: flex; flex: 1; overflow: hidden; }
-  #editor-form { 
-    min-width: 250px; 
-    width: 380px; 
-    padding: 20px; 
-    background: #f4f4f4; 
-    overflow-y: auto; 
-  }
-  #editor-resizer { 
-    width: 10px; 
-    cursor: col-resize; 
-    background: #ccc; 
-    transition: background 0.2s;
-  }
-  #editor-resizer:hover { background: #4285f4; }
-  #editor-tabla { flex: 1; padding: 20px; overflow-y: auto; }
+    /* === EDITOR DE TABLAS - FULLSCREEN === */
+    #editor { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: white; 
+      z-index: 100; 
+      display: none; 
+      flex-direction: column; 
+    }
+    #editor.active { display: flex; }
+    #editor-header { 
+      background: #333; 
+      color: white; 
+      padding: 15px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    #editor-header h2 { margin: 0; border: none; color: white; }
+    #editor-body { display: flex; flex: 1; overflow: hidden; }
+    #editor-form { 
+      min-width: 250px; 
+      width: 380px; 
+      padding: 20px; 
+      background: #f4f4f4; 
+      overflow-y: auto; 
+    }
+    #editor-resizer { 
+      width: 10px; 
+      cursor: col-resize; 
+      background: #ccc; 
+      transition: background 0.2s;
+    }
+    #editor-resizer:hover { background: #4285f4; }
+    #editor-tabla { flex: 1; padding: 20px; overflow-y: auto; }
 
-  /* === EDITOR WIDGET - MISMO ESTILO FULLSCREEN === */
-  #editor-widget { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: white; 
-    z-index: 100; 
-    display: none; 
-    flex-direction: column; 
-  }
-  #editor-widget.active { display: flex; }
-  #editor-widget-header { 
-    background: #333; 
-    color: white; 
-    padding: 15px 20px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-  }
-  #editor-widget-header h2 { margin: 0; border: none; color: white; }
-  #editor-widget-body { display: flex; flex: 1; overflow: hidden; }
-  #editor-widget-form { 
-    min-width: 250px; 
-    width: 380px; 
-    padding: 20px; 
-    background: #f4f4f4; 
-    overflow-y: auto; 
-  }
-  #editor-widget-resizer { 
-    width: 10px; 
-    cursor: col-resize; 
-    background: #ccc; 
-    transition: background 0.2s;
-  }
-  #editor-widget-resizer:hover { background: #4285f4; }
-  #editor-widget-preview { 
-    flex: 1; 
-    background: #e5e5e5; 
-    position: relative; 
-    overflow: hidden; 
-    display: flex; 
-    flex-direction: column;
-  }
-  .preview-bar {
-    padding: 16px; 
-    background: white; 
-    border-bottom: 1px solid #ddd; 
-    font-weight: 600; 
-    font-size: 14px; 
-    color: #666;
-  }
+    /* === EDITOR WIDGET - MISMO ESTILO FULLSCREEN === */
+    #editor-widget { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: white; 
+      z-index: 100; 
+      display: none; 
+      flex-direction: column; 
+    }
+    #editor-widget.active { display: flex; }
+    #editor-widget-header { 
+      background: #333; 
+      color: white; 
+      padding: 15px 20px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    #editor-widget-header h2 { margin: 0; border: none; color: white; }
+    #editor-widget-body { display: flex; flex: 1; overflow: hidden; }
+    #editor-widget-form { 
+      min-width: 250px; 
+      width: 380px; 
+      padding: 20px; 
+      background: #f4f4f4; 
+      overflow-y: auto; 
+    }
+    #editor-widget-resizer { 
+      width: 10px; 
+      cursor: col-resize; 
+      background: #ccc; 
+      transition: background 0.2s;
+    }
+    #editor-widget-resizer:hover { background: #4285f4; }
+    #editor-widget-preview { 
+      flex: 1; 
+      background: #e5e5e5; 
+      position: relative; 
+      overflow: hidden; 
+      display: flex; 
+      flex-direction: column;
+    }
+    .preview-bar {
+      padding: 16px; 
+      background: white; 
+      border-bottom: 1px solid #ddd; 
+      font-weight: 600; 
+      font-size: 14px; 
+      color: #666;
+    }
 
-  /* === TABLAS === */
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-  th, td { border: 1px solid #ddd; padding: 10px; text-align: left; cursor: pointer; }
-  tr.seleccionada { background-color: #d1ecf1!important; }
-  .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
+    /* === TABLAS === */
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; cursor: pointer; }
+    tr.seleccionada { background-color: #d1ecf1!important; }
+    .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
 
-  /* === UTILIDADES === */
-  #loading { 
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    background: rgba(0,0,0,0.7); 
-    color: white; 
-    display: none; 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 200; 
-    font-size: 20px; 
-  }
-  .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
-  .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
-  .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
-  input[type="file"] { padding: 5px; }
-  .estado-activo { color: #28a745; font-weight: bold; }
-  .estado-inactivo { color: #dc3545; font-weight: bold; }
-  .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
-  .form-group { margin-bottom: 16px; }
-  .btn { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px 0; width: 100%; }
-  .btn-primary { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-  .btn-secondary { background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-  .input-field { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-</style>
+    /* === UTILIDADES === */
+    #loading { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: rgba(0,0,0,0.7); 
+      color: white; 
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 200; 
+      font-size: 20px; 
+    }
+    .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
+    .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
+    input[type="file"] { padding: 5px; }
+    .estado-activo { color: #28a745; font-weight: bold; }
+    .estado-inactivo { color: #dc3545; font-weight: bold; }
+    .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
+    .form-group { margin-bottom: 16px; }
+    .btn { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px 0; width: 100%; }
+    .btn-primary { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    .btn-secondary { background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    .input-field { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+  </style>
 </head>
 <body>
 <div id="loading">Guardando...</div>
@@ -207,7 +207,7 @@
         <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
       </div>
 
-      <!-- Configuración del Widget - NUEVA VERSIÓN -->
+      <!-- Configuración del Widget -->
       <div class="card" style="margin-top:30px;">
         <h3 class="card-title">🎨 Configuración del Widget</h3>
         
@@ -340,27 +340,16 @@
     </div>
   </div>
 
-  <!-- Modal Borrado -->
-  <div id="modal-borrar" class="modal-fondo">
-    <div class="modal-box">
-      <h3>¿Borrar fila seleccionada?</h3>
-      <p>Se eliminará también de Google Sheets</p>
-      <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
-      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
+  <!-- EDITOR WIDGET - UNIFICADO AL ESTILO FULLSCREEN -->
+  <div id="editor-widget">
+    <div id="editor-widget-header">
+      <h2>🎨 Personalizar Widget</h2>
+      <button onclick="cerrarEditorWidget()" style="background:#dc3545;">✕ Cerrar</button>
     </div>
-  </div>
 
-  <!-- EDITOR WIDGET PANTALLA DIVIDIDA -->
-  <div id="editor-widget" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center;">
-    <div style="width:95%; max-width:1400px; height:90vh; background:white; border-radius:12px; display:flex; overflow:hidden; position:relative;">
-      
+    <div id="editor-widget-body">
       <!-- PANEL IZQUIERDA: CONFIG -->
-      <div id="editor-widget-form" style="width:380px; padding:24px; border-right:1px solid #eee; overflow-y:auto; background:#fafafa;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-          <h3 style="margin:0; font-size:20px;">🎨 Personalizar Widget</h3>
-          <button onclick="cerrarEditorWidget()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#999; line-height:1;">×</button>
-        </div>
-
+      <div id="editor-widget-form">
         <div class="form-group">
           <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
           <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
@@ -384,17 +373,17 @@
           <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
         </div>
 
-       <div class="form-group">
-  <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar del bot</label>
-  <input type="file" id="avatarWidgetFile" accept="image/*" style="margin-bottom:8px;">
-  <input type="hidden" id="avatarWidgetEdit">
-  <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-    💬
-  </div>
-  <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
-</div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar del bot</label>
+          <input type="file" id="avatarWidgetFile" accept="image/*" style="margin-bottom:8px;">
+          <input type="hidden" id="avatarWidgetEdit">
+          <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            💬
+          </div>
+          <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
+        </div>
 
-        <button class="btn-primary" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px; padding:12px;">
+        <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">
           💾 Guardar cambios
         </button>
 
@@ -408,11 +397,11 @@
       </div>
 
       <!-- RESIZER -->
-      <div id="editor-widget-resizer" style="width:4px; background:#ddd; cursor:col-resize; transition:background 0.2s;"></div>
+      <div id="editor-widget-resizer"></div>
 
       <!-- PANEL DERECHA: PREVIEW -->
-      <div style="flex:1; background:#e5e5e5; position:relative; overflow:hidden; display:flex; flex-direction:column;">
-        <div style="padding:16px; background:white; border-bottom:1px solid #ddd; font-weight:600; font-size:14px; color:#666;">
+      <div id="editor-widget-preview">
+        <div class="preview-bar">
           Vista previa en tiempo real
         </div>
         <div id="preview-container-widget" style="flex:1; position:relative; background:white;">
@@ -422,6 +411,15 @@
     </div>
   </div>
 
+  <!-- Modal Borrado -->
+  <div id="modal-borrar" class="modal-fondo">
+    <div class="modal-box">
+      <h3>¿Borrar fila seleccionada?</h3>
+      <p>Se eliminará también de Google Sheets</p>
+      <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
+      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
@@ -494,7 +492,7 @@
             },
             hojas: { productos: 'Productos', faq: 'FAQ' },
             created_at: oldData.fecha_registro || firebase.firestore.FieldValue.serverTimestamp(),
-         ...oldData
+        ...oldData
           }, { merge: true });
         } else {
           await botDocRef.set({
@@ -651,7 +649,7 @@
     // FUNCIÓN PARA PEDIR TOKEN CON DRIVE
    async function asegurarTokenDrive() {
   if (accessToken) return true;
-  
+
   return new Promise((resolve, reject) => {
     tokenClient.callback = (resp) => {
       if (resp.error) {
@@ -687,7 +685,7 @@
         showToast('Necesitás autorizar Google Drive para subir avatares', 'error');
       });
 
-      document.getElementById('editor-widget').style.display = 'flex';
+      document.getElementById('editor-widget').classList.add('active');
       generarCodigoWidget();
       renderizarPreviewWidget();
 
@@ -767,7 +765,7 @@
     }
 
     function cerrarEditorWidget() {
-      document.getElementById('editor-widget').style.display = 'none';
+      document.getElementById('editor-widget').classList.remove('active');
     }
 
     async function guardarConfigWidgetModal() {
@@ -840,28 +838,28 @@
       const avatarUrl = avatar || ''; // Sin &t=
 
       const btnContent = avatarUrl
-      ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+     ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : '💬';
 
       const avatarHeader = avatarUrl
-      ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+     ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
         : '💬';
 
       container.innerHTML = `
         <style>
           #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-       .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-       .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-       .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-       .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-       .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-       .wasa-btn:hover { transform: scale(1.1); }
-       .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-       .wasa-ventana.activo { display: flex; }
-       .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-       .wasa-body { flex: 1; padding: 16px; background: #f5f5f5; overflow-y: auto; }
-       .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-       .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+      .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+      .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+      .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+      .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+      .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+      .wasa-btn:hover { transform: scale(1.1); }
+      .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+      .wasa-ventana.activo { display: flex; }
+      .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+      .wasa-body { flex: 1; padding: 16px; background: #f5f5f5; overflow-y: auto; }
+      .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+      .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
         <div class="wasa-demo-page">
           <div>
@@ -1038,7 +1036,7 @@
       currentTab = tab;
       modoEdicion = false;
       indiceEdicion = null;
-      document.getElementById('editor').style.display = 'flex';
+      document.getElementById('editor').classList.add('active');
       document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
 
       if (tab === 'productos') {
@@ -1059,7 +1057,7 @@
     }
 
     function cerrarEditor() {
-      document.getElementById('editor').style.display = 'none';
+      document.getElementById('editor').classList.remove('active');
       filaSeleccionada = null;
       modoEdicion = false;
       indiceEdicion = null;
@@ -1385,6 +1383,23 @@
     function resize(e) {
       if (leftSide) leftSide.style.width = e.clientX + 'px';
     }
+
+    // Resizer para editor widget
+    const resizerWidget = document.getElementById('editor-widget-resizer');
+    const leftSideWidget = document.getElementById('editor-widget-form');
+    if (resizerWidget && leftSideWidget) {
+      resizerWidget.addEventListener('mousedown', (e) => {
+        document.addEventListener('mousemove', resizeWidget);
+        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resizeWidget));
+      });
+    }
+    function resizeWidget(e) {
+      if (leftSideWidget) {
+        const newWidth = e.clientX;
+        if (newWidth > 250 && newWidth < 600) {
+          leftSideWidget.style.width = newWidth + 'px';
+        }
+      }
+    }
 </script>
-</body>
-</html>
+</body></html>
