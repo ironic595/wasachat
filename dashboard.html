@@ -638,7 +638,7 @@
         });
 
         // 3. URL directa para usar en <img>
-        const url = `https://drive.google.com/uc?id=${fileId}`;
+        const url = `https://lh3.googleusercontent.com/d/${fileId}`;
 
         // 4. GUARDAR EN FIRESTORE ← ESTO FALTABA
         await db.collection('bots').doc(currentUser.email).update({
