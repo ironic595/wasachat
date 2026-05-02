@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>MiBot IA - Dashboard</title>
+  <title>WasaChat - Dashboard</title>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -20,7 +21,7 @@
     button.success { background: #28a745; }
     button.warning { background: #ff9500; }
     button.big { width: 100%; padding: 20px; font-size: 18px; margin: 10px 0; }
-    input, textarea { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
    .success-msg { color: green; font-weight: bold; }
    .error-msg { color: red; }
    .hidden { display: none!important; }
@@ -33,7 +34,7 @@
     #editor-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
     #editor-header h2 { margin: 0; border: none; color: white; }
     #editor-body { display: flex; flex: 1; overflow: hidden; }
-    #editor-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4; overflow-y: auto; }
+    #editor-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4f4; overflow-y: auto; }
     #editor-resizer { width: 10px; cursor: col-resize; background: #ccc; }
     #editor-tabla { flex: 1; padding: 20px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
@@ -45,8 +46,9 @@
    .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
    .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
     input[type="file"] { padding: 5px; }
-       .estado-activo { color: #28a745; font-weight: bold; }
+   .estado-activo { color: #28a745; font-weight: bold; }
    .estado-inactivo { color: #dc3545; font-weight: bold; }
+   .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
   </style>
 </head>
 <body>
@@ -54,19 +56,21 @@
   <div class="toast" id="toast"></div>
 
   <div class="container">
-    <h1>MiBot IA - Panel de Control</h1>
+    <h1>WasaChat - Panel de Control</h1>
     <div id="userInfo"></div>
 
-    <!-- PASO 1: WhatsApp -->
-    <div class="card" id="stepWhatsapp">
-      <h2>1. Conectá tu WhatsApp</h2>
-      <input type="text" id="whatsappInput" placeholder="Ej: 5491123456789">
-      <button id="guardarWsBtn" class="success">Guardar número</button>
-      <div id="wsStatus"></div>
+    <!-- PASO 1: DOMINIO -->
+    <div class="card" id="stepDominio">
+      <h2>1. Registrá tu dominio</h2>
+      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
+      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
+      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
+      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
+      <div id="dominioStatus"></div>
     </div>
 
     <!-- PASO 2: Google Sheet -->
-    <div class="card" id="stepSheet">
+    <div class="card hidden" id="stepSheet">
       <h2>2. Creá tu base de datos</h2>
       <p>Vamos a crear un Google Sheet en tu Drive con 2 pestañas: Productos y Preguntas Frecuentes.</p>
       <button id="crearSheetBtn">Crear mi Google Sheet</button>
@@ -79,9 +83,9 @@
 
       <div class="info-row">
         <div>
-          <strong>WhatsApp:</strong> <span id="wsActual"></span>
+          <strong>Dominio:</strong> <span id="dominioActual"></span>
         </div>
-        <button class="warning" onclick="mostrarCambiarWs()">Cambiar número</button>
+        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
       </div>
 
       <div class="info-row">
@@ -90,12 +94,35 @@
         </div>
         <button class="danger" onclick="confirmarRecrearSheet()">Recrear Sheet</button>
       </div>
-  <div class="info-row">
+
+      <div class="info-row">
         <div>
           <strong>Estado del Bot:</strong> <span id="estadoBot"></span>
         </div>
         <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
       </div>
+
+      <h3 style="margin-top: 30px;">Personalizá tu chat</h3>
+
+      <label>Color principal</label>
+      <input type="color" id="colorWidget" value="#25D366">
+
+      <label>Posición del botón</label>
+      <select id="posWidget">
+        <option value="right">Derecha</option>
+        <option value="left">Izquierda</option>
+      </select>
+
+      <label>Mensaje de bienvenida</label>
+      <input type="text" id="saludoWidget" value="Hola 👋 ¿En qué te ayudo?" maxlength="100">
+
+      <button onclick="guardarConfigWidget()" class="success" style="width:100%; margin-top:10px">Guardar cambios</button>
+
+      <h3 style="margin-top: 30px;">Tu código de instalación</h3>
+      <textarea id="codigoWidget" readonly rows="2" style="font-family:monospace"></textarea>
+      <button onclick="copiarCodigo()" class="big">📋 Copiar código</button>
+      <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+
       <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
       <button class="big success" onclick="abrirEditor('productos')">
         📦 Editar Tabla de Productos
@@ -108,12 +135,13 @@
     <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
   </div>
 
-  <!-- MODAL Cambiar WhatsApp -->
-  <div id="modal-cambiar-ws" class="modal-fondo">
+  <!-- MODAL Cambiar Dominio -->
+  <div id="modal-cambiar-dominio" class="modal-fondo">
     <div class="modal-box">
-      <h3>Cambiar número de WhatsApp</h3>
-      <input type="text" id="nuevoWhatsappInput" placeholder="Ej: 5491123456789">
-      <button onclick="cambiarWhatsapp()" class="success" style="margin: 10px;">Guardar</button>
+      <h3>Cambiar dominio</h3>
+      <input type="text" id="nuevoDominioInput" placeholder="Ej: negocio.com">
+      <div class="help-text">El chat dejará de funcionar en el dominio anterior</div>
+      <button onclick="cambiarDominio()" class="success" style="margin: 10px;">Guardar</button>
       <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
     </div>
   </div>
@@ -172,7 +200,6 @@
       <div id="editor-resizer"></div>
 
       <div id="editor-tabla">
-        <!-- Tabla Productos -->
         <div id="tabla-productos" class="hidden">
           <h3>Productos Cargados</h3>
           <table id="miTabla">
@@ -183,7 +210,6 @@
           </table>
         </div>
 
-        <!-- Tabla Config -->
         <div id="tabla-config" class="hidden">
           <h3>Base de Conocimiento del Bot</h3>
           <table id="miTablaConfig">
@@ -251,47 +277,51 @@
       }
 
       currentUser = user;
-      const doc = await db.collection('users').doc(user.email).get();
+      const doc = await db.collection('bots').doc(user.email).get();
       if (!doc.exists) {
-        window.location.href = 'index.html';
-        return;
+        await db.collection('bots').doc(user.email).set({
+          email: user.email,
+          estado: 'inactivo',
+          created_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        userData = { email: user.email, estado: 'inactivo' };
+      } else {
+        userData = doc.data();
       }
 
-      userData = doc.data();
       document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
-
       mostrarPanelCorrecto();
+      cargarConfigWidget();
     });
 
     function mostrarPanelCorrecto() {
-      const stepWs = document.getElementById('stepWhatsapp');
+      const stepDominio = document.getElementById('stepDominio');
       const stepSheet = document.getElementById('stepSheet');
       const panelPrincipal = document.getElementById('panelPrincipal');
 
-      if (!userData.whatsapp_numero) {
-        stepWs.classList.remove('hidden');
+      if (!userData.domain) {
+        stepDominio.classList.remove('hidden');
         stepSheet.classList.add('hidden');
         panelPrincipal.classList.add('hidden');
         return;
       }
 
       if (!userData.sheet_id) {
-        stepWs.classList.add('hidden');
+        stepDominio.classList.add('hidden');
         stepSheet.classList.remove('hidden');
         panelPrincipal.classList.add('hidden');
         return;
       }
 
-      stepWs.classList.add('hidden');
+      stepDominio.classList.add('hidden');
       stepSheet.classList.add('hidden');
       panelPrincipal.classList.remove('hidden');
-      document.getElementById('wsActual').textContent = userData.whatsapp_numero;
+      document.getElementById('dominioActual').textContent = userData.domain;
       document.getElementById('sheetLink').href = userData.sheet_url;
 
-      // NUEVO: MOSTRAR ESTADO DEL BOT
       const estadoBotSpan = document.getElementById('estadoBot');
       const btnComprar = document.getElementById('btnComprarPlan');
-      
+
       if (userData.estado === 'activo' || userData.estado === 'pago') {
         estadoBotSpan.textContent = '✅ Activo';
         estadoBotSpan.className = 'estado-activo';
@@ -304,31 +334,75 @@
     }
 
     function irAComprar() {
-  // Redirige a la sección de precios del index
-  window.location.href = 'index.html#precios';
-}
+      window.location.href = 'index.html#precios';
+    }
 
-    // WhatsApp
-    document.getElementById('guardarWsBtn').addEventListener('click', async () => {
-      const whatsapp = document.getElementById('whatsappInput').value.trim();
-      if (!whatsapp) return alert("Ingresá un número");
-      await db.collection('users').doc(currentUser.email).update({ whatsapp_numero: whatsapp });
-      userData.whatsapp_numero = whatsapp;
+    // DOMINIO
+    document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
+      let dominio = document.getElementById('dominioInput').value.trim();
+      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+      if (!dominio) return alert("Ingresá un dominio válido");
+
+      showLoading(true);
+      await db.collection('bots').doc(currentUser.email).update({ domain: dominio });
+      userData.domain = dominio;
+      showLoading(false);
       mostrarPanelCorrecto();
     });
 
-    function mostrarCambiarWs() {
-      document.getElementById('nuevoWhatsappInput').value = userData.whatsapp_numero;
-      document.getElementById('modal-cambiar-ws').style.display = 'block';
+    function mostrarCambiarDominio() {
+      document.getElementById('nuevoDominioInput').value = userData.domain;
+      document.getElementById('modal-cambiar-dominio').style.display = 'block';
     }
 
-    async function cambiarWhatsapp() {
-      const nuevo = document.getElementById('nuevoWhatsappInput').value.trim();
-      if (!nuevo) return alert("Ingresá un número");
-      await db.collection('users').doc(currentUser.email).update({ whatsapp_numero: nuevo });
-      userData.whatsapp_numero = nuevo;
-      document.getElementById('wsActual').textContent = nuevo;
+    async function cambiarDominio() {
+      let nuevo = document.getElementById('nuevoDominioInput').value.trim();
+      nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+      if (!nuevo) return alert("Ingresá un dominio");
+
+      showLoading(true);
+      await db.collection('bots').doc(currentUser.email).update({ domain: nuevo });
+      userData.domain = nuevo;
+      document.getElementById('dominioActual').textContent = nuevo;
+      showLoading(false);
       cerrarModales();
+      generarCodigoWidget();
+    }
+
+    // CONFIG WIDGET
+    async function cargarConfigWidget() {
+      const cfg = userData.config || {};
+      document.getElementById('colorWidget').value = cfg.color || '#25D366';
+      document.getElementById('posWidget').value = cfg.pos || 'right';
+      document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+      generarCodigoWidget();
+    }
+
+    async function guardarConfigWidget() {
+      const config = {
+        color: document.getElementById('colorWidget').value,
+        pos: document.getElementById('posWidget').value,
+        saludo: document.getElementById('saludoWidget').value
+      };
+
+      showLoading(true);
+      await db.collection('bots').doc(currentUser.email).update({ config: config });
+      userData.config = config;
+      showLoading(false);
+      showToast('✅ Configuración guardada');
+    }
+
+    function generarCodigoWidget() {
+      const botId = currentUser.email;
+      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot="${botId}"><\/script>`;
+      document.getElementById('codigoWidget').value = codigo;
+    }
+
+    function copiarCodigo() {
+      const textarea = document.getElementById('codigoWidget');
+      textarea.select();
+      document.execCommand('copy');
+      showToast('📋 Código copiado');
     }
 
     // Crear Sheet
@@ -352,7 +426,7 @@
 
       try {
         const metadata = {
-          name: `MiBot IA - ${userData.nombre}`,
+          name: `WasaChat - ${userData.email}`,
           mimeType: 'application/vnd.google-apps.spreadsheet'
         };
 
@@ -362,42 +436,31 @@
           body: JSON.stringify(metadata)
         });
 
-        if (!driveRes.ok) {
-          const err = await driveRes.json();
-          throw new Error('Error de Drive API: ' + (err.error?.message || JSON.stringify(err)));
-        }
-
+        if (!driveRes.ok) throw new Error('Error de Drive API');
         const file = await driveRes.json();
-        if (!file.id) throw new Error('Google Drive no devolvió el ID del archivo.');
-
         const sheetId = file.id;
 
         const requests = [
-          { addSheet: { properties: { title: 'productos' } } },
-          { addSheet: { properties: { title: 'config' } } },
+          { addSheet: { properties: { title: 'Productos' } } },
+          { addSheet: { properties: { title: 'FAQ' } } },
           { deleteSheet: { sheetId: 0 } }
         ];
 
-        const batchRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ requests })
         });
 
-        if (!batchRes.ok) {
-          const err = await batchRes.json();
-          throw new Error('Error al crear pestañas: ' + (err.error?.message || JSON.stringify(err)));
-        }
-
         const values = {
-          'productos!A1:F1': [['nombre', 'precio', 'stock', 'descripcion', 'foto_url', 'url_producto']],
-          'config!A1:C2': [
-            ['pregunta', 'respuesta', 'palabras_clave'],
-            ['¿Cuáles son los horarios?', 'Lunes a Viernes de 9 a 18hs', 'horario, abierto, atender, hora']
+          'Productos!A1:D1': [['nombre', 'precio', 'stock', 'descripcion']],
+          'FAQ!A1:B2': [
+            ['pregunta', 'respuesta'],
+            ['¿Cuáles son los horarios?', 'Lunes a Viernes de 9 a 18hs']
           ]
         };
 
-        const valuesRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -406,18 +469,15 @@
           })
         });
 
-        if (!valuesRes.ok) {
-          const err = await valuesRes.json();
-          throw new Error('Error al escribir headers: ' + (err.error?.message || JSON.stringify(err)));
-        }
-
-        await db.collection('users').doc(currentUser.email).update({
+        await db.collection('bots').doc(currentUser.email).update({
           sheet_id: sheetId,
-          sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`
+          sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`,
+          hojas: { productos: 'Productos', faq: 'FAQ' }
         });
 
         userData.sheet_id = sheetId;
         userData.sheet_url = `https://docs.google.com/spreadsheets/d/${sheetId}`;
+        userData.hojas = { productos: 'Productos', faq: 'FAQ' };
 
         showLoading(false);
         mostrarPanelCorrecto();
@@ -432,7 +492,7 @@
 
     async function confirmarRecrearSheet() {
       if (!confirm('¿Seguro? Se va a crear un Sheet nuevo y perderás la referencia al anterior.')) return;
-      await db.collection('users').doc(currentUser.email).update({
+      await db.collection('bots').doc(currentUser.email).update({
         sheet_id: firebase.firestore.FieldValue.delete(),
         sheet_url: firebase.firestore.FieldValue.delete()
       });
@@ -511,14 +571,14 @@
       if (!accessToken) await obtenerToken();
 
       try {
-        const resProd = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/productos!A2:F`, {
+        const resProd = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/Productos!A2:F`, {
           headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         const dataProd = await resProd.json();
         datosProductos = dataProd.values || [];
         renderTablaProductos();
 
-        const resConf = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/config!A2:C`, {
+        const resConf = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/FAQ!A2:C`, {
           headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         const dataConf = await resConf.json();
@@ -553,16 +613,15 @@
       });
     }
 
-    // AUTO-SYNC AL SHEET
     async function syncProductos() {
       if (!accessToken) await obtenerToken();
       try {
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/productos!A2:F:clear`, {
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/Productos!A2:F:clear`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         if (datosProductos.length > 0) {
-          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/productos!A2:F?valueInputOption=RAW`, {
+          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/Productos!A2:F?valueInputOption=RAW`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ values: datosProductos })
@@ -577,12 +636,12 @@
     async function syncConfig() {
       if (!accessToken) await obtenerToken();
       try {
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/config!A2:C:clear`, {
+        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/FAQ!A2:C:clear`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${accessToken}` }
         });
         if (datosConfig.length > 0) {
-          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/config!A2:C?valueInputOption=RAW`, {
+          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/FAQ!A2:C?valueInputOption=RAW`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ values: datosConfig })
@@ -594,7 +653,6 @@
       }
     }
 
-    // CRUD PRODUCTOS - CON MODO EDICIÓN
     document.getElementById('btnGuardar').addEventListener('click', async () => {
       const prod = document.getElementById('inputProducto').value;
       const precio = document.getElementById('inputPrecio').value;
@@ -607,13 +665,11 @@
       const nuevaFila = [prod, precio, stock, desc, foto, urlProd];
 
       if (modoEdicion && indiceEdicion!== null) {
-        // ACTUALIZAR
         datosProductos[indiceEdicion] = nuevaFila;
         modoEdicion = false;
         indiceEdicion = null;
         limpiarFormProductos();
       } else {
-        // AGREGAR
         datosProductos.push(nuevaFila);
         limpiarFormProductos();
       }
@@ -624,7 +680,6 @@
       showLoading(false);
     });
 
-    // Cancelar edición Productos
     document.getElementById('btnCancelarEdicionProd').addEventListener('click', () => {
       modoEdicion = false;
       indiceEdicion = null;
@@ -634,7 +689,6 @@
       document.getElementById('btnBorrar').disabled = true;
     });
 
-    // CRUD CONFIG - CON MODO EDICIÓN
     document.getElementById('btnGuardarConfig').addEventListener('click', async () => {
       const pregunta = document.getElementById('inputPregunta').value;
       const respuesta = document.getElementById('inputRespuesta').value;
@@ -644,13 +698,11 @@
       const nuevaFila = [pregunta, respuesta, claves];
 
       if (modoEdicion && indiceEdicion!== null) {
-        // ACTUALIZAR
         datosConfig[indiceEdicion] = nuevaFila;
         modoEdicion = false;
         indiceEdicion = null;
         limpiarFormConfig();
       } else {
-        // AGREGAR
         datosConfig.push(nuevaFila);
         limpiarFormConfig();
       }
@@ -661,7 +713,6 @@
       showLoading(false);
     });
 
-    // Cancelar edición Config
     document.getElementById('btnCancelarEdicionConfig').addEventListener('click', () => {
       modoEdicion = false;
       indiceEdicion = null;
@@ -671,7 +722,6 @@
       document.getElementById('btnBorrarConfig').disabled = true;
     });
 
-    // SELECCIONAR FILA - AHORA CARGA EN INPUTS
     function seleccionarFila(row, index, tipo) {
       document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
       row.classList.add('seleccionada');
@@ -688,7 +738,7 @@
         document.getElementById('inputFoto').value = datos[4] || '';
         document.getElementById('inputUrlProd').value = datos[5] || '';
         document.getElementById('btnGuardar').textContent = '✏️ Actualizar Producto';
-        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+                document.getElementById('tituloFormProd').textContent = 'Editar Producto';
         document.getElementById('modoEdicionProd').classList.remove('hidden');
         document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
         document.getElementById('btnBorrar').disabled = false;
