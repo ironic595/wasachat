@@ -231,6 +231,7 @@
       <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
     </div>
   </div>
+
 <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
@@ -268,51 +269,74 @@
       callback: '',
     });
 
-    auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    window.location.href = 'index.html';
-    return;
-  }
-
-  currentUser = user;
-  const botDocRef = db.collection('bots').doc(user.email);
-  let botDoc = await botDocRef.get();
-
-  // MIGRACIÓN: Si no existe en 'bots' pero sí en 'users', copiá todo
-  if (!botDoc.exists) {
-    const userDocRef = db.collection('users').doc(user.email);
-    const userDoc = await userDocRef.get();
-    
-    if (userDoc.exists) {
-      const oldData = userDoc.data();
-      await botDocRef.set({
-        email: user.email,
-        estado: oldData.estado || 'inactivo',
-        domain: null,
-        config: {},
-        hojas: { productos: 'Productos', faq: 'FAQ' },
-        created_at: oldData.fecha_registro || firebase.firestore.FieldValue.serverTimestamp(),
-        ...oldData
-      }, { merge: true });
-      console.log('Migrado de users a bots');
-    } else {
-      await botDocRef.set({
-        email: user.email,
-        estado: 'inactivo',
-        domain: null,
-        config: {},
-        hojas: { productos: 'Productos', faq: 'FAQ' },
-        created_at: firebase.firestore.FieldValue.serverTimestamp()
-      });
+    function generarBotId() {
+      return 'wasa_' + Math.random().toString(36).substring(2, 10);
     }
-    botDoc = await botDocRef.get();
-  }
 
-  userData = botDoc.data();
-  document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
-  mostrarPanelCorrecto();
-  cargarConfigWidget();
-});
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      currentUser = user;
+      const botDocRef = db.collection('bots').doc(user.email);
+      let botDoc = await botDocRef.get();
+
+      // MIGRACIÓN: Si no existe en 'bots' pero sí en 'users', copiá todo
+      if (!botDoc.exists) {
+        const userDocRef = db.collection('users').doc(user.email);
+        const userDoc = await userDocRef.get();
+
+        if (userDoc.exists) {
+          const oldData = userDoc.data();
+          await botDocRef.set({
+            email: user.email,
+            bot_id: generarBotId(),
+            estado: oldData.estado || 'inactivo',
+            domain: null,
+            config: {
+              color: '#25D366',
+              pos: 'right',
+              saludo: 'Hola 👋 ¿En qué te ayudo?'
+            },
+            hojas: { productos: 'Productos', faq: 'FAQ' },
+            created_at: oldData.fecha_registro || firebase.firestore.FieldValue.serverTimestamp(),
+           ...oldData
+          }, { merge: true });
+          console.log('Migrado de users a bots');
+        } else {
+          await botDocRef.set({
+            email: user.email,
+            bot_id: generarBotId(),
+            estado: 'inactivo',
+            domain: null,
+            config: {
+              color: '#25D366',
+              pos: 'right',
+              saludo: 'Hola 👋 ¿En qué te ayudo?'
+            },
+            hojas: { productos: 'Productos', faq: 'FAQ' },
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        botDoc = await botDocRef.get();
+      }
+
+      userData = botDoc.data();
+
+      // Si no tiene bot_id o tiene formato viejo, generar nuevo
+      if (!userData.bot_id ||!userData.bot_id.startsWith('wasa_')) {
+        const newBotId = generarBotId();
+        await botDocRef.set({ bot_id: newBotId }, { merge: true });
+        userData.bot_id = newBotId;
+      }
+
+      document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
+      mostrarPanelCorrecto();
+      cargarConfigWidget();
+      renderizarPreview();
+    });
 
     function mostrarPanelCorrecto() {
       const stepDominio = document.getElementById('stepDominio');
@@ -405,13 +429,14 @@
       }
     }
 
-    // CONFIG WIDGET - ARREGLADO CON MERGE
+    // CONFIG WIDGET - ARREGLADO CON MERGE + PREVIEW
     async function cargarConfigWidget() {
       const cfg = userData.config || {};
       document.getElementById('colorWidget').value = cfg.color || '#25D366';
       document.getElementById('posWidget').value = cfg.pos || 'right';
       document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
       generarCodigoWidget();
+      renderizarPreview();
     }
 
     async function guardarConfigWidget() {
@@ -427,6 +452,7 @@
         userData.config = config;
         showLoading(false);
         showToast('✅ Configuración guardada');
+        renderizarPreview();
       } catch (e) {
         showLoading(false);
         alert('Error: ' + e.message);
@@ -434,7 +460,7 @@
     }
 
     function generarCodigoWidget() {
-      const botId = currentUser.email;
+      const botId = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
       const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot="${botId}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
     }
@@ -445,6 +471,116 @@
       document.execCommand('copy');
       showToast('📋 Código copiado');
     }
+
+    // PREVIEW DEL WIDGET
+    function renderizarPreview() {
+      const cfg = userData.config || {};
+      const color = cfg.color || '#25D366';
+      const pos = cfg.pos || 'right';
+      const saludo = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+
+      let preview = document.getElementById('widget-preview');
+      if (!preview) {
+        preview = document.createElement('div');
+        preview.id = 'widget-preview';
+        document.body.appendChild(preview);
+      }
+
+      preview.innerHTML = `
+        <style>
+          #widget-preview {
+            position: fixed;
+            bottom: 20px;
+            ${pos}: 20px;
+            z-index: 9999;
+            font-family: sans-serif;
+          }
+         .wasa-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: ${color};
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            transition: transform 0.2s;
+          }
+         .wasa-btn:hover { transform: scale(1.1); }
+         .wasa-ventana {
+            position: absolute;
+            bottom: 70px;
+            ${pos}: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+          }
+         .wasa-ventana.activo { display: flex; }
+         .wasa-header {
+            background: ${color};
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+         .wasa-body {
+            flex: 1;
+            padding: 15px;
+            background: #f5f5f5;
+            overflow-y: auto;
+          }
+         .wasa-msg {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+          }
+         .wasa-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+          }
+        </style>
+        <div class="wasa-ventana" id="wasa-ventana">
+          <div class="wasa-header">
+            <span>WasaChat</span>
+            <button class="wasa-close" onclick="toggleWidget()">×</button>
+          </div>
+          <div class="wasa-body">
+            <div class="wasa-msg">${saludo}</div>
+          </div>
+        </div>
+        <button class="wasa-btn" onclick="toggleWidget()">💬</button>
+      `;
+    }
+
+    window.toggleWidget = function() {
+      const ventana = document.getElementById('wasa-ventana');
+      if (ventana) ventana.classList.toggle('activo');
+    }
+
+    // Preview en vivo cuando cambiás valores
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('colorWidget').addEventListener('input', renderizarPreview);
+      document.getElementById('posWidget').addEventListener('change', renderizarPreview);
+      document.getElementById('saludoWidget').addEventListener('input', renderizarPreview);
+    });
 
     // Crear Sheet
     document.getElementById('crearSheetBtn').addEventListener('click', () => {
