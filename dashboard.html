@@ -647,7 +647,7 @@
 
     async function subirAvatarADrive(file) {
       if (!file) return null;
-      if (file.size > 2 * 1024) {
+      if (file.size > 2 * 1024 *1024) {
         throw new Error('La imagen debe pesar menos de 2MB');
       }
       if (!accessToken) throw new Error('No hay token de acceso. Autorizá Google Drive primero');
