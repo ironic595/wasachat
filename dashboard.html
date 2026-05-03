@@ -812,23 +812,24 @@
       .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
       .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
-        <div class="wasa-demo-page">
+ <div class="wasa-demo-page">
           <div>
             <h2>Tu Sitio Web</h2>
             <p>Así se verá el widget en tu página</p>
           </div>
-          <div class="wasa-widget">
-            <div class="wasa-ventana" id="wasa-ventana-preview">
-              <div class="wasa-header">
-                ${avatarHeader}
-                <span>${nombre}</span>
-                <button class="wasa-close" onclick="document.getElementById('wasa-ventana-preview').classList.remove('activo')">×</button>
-              </div>
-              <div class="wasa-body">
-                <div class="wasa-msg">${saludo}</div>
-              </div>
-            <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">${btnContent}</button>
+        <div class="wasa-widget">
+          <div class="wasa-ventana" id="wasa-ventana-preview">
+            <div class="wasa-header">
+              ${avatarHeader}
+              <span>${nombre}</span>
+              <button class="wasa-close" onclick="document.getElementById('wasa-ventana-preview').classList.remove('activo')">×</button>
+            </div>
+            <div class="wasa-body">
+              <div class="wasa-msg">${saludo}</div>
+            </div>
           </div>
+          <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">${btnContent}</button>
+        </div>
       `;
     }
 
