@@ -447,14 +447,10 @@
     let datosProductos = [];
     let datosConfig = [];
 
-    gapi.load('client', async () => {
-      await gapi.client.init({});
-    });
-
-    // SCOPE ACTUALIZADO: Sheets + Drive
+    // SOLO DRIVE - Sheets eliminado
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/drive.file',
       callback: '',
     });
 
@@ -490,9 +486,13 @@
               nombre: 'WasaChat',
               avatar: ''
             },
-            hojas: { productos: 'Productos', faq: 'FAQ' },
+            data: { // NUEVO - Estructura fija
+              productos: [],
+              faq: [],
+              updated_at: Date.now()
+            },
             created_at: oldData.fecha_registro || firebase.firestore.FieldValue.serverTimestamp(),
-        ...oldData
+           ...oldData
           }, { merge: true });
         } else {
           await botDocRef.set({
@@ -507,7 +507,11 @@
               nombre: 'WasaChat',
               avatar: ''
             },
-            hojas: { productos: 'Productos', faq: 'FAQ' },
+            data: { // NUEVO
+              productos: [],
+              faq: [],
+              updated_at: Date.now()
+            },
             created_at: firebase.firestore.FieldValue.serverTimestamp()
           });
         }
@@ -529,28 +533,18 @@
 
     function mostrarPanelCorrecto() {
       const stepDominio = document.getElementById('stepDominio');
-      const stepSheet = document.getElementById('stepSheet');
       const panelPrincipal = document.getElementById('panelPrincipal');
 
       if (!userData.domain) {
         stepDominio.classList.remove('hidden');
-        stepSheet.classList.add('hidden');
         panelPrincipal.classList.add('hidden');
         return;
       }
 
-      if (!userData.sheet_id) {
-        stepDominio.classList.add('hidden');
-        stepSheet.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-        return;
-      }
-
+      // Sheets eliminado - va directo al panel
       stepDominio.classList.add('hidden');
-      stepSheet.classList.add('hidden');
       panelPrincipal.classList.remove('hidden');
       document.getElementById('dominioActual').textContent = userData.domain;
-      document.getElementById('sheetLink').href = userData.sheet_url;
 
       const estadoBotSpan = document.getElementById('estadoBot');
       const btnComprar = document.getElementById('btnComprarPlan');
@@ -646,24 +640,20 @@
       showToast('📋 Código copiado');
     }
 
-    // FUNCIÓN PARA PEDIR TOKEN CON DRIVE
-   async function asegurarTokenDrive() {
-  if (accessToken) return true;
-
-  return new Promise((resolve, reject) => {
-    tokenClient.callback = (resp) => {
-      if (resp.error) {
-        reject(new Error('No autorizaste Google Drive'));
-        return;
-      }
-      accessToken = resp.access_token;
-      console.log('Token con scopes:', resp.scope);
-      resolve(true);
-    };
-    // SACÁ EL PROMPT: CONSENT ↓
-    tokenClient.requestAccessToken({prompt: ''}); // ← Vacío, no pide cada vez
-  });
-}
+    async function asegurarTokenDrive() {
+      if (accessToken) return true;
+      return new Promise((resolve, reject) => {
+        tokenClient.callback = (resp) => {
+          if (resp.error) {
+            reject(new Error('No autorizaste Google Drive'));
+            return;
+          }
+          accessToken = resp.access_token;
+          resolve(true);
+        };
+        tokenClient.requestAccessToken({prompt: ''});
+      });
+    }
 
     function abrirEditorWidget() {
       const cfg = userData.config || {};
@@ -680,7 +670,6 @@
         document.getElementById('avatarPreview').innerHTML = '💬';
       }
 
-      // Pedir token al abrir el modal
       asegurarTokenDrive().catch(err => {
         showToast('Necesitás autorizar Google Drive para subir avatares', 'error');
       });
@@ -696,20 +685,15 @@
       document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
     }
 
-    // SUBIR AVATAR A DRIVE + GUARDAR EN FIREBASE ← ACÁ ESTÁ EL FIX
     async function subirAvatarADrive(file) {
       if (!file) return null;
-
-      // Validación correcta: 2MB
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > 2 * 1024) {
         throw new Error('La imagen debe pesar menos de 2MB');
       }
-
       if (!accessToken) throw new Error('No hay token de acceso. Autorizá Google Drive primero');
 
       showLoading(true);
       try {
-        // 1. Subir archivo a Drive
         const metadata = {
           name: `wasa_avatar_${currentUser.uid}_${Date.now()}.${file.name.split('.').pop()}`,
           mimeType: file.type
@@ -725,14 +709,10 @@
           body: form
         });
 
-        if (!uploadRes.ok) {
-          const err = await uploadRes.text();
-          throw new Error('Error al subir: ' + err);
-        }
+        if (!uploadRes.ok) throw new Error('Error al subir: ' + await uploadRes.text());
         const fileData = await uploadRes.json();
         const fileId = fileData.id;
 
-        // 2. Hacer público el archivo
         await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
           method: 'POST',
           headers: {
@@ -742,16 +722,13 @@
           body: JSON.stringify({ role: 'reader', type: 'anyone' })
         });
 
-        // 3. URL directa para usar en <img>
         const url = `https://lh3.googleusercontent.com/d/${fileId}`;
 
-        // 4. GUARDAR EN FIRESTORE ← ESTO FALTABA
         await db.collection('bots').doc(currentUser.email).update({
           'config.avatar': url,
           'config.avatarUpdated': firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Actualizar userData local
         if (!userData.config) userData.config = {};
         userData.config.avatar = url;
 
@@ -813,7 +790,7 @@
       if (previewMini) {
         previewMini.style.background = color;
         if (cfg.avatar) {
-          previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`; // Sin &t=
+          previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
         } else {
           previewMini.innerHTML = '💬';
         }
@@ -835,54 +812,53 @@
       const avatar = document.getElementById('avatarWidgetEdit').value;
 
       const container = document.getElementById('preview-container-widget');
-      const avatarUrl = avatar || ''; // Sin &t=
+      const avatarUrl = avatar || '';
 
       const btnContent = avatarUrl
-     ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+       ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : '💬';
 
       const avatarHeader = avatarUrl
-     ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+       ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
         : '💬';
 
       container.innerHTML = `
         <style>
           #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-      .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-      .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-      .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-      .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-      .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-      .wasa-btn:hover { transform: scale(1.1); }
-      .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-      .wasa-ventana.activo { display: flex; }
-      .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-      .wasa-body { flex: 1; padding: 16px; background: #f5f5f5; overflow-y: auto; }
-      .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-      .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+         .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+         .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+         .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+         .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+         .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+         .wasa-btn:hover { transform: scale(1.1); }
+         .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+         .wasa-ventana.activo { display: flex; }
+         .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+         .wasa-body { flex: 1; padding: 16px; background: #f5f5; overflow-y: auto; }
+         .wasa-msg { background: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+         .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
         <div class="wasa-demo-page">
           <div>
             <h2>Tu Sitio Web</h2>
             <p>Así se verá el widget en tu página</p>
           </div>
-        <div class="wasa-widget">
-          <div class="wasa-ventana" id="wasa-ventana-preview">
-            <div class="wasa-header">
-              ${avatarHeader}
-              <span>${nombre}</span>
-              <button class="wasa-close" onclick="document.getElementById('wasa-ventana-preview').classList.remove('activo')">×</button>
-            </div>
-            <div class="wasa-body">
-              <div class="wasa-msg">${saludo}</div>
-            </div>
+          <div class="wasa-widget">
+            <div class="wasa-ventana" id="wasa-ventana-preview">
+              <div class="wasa-header">
+                ${avatarHeader}
+                <span>${nombre}</span>
+                <button class="wasa-close" onclick="document.getElementById('wasa-ventana-preview').classList.remove('activo')">×</button>
+              </div>
+              <div class="wasa-body">
+                <div class="wasa-msg">${saludo}</div>
+              </div>
+            <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">${btnContent}</button>
           </div>
-          <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">${btnContent}</button>
         </div>
       `;
     }
 
-    // EVENTO PARA SUBIR AVATAR
     document.addEventListener('DOMContentLoaded', () => {
       const fileInput = document.getElementById('avatarWidgetFile');
       if (fileInput) {
@@ -897,7 +873,6 @@
             return;
           }
 
-          // Preview local inmediato
           const reader = new FileReader();
           reader.onload = (e) => {
             document.getElementById('avatarPreview').innerHTML =
@@ -919,119 +894,7 @@
       }
     });
 
-    function resizeWidget(e) {
-      const container = document.getElementById('editor-widget-form').parentElement;
-      const containerRect = container.getBoundingClientRect();
-      const newWidth = e.clientX - containerRect.left;
-      if (newWidth > 300 && newWidth < 600) {
-        document.getElementById('editor-widget-form').style.width = newWidth + 'px';
-      }
-    }
-
-    // Resto del código de Sheets igual...
-    document.getElementById('crearSheetBtn').addEventListener('click', () => {
-      tokenClient.callback = async (resp) => {
-        if (resp.error) {
-          document.getElementById('sheetStatus').innerHTML = '<p class="error-msg">Error: ' + resp.error + '</p>';
-          return;
-        }
-        accessToken = resp.access_token;
-        await crearSheet(resp.access_token);
-      };
-      tokenClient.requestAccessToken({prompt: 'consent'});
-    });
-
-    async function crearSheet(token) {
-      showLoading(true);
-      const btn = document.getElementById('crearSheetBtn');
-      btn.disabled = true;
-      document.getElementById('sheetStatus').innerHTML = '';
-
-      try {
-        const metadata = {
-          name: `WasaChat - ${userData.email}`,
-          mimeType: 'application/vnd.google-apps.spreadsheet'
-        };
-
-        const driveRes = await fetch('https://www.googleapis.com/drive/v3/files', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify(metadata)
-        });
-
-        if (!driveRes.ok) throw new Error('Error de Drive API');
-        const file = await driveRes.json();
-        const sheetId = file.id;
-
-        const requests = [
-          { addSheet: { properties: { title: 'Productos' } } },
-          { addSheet: { properties: { title: 'FAQ' } } },
-          { deleteSheet: { sheetId: 0 } }
-        ];
-
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}:batchUpdate`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ requests })
-        });
-
-        const values = {
-          'Productos!A1:D1': [['nombre', 'precio', 'stock', 'descripcion']],
-          'FAQ!A1:B2': [
-            ['pregunta', 'respuesta'],
-            ['¿Cuáles son los horarios?', 'Lunes a Viernes de 9 a 18hs']
-          ]
-        };
-
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values:batchUpdate`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            valueInputOption: 'RAW',
-            data: Object.entries(values).map(([range, vals]) => ({ range, values: vals }))
-          })
-        });
-
-        await db.collection('bots').doc(currentUser.email).set({
-          sheet_id: sheetId,
-          sheet_url: `https://docs.google.com/spreadsheets/d/${sheetId}`,
-          hojas: { productos: 'Productos', faq: 'FAQ' }
-        }, { merge: true });
-
-        userData.sheet_id = sheetId;
-        userData.sheet_url = `https://docs.google.com/spreadsheets/d/${sheetId}`;
-        userData.hojas = { productos: 'Productos', faq: 'FAQ' };
-
-        showLoading(false);
-        mostrarPanelCorrecto();
-
-      } catch (error) {
-        showLoading(false);
-        console.error('Error completo en crearSheet:', error);
-        document.getElementById('sheetStatus').innerHTML = '<p class="error-msg">Error: ' + error.message + '</p>';
-        btn.disabled = false;
-      }
-    }
-
-    async function confirmarRecrearSheet() {
-      if (!confirm('¿Seguro? Se va a crear un Sheet nuevo y perderás la referencia al anterior.')) return;
-      await db.collection('bots').doc(currentUser.email).set({
-        sheet_id: firebase.firestore.FieldValue.delete(),
-        sheet_url: firebase.firestore.FieldValue.delete()
-      }, { merge: true });
-      location.reload();
-    }
-
-    async function obtenerToken() {
-      return new Promise((resolve) => {
-        tokenClient.callback = (resp) => {
-          accessToken = resp.access_token;
-          resolve(resp.access_token);
-        };
-        tokenClient.requestAccessToken({prompt: ''});
-      });
-    }
-
+    // EDITOR DE TABLAS - AHORA CON FIRESTORE
     async function abrirEditor(tab) {
       currentTab = tab;
       modoEdicion = false;
@@ -1053,7 +916,7 @@
         limpiarFormConfig();
       }
 
-      await cargarDatosDeSheet();
+      await cargarDatosDeFirestore();
     }
 
     function cerrarEditor() {
@@ -1088,25 +951,18 @@
       document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
     }
 
-    async function cargarDatosDeSheet() {
+    // NUEVO - Carga desde Firestore
+    async function cargarDatosDeFirestore() {
       showLoading(true);
-      if (!accessToken) await obtenerToken();
-
       try {
-        const resProd = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/Productos!A2:F`, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        const dataProd = await resProd.json();
-        datosProductos = dataProd.values || [];
+        const doc = await db.collection('bots').doc(currentUser.email).get();
+        const data = doc.data().data || {};
+
+        datosProductos = data.productos || [];
+        datosConfig = data.faq || [];
+
         renderTablaProductos();
-
-        const resConf = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/FAQ!A2:C`, {
-          headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        const dataConf = await resConf.json();
-        datosConfig = dataConf.values || [];
         renderTablaConfig();
-
         showLoading(false);
       } catch(e) {
         showLoading(false);
@@ -1120,7 +976,7 @@
       tbody.innerHTML = '';
       datosProductos.forEach((row, i) => {
         const tr = tbody.insertRow();
-        tr.innerHTML = `<td>${row[0]||''}</td><td>${row[1]||''}</td><td>${row[2]||''}</td><td>${row[3]||''}</td><td>${row[5]||''}</td>`;
+        tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.stock||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
         tr.onclick = () => seleccionarFila(tr, i, 'productos');
       });
     }
@@ -1130,46 +986,31 @@
       tbody.innerHTML = '';
       datosConfig.forEach((row, i) => {
         const tr = tbody.insertRow();
-        tr.innerHTML = `<td>${row[0]||''}</td><td>${row[1]||''}</td><td>${row[2]||''}</td>`;
+        tr.innerHTML = `<td>${row.pregunta||''}</td><td>${row.respuesta||''}</td><td>${row.keywords||''}</td>`;
         tr.onclick = () => seleccionarFila(tr, i, 'config');
       });
     }
 
+    // NUEVO - Guarda en Firestore
     async function syncProductos() {
-      if (!accessToken) await obtenerToken();
       try {
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/Productos!A2:F:clear`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
+        await db.collection('bots').doc(currentUser.email).update({
+          'data.productos': datosProductos,
+          'data.updated_at': Date.now()
         });
-        if (datosProductos.length > 0) {
-          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/Productos!A2:F?valueInputOption=RAW`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ values: datosProductos })
-          });
-        }
-        showToast('✅ Guardado en Google Sheets');
+        showToast('✅ Guardado');
       } catch(e) {
         showToast('Error al guardar: ' + e.message, 'error');
       }
     }
 
     async function syncConfig() {
-      if (!accessToken) await obtenerToken();
       try {
-        await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/FAQ!A2:C:clear`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` }
+        await db.collection('bots').doc(currentUser.email).update({
+          'data.faq': datosConfig,
+          'data.updated_at': Date.now()
         });
-        if (datosConfig.length > 0) {
-          await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${userData.sheet_id}/values/FAQ!A2:C?valueInputOption=RAW`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ values: datosConfig })
-          });
-        }
-        showToast('✅ Guardado en Google Sheets');
+        showToast('✅ Guardado');
       } catch(e) {
         showToast('Error al guardar: ' + e.message, 'error');
       }
@@ -1184,15 +1025,15 @@
       const urlProd = document.getElementById('inputUrlProd').value;
       if(!prod ||!precio ||!stock) return alert("Completá nombre, precio y stock");
 
-      const nuevaFila = [prod, precio, stock, desc, foto, urlProd];
+      const nuevoProd = {nombre: prod, precio, stock, desc, foto, url: urlProd};
 
       if (modoEdicion && indiceEdicion!== null) {
-        datosProductos[indiceEdicion] = nuevaFila;
+        datosProductos[indiceEdicion] = nuevoProd;
         modoEdicion = false;
         indiceEdicion = null;
         limpiarFormProductos();
       } else {
-        datosProductos.push(nuevaFila);
+        datosProductos.push(nuevoProd);
         limpiarFormProductos();
       }
 
@@ -1217,15 +1058,15 @@
       const claves = document.getElementById('inputClaves').value;
       if(!pregunta ||!respuesta ||!claves) return alert("Completá los 3 campos");
 
-      const nuevaFila = [pregunta, respuesta, claves];
+      const nuevaFaq = {pregunta, respuesta, keywords: claves};
 
       if (modoEdicion && indiceEdicion!== null) {
-        datosConfig[indiceEdicion] = nuevaFila;
+        datosConfig[indiceEdicion] = nuevaFaq;
         modoEdicion = false;
         indiceEdicion = null;
         limpiarFormConfig();
       } else {
-        datosConfig.push(nuevaFila);
+        datosConfig.push(nuevaFaq);
         limpiarFormConfig();
       }
 
@@ -1253,12 +1094,12 @@
 
       if (tipo === 'productos') {
         const datos = datosProductos[index];
-        document.getElementById('inputProducto').value = datos[0] || '';
-        document.getElementById('inputPrecio').value = datos[1] || '';
-        document.getElementById('inputStock').value = datos[2] || '';
-        document.getElementById('inputDesc').value = datos[3] || '';
-        document.getElementById('inputFoto').value = datos[4] || '';
-        document.getElementById('inputUrlProd').value = datos[5] || '';
+        document.getElementById('inputProducto').value = datos.nombre || '';
+        document.getElementById('inputPrecio').value = datos.precio || '';
+        document.getElementById('inputStock').value = datos.stock || '';
+        document.getElementById('inputDesc').value = datos.desc || '';
+        document.getElementById('inputFoto').value = datos.foto || '';
+        document.getElementById('inputUrlProd').value = datos.url || '';
         document.getElementById('btnGuardar').textContent = '✏️ Actualizar Producto';
         document.getElementById('tituloFormProd').textContent = 'Editar Producto';
         document.getElementById('modoEdicionProd').classList.remove('hidden');
@@ -1266,9 +1107,9 @@
         document.getElementById('btnBorrar').disabled = false;
       } else {
         const datos = datosConfig[index];
-        document.getElementById('inputPregunta').value = datos[0] || '';
-        document.getElementById('inputRespuesta').value = datos[1] || '';
-        document.getElementById('inputClaves').value = datos[2] || '';
+        document.getElementById('inputPregunta').value = datos.pregunta || '';
+        document.getElementById('inputRespuesta').value = datos.respuesta || '';
+        document.getElementById('inputClaves').value = datos.keywords || '';
         document.getElementById('btnGuardarConfig').textContent = '✏️ Actualizar Pregunta';
         document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
         document.getElementById('modoEdicionConfig').classList.remove('hidden');
@@ -1306,7 +1147,7 @@
       showLoading(false);
     });
 
-    // CARGAR CSV
+    // CARGAR CSV - Guarda en Firestore
     document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
       const file = document.getElementById('csvProductos').files[0];
       if (!file) return alert('Seleccioná un archivo CSV');
@@ -1318,7 +1159,14 @@
 
       datosProductos = lines.slice(1).map(line => {
         const vals = line.split(',');
-        return [vals[0]||'', vals[1]||'', vals[2]||'', vals[3]||'', vals[4]||'', vals[5]||''];
+        return {
+          nombre: vals[0]||'',
+          precio: vals[1]||'',
+          stock: vals[2]||'',
+          desc: vals[3]||'',
+          foto: vals[4]||'',
+          url: vals[5]||''
+        };
       });
 
       renderTablaProductos();
@@ -1339,7 +1187,11 @@
 
       datosConfig = lines.slice(1).map(line => {
         const vals = line.split(',');
-        return [vals[0]||'', vals[1]||'', vals[2]||''];
+        return {
+          pregunta: vals[0]||'',
+          respuesta: vals[1]||'',
+          keywords: vals[2]||''
+        };
       });
 
       renderTablaConfig();
