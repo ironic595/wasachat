@@ -576,7 +576,6 @@ footer {
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
-  // 1. PEGÁ TU firebaseConfig ACÁ
   const firebaseConfig = {
     apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
     authDomain: "dbwasa-f07b6.firebaseapp.com",
@@ -587,12 +586,10 @@ footer {
     measurementId: "G-S27J09LLF7"
   };
 
-  // 2. Inicializar Firebase
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // 3. Modal abrir/cerrar
   const btnLogin = document.getElementById('btnLogin');
   const modalLogin = document.getElementById('modalLogin');
   const closeModal = document.getElementById('closeModal');
@@ -612,13 +609,9 @@ footer {
     document.body.style.overflow = 'auto';
   }
 
-  // 4. Login con Google - SOLO CUANDO HACE CLIC EN EL BOTÓN
   const provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({
-    prompt: 'select_account'  // <- Fuerza selector de cuentas
-  });
-  
-  // Crear el botón de login dentro del modal
+  provider.setCustomParameters({ prompt: 'select_account' });
+
   document.querySelector('.modal-body').innerHTML = `
     <button id="googleLoginBtn" style="width:100%;padding:1rem;background:#fff;border:1px solid #ddd;border-radius:25px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font-weight:600;">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
@@ -630,43 +623,57 @@ footer {
     </p>
   `;
 
+  function generarBotId() {
+    return 'wasa_' + Math.random().toString(36).substring(2, 10);
+  }
+
   document.getElementById('googleLoginBtn').addEventListener('click', async () => {
     try {
       const result = await auth.signInWithPopup(provider);
       const user = result.user;
-      
-      // 5. Crear usuario en Firestore si es la primera vez
-      const userRef = db.collection('users').doc(user.email);
-      const doc = await userRef.get();
-      
+
+      // CREA DIRECTO EN BOTS - No más colección 'users'
+      const botRef = db.collection('bots').doc(user.email);
+      const doc = await botRef.get();
+
       if (!doc.exists) {
-        await userRef.set({
+        await botRef.set({
           email: user.email,
-          nombre: user.displayName,
+          bot_id: generarBotId(),
+          nombre_usuario: user.displayName, // Dato de Auth
           estado: "gratis",
           plan: null,
           fecha_registro: firebase.firestore.FieldValue.serverTimestamp(),
           fecha_vencimiento: null,
           pago_alguna_vez: false,
           whatsapp_numero: "",
-          sheet_id: "",
-          sheet_url: ""
+          domain: null,
+          config: {
+            color: '#25D366',
+            pos: 'right',
+            saludo: 'Hola 👋 ¿En qué te ayudo?',
+            nombre: 'WasaChat',
+            avatar: ''
+          },
+          data: {
+            productos: [],
+            faq: [],
+            updated_at: Date.now()
+          },
+          created_at: firebase.firestore.FieldValue.serverTimestamp()
         });
-        console.log("Usuario nuevo creado en Firestore");
-      } else {
-        console.log("Usuario ya existe:", doc.data());
+        console.log("Bot nuevo creado");
       }
-      
+
       cerrarModal();
       window.location.href = "dashboard.html";
-      
+
     } catch (error) {
       console.error("Error en login:", error);
       alert("Error al iniciar sesión. Intentá de nuevo.");
     }
   });
 
-  // 6. Detectar si ya está logueado - Cambiar texto del botón
   auth.onAuthStateChanged((user) => {
     if (user) {
       btnLogin.textContent = "Mi Dashboard";
@@ -680,24 +687,21 @@ footer {
     }
   });
 
-  // Cerrar con ESC
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape' && modalLogin.classList.contains('active')) {
       cerrarModal();
     }
   });
 
-    function elegirPlan(tipo, precio) {
-  // Guardamos el plan elegido para el checkout
-  localStorage.setItem('planElegido', JSON.stringify({
-    tipo: tipo,
-    precio: precio,
-    nombre: tipo === 'mensual' ? 'Plan Mensual' : tipo === 'semestral' ? 'Plan Semestral' : 'Plan Anual'
-  }));
-  window.location.href = 'checkout.html';
-}
+  function elegirPlan(tipo, precio) {
+    localStorage.setItem('planElegido', JSON.stringify({
+      tipo: tipo,
+      precio: precio,
+      nombre: tipo === 'mensual'? 'Plan Mensual' : tipo === 'semestral'? 'Plan Semestral' : 'Plan Anual'
+    }));
+    window.location.href = 'checkout.html';
+  }
 </script>
-
    
 </body>
 </html>
