@@ -1,7 +1,6 @@
 (function() {
   'use strict';
 
-  // 1. LEER CONFIG DEL SCRIPT TAG DEL CLIENTE
   const scriptTag = document.currentScript;
   const CLIENT_EMAIL = scriptTag.getAttribute('data-client-email');
   const FIREBASE_CONFIG = JSON.parse(scriptTag.getAttribute('data-firebase-config'));
@@ -11,7 +10,6 @@
     return;
   }
 
-  // 2. CARGAR FIREBASE SDK DINÁMICAMENTE - así el cliente pega 1 sola línea
   function loadScript(src) {
     return new Promise((resolve) => {
       const s = document.createElement('script');
@@ -31,25 +29,14 @@
     let PRODUCTOS = [];
     let FAQS = [];
     let ULTIMOS_PRODUCTOS_MOSTRADOS = [];
-    let NOMBRES_COLECCIONES = { productos: "Productos", faq: "FAQ" };
-
-    const FRASES = {
-      hola: ["¡Holaa! 👋 ¿Qué andás buscando hoy?", "¡Ey! 😄 Decime qué necesitás"],
-      encontreUno: ["¡Mirá lo que encontré para vos! 👇", "Creo que esto te sirve 😎"],
-      encontreVarios: ["Encontré varias opciones 👇", "Fijate cuál te gusta más:"],
-      listaCompleta: ["Te paso todas las {categoria} que tenemos: 👇", "Estas son todas las {categoria} disponibles:"],
-      noHay: ["No tengo ese exacto 😅 Pero mirá estos:", "No lo encontré, pero capaz te sirve alguno:"],
-      suspendido: ["Este chat está temporalmente suspendido. Contactá a soporte.", "Servicio pausado. Regularizá tu suscripción para activarlo."],
-      cta: ["Comprar ahora 😉", "Ver en la tienda", "¿Te paso el link?"]
+    let BOT_CONFIG = { // defaults
+      color: '#2563eb',
+      nombre: 'Asistente',
+      saludo: '¡Hola! ¿En qué te ayudo?',
+      pos: 'right',
+      avatar: null
     };
 
-    function fraseRandom(tipo, vars = {}) {
-      let frase = FRASES[tipo][Math.floor(Math.random() * FRASES[tipo].length)];
-      Object.keys(vars).forEach(k => frase = frase.replace(`{${k}}`, vars[k]));
-      return frase;
-    }
-
-    // CARGAR DATOS + VALIDAR SUSCRIPCIÓN
     async function cargarDatos() {
       try {
         const botDoc = await db.collection('bots').doc(CLIENT_EMAIL).get();
@@ -57,20 +44,34 @@
 
         const data = botDoc.data();
 
-        // VALIDACIÓN DE SUSCRIPCIÓN - Si no está activo, no carga nada
+        // VALIDACIÓN DE SUSCRIPCIÓN Y DOMINIO
         if (data.estado!== 'activo' && data.estado!== 'gratis') {
-          agregarMensaje('bot', fraseRandom('suspendido'));
+          console.log('[WasaChat] Bot suspendido');
           return false;
         }
 
-        if (data.hojas) {
-          NOMBRES_COLECCIONES.productos = data.hojas.productos || "Productos";
-          NOMBRES_COLECCIONES.faq = data.hojas.faq || "FAQ";
+        // Validar dominio - opcional pero recomendado
+        if (data.domain && window.location.hostname!== data.domain && window.location.hostname!== 'localhost') {
+          console.error('[WasaChat] Dominio no autorizado:', window.location.hostname);
+          return false;
         }
 
+        // CARGAR CONFIG DEL BOT
+        if (data.config) {
+          BOT_CONFIG.color = data.config.color || '#2563eb';
+          BOT_CONFIG.nombre = data.config.nombre || 'Asistente';
+          BOT_CONFIG.saludo = data.config.saludo || '¡Hola! ¿En qué te ayudo?';
+          BOT_CONFIG.pos = data.config.pos || 'right';
+          BOT_CONFIG.avatar = data.config.avatar || null;
+        }
+
+        // NOMBRES DE SUBCOLECCIONES
+        const colProductos = data.hojas?.productos || "Productos";
+        const colFaq = data.hojas?.faq || "FAQ";
+
         const [prod, faqs] = await Promise.all([
-          db.collection('bots').doc(CLIENT_EMAIL).collection(NOMBRES_COLECCIONES.productos).get(),
-          db.collection('bots').doc(CLIENT_EMAIL).collection(NOMBRES_COLECCIONES.faq).get()
+          db.collection('bots').doc(CLIENT_EMAIL).collection(colProductos).get(),
+          db.collection('bots').doc(CLIENT_EMAIL).collection(colFaq).get()
         ]);
 
         PRODUCTOS = prod.docs.map(d => ({id: d.id,...d.data()}));
@@ -87,8 +88,8 @@
       const limpiar = (str) => {
         if (!str) return '';
         return str.toString().toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[¿?¡!,.;:]/g, '');
+       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+       .replace(/[¿?¡!,.;:]/g, '');
       }
       const palabrasUsuario = limpiar(texto).split(' ').filter(p => p.length > 2);
       if(palabrasUsuario.length === 0) return [];
@@ -130,52 +131,54 @@
         <img src="${p.imagen}" style="width:100%;border-radius:8px;margin:8px 0"><br>
         ${p.descripcion}<br>
         <b>$${p.precio?.toLocaleString('es-AR')}</b><br>
-        <a href="${p.link}" target="_blank" style="background:#2563eb;color:#fff;padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600">
-          ${fraseRandom('cta')}
+        <a href="${p.link}" target="_blank" style="background:${BOT_CONFIG.color};color:#fff;padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600">
+          Comprar ahora
         </a>
       `;
     }
 
     function responder(texto) {
-      if(/hola|buenas|hey/.test(texto.toLowerCase())) return fraseRandom('hola');
+      if(/hola|buenas|hey/.test(texto.toLowerCase())) return BOT_CONFIG.saludo;
       const faq = FAQS.find(f => texto.toLowerCase().includes(f.pregunta.toLowerCase()));
       if(faq) return faq.respuesta;
 
       const encontrados = buscarProductos(texto);
       if(esBusquedaAmplia(texto, encontrados)) {
         const categoria = encontrados[0].categoria || texto;
-        return `${fraseRandom('listaCompleta', {categoria})}<br>${armarListaProductos(encontrados)}`;
+        return `Te paso todas las ${categoria} que tenemos: 👇<br>${armarListaProductos(encontrados)}`;
       }
-      if(encontrados.length === 1) return `${fraseRandom('encontreUno')}<br><br>${fichaProducto(encontrados[0])}`;
-      if(encontrados.length > 1) return `${fraseRandom('encontreVarios')}<br>${armarListaProductos(encontrados.slice(0,6))}`;
+      if(encontrados.length === 1) return `¡Mirá lo que encontré! 👇<br><br>${fichaProducto(encontrados[0])}`;
+      if(encontrados.length > 1) return `Encontré varias opciones 👇<br>${armarListaProductos(encontrados.slice(0,6))}`;
 
       const top = PRODUCTOS.slice(0,6);
       ULTIMOS_PRODUCTOS_MOSTRADOS = top;
-      return `${fraseRandom('noHay')}<br>${armarListaProductos(top)}`;
+      return `No tengo ese exacto 😅 Pero mirá estos:<br>${armarListaProductos(top)}`;
     }
 
-    // UI
+    // UI CON CONFIG PERSONALIZADA
+    const posStyle = BOT_CONFIG.pos === 'left'? 'left:20px;' : 'right:20px;';
     const root = document.createElement('div');
     root.id = 'wasachat-root';
     root.innerHTML = `
       <style>
         #wasachat-root * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-     .wc-bubble { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #2563eb; border-radius: 50%; color: #fff; font-size: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.2); z-index: 99999; }
-     .wc-window { position: fixed; bottom: 90px; right: 20px; width: 90vw; max-width: 360px; height: 500px; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.2); display: none; flex-direction: column; overflow: hidden; z-index: 99999; }
-     .wc-window.open { display: flex; }
-     .wc-header { background: #2563eb; color: #fff; padding: 14px; font-weight: 600; }
-     .wc-msgs { flex: 1; padding: 12px; overflow-y: auto; background: #f5f5f5; font-size: 14px; }
-     .wc-input { display: flex; padding: 8px; border-top: 1px solid #ddd; }
-     .wc-input input { flex: 1; border: 1px solid #ccc; border-radius: 20px; padding: 8px 12px; outline: none; }
-     .wc-msg { margin: 8px 0; }
-     .wc-msg.user { text-align: right; }
-     .wc-bubble-msg { display: inline-block; padding: 8px 12px; border-radius: 12px; max-width: 85%; text-align: left; }
-     .wc-msg.bot.wc-bubble-msg { background: #fff; border: 1px solid #eee; }
-     .wc-msg.user.wc-bubble-msg { background: #2563eb; color: #fff; }
+    .wc-bubble { position: fixed; bottom: 20px; ${posStyle} width: 60px; height: 60px; background: ${BOT_CONFIG.color}; border-radius: 50%; color: #fff; font-size: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.2); z-index: 99999; }
+    .wc-bubble img { width: 36px; height: 36px; border-radius: 50%; }
+    .wc-window { position: fixed; bottom: 90px; ${posStyle} width: 90vw; max-width: 360px; height: 500px; background: #fff; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,.2); display: none; flex-direction: column; overflow: hidden; z-index: 99999; }
+    .wc-window.open { display: flex; }
+    .wc-header { background: ${BOT_CONFIG.color}; color: #fff; padding: 14px; font-weight: 600; }
+    .wc-msgs { flex: 1; padding: 12px; overflow-y: auto; background: #f5f5f5; font-size: 14px; }
+    .wc-input { display: flex; padding: 8px; border-top: 1px solid #ddd; }
+    .wc-input input { flex: 1; border: 1px solid #ccc; border-radius: 20px; padding: 8px 12px; outline: none; }
+    .wc-msg { margin: 8px 0; }
+    .wc-msg.user { text-align: right; }
+    .wc-bubble-msg { display: inline-block; padding: 8px 12px; border-radius: 12px; max-width: 85%; text-align: left; }
+    .wc-msg.bot.wc-bubble-msg { background: #fff; border: 1px solid #eee; }
+    .wc-msg.user.wc-bubble-msg { background: ${BOT_CONFIG.color}; color: #fff; }
       </style>
-      <div class="wc-bubble">💬</div>
+      <div class="wc-bubble">${BOT_CONFIG.avatar? `<img src="${BOT_CONFIG.avatar}">` : '💬'}</div>
       <div class="wc-window">
-        <div class="wc-header">Asistente de tienda</div>
+        <div class="wc-header">${BOT_CONFIG.nombre}</div>
         <div class="wc-msgs"></div>
         <div class="wc-input">
           <input placeholder="Escribí acá...">
@@ -207,7 +210,6 @@
       }
     };
 
-    // Exponer función global para clicks en cards
     window.WasaChat = {
       verProducto: (index) => {
         const p = ULTIMOS_PRODUCTOS_MOSTRADOS[index];
@@ -216,9 +218,8 @@
       }
     };
 
-    // ARRANCAR
     const ok = await cargarDatos();
-    if(ok) agregarMensaje('bot', fraseRandom('hola'));
+    if(ok) agregarMensaje('bot', BOT_CONFIG.saludo);
   }
 
   init();
