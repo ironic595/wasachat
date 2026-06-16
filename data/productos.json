@@ -1,32 +1,38 @@
 [
   {
-    "nombre": "Plan Starter",
-    "modelo": "Mensual",
-    "precio": 25000,
-    "categoria": "suscripcion",
-    "descripcion": "Hasta 1000 consultas/mes. Respuestas con IA. Personalización básica.",
-    "link": "https://wasa.chat/#pricing",
-    "imagen": "/wasachat/assets/img/plan-starter.png",
-    "keywords": ["plan", "starter", "basico", "barato", "emprendedor"]
+    "nombre": "WasaChat",
+    "modelo": "1 mes",
+    "precio": 4.99,
+    "precio_mes": 4.99,
+    "duracion": 1,
+    "moneda": "USD",
+    "descripcion": "Chatbot con IA para tu web. Respuestas ilimitadas 24/7. Instalación en 5 minutos. Sin permanencia.",
+    "link": "https://wasa.chat/checkout?plan=mes",
+    "ahorro": 0,
+    "keywords": ["mes", "mensual", "plan", "precio", "costo", "cuanto", "vale", "barato", "ofrecen", "prueba"]
   },
   {
-    "nombre": "Plan Pro",
-    "modelo": "Mensual",
-    "precio": 45000,
-    "categoria": "suscripcion", 
-    "descripcion": "Consultas ilimitadas. IA avanzada. Múltiples FAQs. Soporte prioritario.",
-    "link": "https://wasa.chat/#pricing",
-    "imagen": "/wasachat/assets/img/plan-pro.png",
-    "keywords": ["plan", "pro", "profesional", "ilimitado", "empresa"]
+    "nombre": "WasaChat",
+    "modelo": "6 meses",
+    "precio": 27.99,
+    "precio_mes": 4.67,
+    "duracion": 6,
+    "moneda": "USD",
+    "descripcion": "Mismo servicio por 6 meses. Te ahorrás vs pagar mes a mes. Ideal si ya probaste y te gustó.",
+    "link": "https://wasa.chat/checkout?plan=6meses",
+    "ahorro": 6,
+    "keywords": ["6 meses", "semestral", "semestre", "plan", "precio", "ahorro", "descuento", "oferta"]
   },
   {
-    "nombre": "Plan Agency",
-    "modelo": "Mensual",
-    "precio": 99000,
-    "categoria": "suscripcion",
-    "descripcion": "Para agencias. 10 clientes incluidos. White label. API access.",
-    "link": "https://wasa.chat/#pricing",
-    "imagen": "/wasachat/assets/img/plan-agency.png",
-    "keywords": ["plan", "agency", "agencia", "white label", "revendedor"]
+    "nombre": "WasaChat",
+    "modelo": "1 año",
+    "precio": 49.99,
+    "precio_mes": 4.17,
+    "duracion": 12,
+    "moneda": "USD",
+    "descripcion": "El mejor precio. WasaChat por 12 meses. Te queda a $4.17/mes. Ahorrás 16% vs mensual.",
+    "link": "https://wasa.chat/checkout?plan=anual",
+    "ahorro": 16,
+    "keywords": ["año", "anual", "12 meses", "plan", "precio", "ahorro", "descuento", "barato", "oferta", "mejor"]
   }
 ]
