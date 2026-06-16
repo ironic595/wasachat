@@ -1,1 +1,26 @@
-
+[
+  {
+    "pregunta": "Como funciona",
+    "respuesta": "Pegás 1 línea de código en tu web y el bot empieza a responder 24/7 usando tus productos. Sin programar nada."
+  },
+  {
+    "pregunta": "Que necesito",
+    "respuesta": "Solo una lista de productos en Google Sheets o Excel. Nosotros la conectamos a Firebase y listo."
+  },
+  {
+    "pregunta": "Cuanto cuesta",
+    "respuesta": "Desde $25.000/mes el plan Starter. Tenés 7 días gratis para probar sin tarjeta."
+  },
+  {
+    "pregunta": "Sirve para tienda nube",
+    "respuesta": "Sí, funciona en Tiendanube, Shopify, WordPress, Wix, o cualquier web donde puedas pegar un script."
+  },
+  {
+    "pregunta": "Usa inteligencia artificial",
+    "respuesta": "Sí, pero no inventa. Solo responde con la info de productos que vos cargás. Cero alucinaciones."
+  },
+  {
+    "pregunta": "Metodos de pago",
+    "respuesta": "MercadoPago, transferencia o tarjeta. Facturamos en Argentina."
+  }
+]
