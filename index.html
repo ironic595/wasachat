@@ -920,27 +920,59 @@ footer {
     `).join('');
   }
 
-  function armarCard(item) {
-    if(item.pregunta) return `<b>${item.pregunta}</b><br><br>${item.respuesta}`;
-    return `
-      <b>${item.nombre} - ${item.modelo || ''}</b><br>
-      ${item.imagen? `<img src="${item.imagen}" style="width:100%;border-radius:8px;margin:8px 0">` : ''}
-      ${item.descripcion}<br>
-      ${item.precio? `<b style="color:#16a34a">$${item.precio.toLocaleString('es-AR')}/mes</b><br>` : ''}
-      ${item.link? `<a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600">Ver más</a>` : ''}
-    `;
+function armarCard(item) {
+  if(item.pregunta) return `<b>${item.pregunta}</b><br><br>${item.respuesta}`;
+  
+  return `
+    <b>${item.nombre} - ${item.modelo}</b><br>
+    ${item.imagen? `<img src="${item.imagen}" style="width:100%;border-radius:8px;margin:8px 0">` : ''}
+    ${item.descripcion}<br>
+    <b style="font-size:18px">$${item.precio} ${item.moneda || 'USD'}</b> total<br>
+    <span style="color:#64748b;font-size:13px">($${item.precio_mes}/mes)</span><br>
+    ${item.ahorro > 0? `<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">Ahorrás ${item.ahorro}%</span><br>` : ''}
+    <a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600">
+      Contratar por ${item.modelo}
+    </a>
+  `;
+}
+
+function responder(texto) {
+  const t = texto.toLowerCase();
+
+  if(/hola|buenas|hey|buen dia|buenas tardes/.test(t)) {
+    const saludos = [
+      '¡Hola! 👋 WasaChat desde $4.99 USD. Mismo servicio, elegís duración: 1 mes, 6 meses o 1 año. ¿Qué te sirve?',
+      '¡Hey! Arrancamos en $4.99/mes. Si pagás anual te queda $4.17/mes. ¿Querés ver opciones?',
+      '¡Buenas! Es simple: $4.99 por mes, $27.99 por 6 meses, $49.99 por año. Todo incluido.'
+    ];
+    return saludos[Math.floor(Math.random() * saludos.length)];
   }
 
-  function responder(texto) {
-    const t = texto.toLowerCase();
-    if(/hola|buenas|hey/.test(t)) return BOT_CONFIG.saludo;
-
-    const encontrados = buscar(texto);
-    if(encontrados.length === 1) return armarCard(encontrados[0]);
-    if(encontrados.length > 1) return `Encontré esto: 👇<br>${armarLista(encontrados.slice(0,4))}`;
-
-    return `No encontré eso 😅 Probá: "planes", "precios", "cómo funciona", "métodos de pago"`;
+  const intencionPrecio = ['plan', 'planes', 'precio', 'precios', 'costo', 'costos', 'cuanto', 'vale', 'valen', 'ofrece', 'ofrecen', 'tienen', 'hay', 'cuesta', 'sale', 'barato'];
+  const esIntencionPrecio = intencionPrecio.some(p => t.includes(p));
+  
+  if(esIntencionPrecio) {
+    const frases = [
+      'Desde $4.99 USD tenés WasaChat. Mirá las opciones 👇',
+      'Re barato: arranca en $4.99. Si pagás más meses, mejor precio 👇',
+      'Mismo servicio, 3 duraciones. El anual es el que más conviene 👇',
+      'Te paso los precios. Sin letra chica, todo incluido 👇'
+    ];
+    const frase = frases[Math.floor(Math.random() * frases.length)];
+    return `${frase}<br>${armarLista(PRODUCTOS)}`;
   }
+
+  const encontrados = buscar(texto);
+  if(encontrados.length === 1) return armarCard(encontrados[0]);
+  if(encontrados.length > 1) return `Encontré esto: 👇<br>${armarLista(encontrados.slice(0,4))}`;
+
+  const noEncontrado = [
+    'No tengo ese dato 😅 Pero arranca en $4.99 USD/mes. Preguntame "precio"',
+    'Mmm no encontré eso. WasaChat sale $4.99 por mes, $27.99 x6 meses, $49.99 el año. ¿Cuál querés?',
+    'No tengo esa info. Es fácil: desde $4.17/mes si pagás anual. Tirame "planes"'
+  ];
+  return noEncontrado[Math.floor(Math.random() * noEncontrado.length)];
+}
 
   // 3. UI
   const bubble = document.getElementById('wc-bubble');
