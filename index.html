@@ -910,28 +910,37 @@ footer {
   }
 
   function armarLista(items) {
-    ULTIMOS_PRODUCTOS_MOSTRADOS = items;
-    return items.map((item,i) => `
-      <div onclick="window.WasaChatLanding.verItem(${i})" style="padding:10px;border:1px solid #e2e8f0;border-radius:8px;margin:8px 0;cursor:pointer;background:#fff">
-        <div style="font-weight:600;font-size:13px">${item.nombre || item.pregunta}</div>
-        <div style="font-size:12px;color:#64748b;margin-top:4px">${(item.descripcion || item.respuesta || '').substring(0,70)}...</div>
-        ${item.precio? `<div style="color:#16a34a;font-size:13px;font-weight:600;margin-top:4px">$${item.precio.toLocaleString('es-AR')}/mes</div>` : ''}
+  ULTIMOS_PRODUCTOS_MOSTRADOS = items;
+  return items.map((item,i) => `
+    <div onclick="window.WasaChatLanding.verItem(${i})" style="padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin:8px 0;cursor:pointer;background:#fff">
+      <div style="font-weight:700;font-size:14px;color:#1e293b">${item.nombre}</div>
+      <div style="font-size:12px;color:#64748b;margin:4px 0">${(item.descripcion || '').substring(0,60)}...</div>
+      <div style="margin-top:6px">
+        <span style="color:#16a34a;font-size:18px;font-weight:700">$${item.precio}</span>
+        <span style="color:#64748b;font-size:13px">${item.es_mensual? '/mes' : ' USD total'}</span>
       </div>
-    `).join('');
-  }
+      ${!item.es_mensual? `<div style="color:#64748b;font-size:12px">Equivale a $${item.precio_mes}/mes</div>` : ''}
+      ${item.ahorro > 0? `<div style="margin-top:4px"><span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600">Ahorrás ${item.ahorro}%</span></div>` : ''}
+    </div>
+  `).join('');
+}
 
 function armarCard(item) {
   if(item.pregunta) return `<b>${item.pregunta}</b><br><br>${item.respuesta}`;
   
   return `
-    <b>${item.nombre} - ${item.modelo}</b><br>
+    <b style="font-size:15px">${item.nombre}</b><br>
     ${item.imagen? `<img src="${item.imagen}" style="width:100%;border-radius:8px;margin:8px 0">` : ''}
-    ${item.descripcion}<br>
-    <b style="font-size:18px">$${item.precio} ${item.moneda || 'USD'}</b> total<br>
-    <span style="color:#64748b;font-size:13px">($${item.precio_mes}/mes)</span><br>
-    ${item.ahorro > 0? `<span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600">Ahorrás ${item.ahorro}%</span><br>` : ''}
-    <a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600">
-      Contratar por ${item.modelo}
+    ${item.descripcion}<br><br>
+    <div style="background:#f8fafc;padding:12px;border-radius:8px;margin:8px 0">
+      <div style="font-size:24px;font-weight:700;color:#16a34a">$${item.precio} USD</div>
+      <div style="color:#64748b;font-size:13px">
+        ${item.es_mensual? 'Precio mensual - Cancelás cuando quieras' : `Pago único por ${item.duracion} meses - Equivale a $${item.precio_mes}/mes`}
+      </div>
+      ${item.ahorro > 0? `<div style="margin-top:6px"><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">🔥 Ahorrás ${item.ahorro}%</span></div>` : ''}
+    </div>
+    <a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:10px 16px;border-radius:8px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600;width:100%;text-align:center">
+      Contratar ${item.nombre}
     </a>
   `;
 }
