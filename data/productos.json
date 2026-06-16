@@ -1,1 +1,32 @@
-
+[
+  {
+    "nombre": "Plan Starter",
+    "modelo": "Mensual",
+    "precio": 25000,
+    "categoria": "suscripcion",
+    "descripcion": "Hasta 1000 consultas/mes. Respuestas con IA. Personalización básica.",
+    "link": "https://wasa.chat/#pricing",
+    "imagen": "/wasachat/assets/img/plan-starter.png",
+    "keywords": ["plan", "starter", "basico", "barato", "emprendedor"]
+  },
+  {
+    "nombre": "Plan Pro",
+    "modelo": "Mensual",
+    "precio": 45000,
+    "categoria": "suscripcion", 
+    "descripcion": "Consultas ilimitadas. IA avanzada. Múltiples FAQs. Soporte prioritario.",
+    "link": "https://wasa.chat/#pricing",
+    "imagen": "/wasachat/assets/img/plan-pro.png",
+    "keywords": ["plan", "pro", "profesional", "ilimitado", "empresa"]
+  },
+  {
+    "nombre": "Plan Agency",
+    "modelo": "Mensual",
+    "precio": 99000,
+    "categoria": "suscripcion",
+    "descripcion": "Para agencias. 10 clientes incluidos. White label. API access.",
+    "link": "https://wasa.chat/#pricing",
+    "imagen": "/wasachat/assets/img/plan-agency.png",
+    "keywords": ["plan", "agency", "agencia", "white label", "revendedor"]
+  }
+]
