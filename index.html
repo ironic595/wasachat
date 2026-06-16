@@ -860,33 +860,137 @@ footer {
 </div>
 
 <script>
-// LÓGICA BÁSICA - ABRIR/CERRAR
-document.getElementById('wc-bubble').onclick = () => {
-  document.getElementById('wc-window').classList.add('open');
-  document.getElementById('wc-bubble').style.display = 'none';
-};
+(function() {
+  'use strict';
 
-document.getElementById('wc-close').onclick = () => {
-  document.getElementById('wc-window').classList.remove('open');
-  document.getElementById('wc-bubble').style.display = 'flex';
-};
+  let PRODUCTOS = [];
+  let FAQS = [];
+  let ULTIMOS_PRODUCTOS_MOSTRADOS = [];
 
-// ACÁ DESPUÉS CONECTÁS LOS JSON
-document.getElementById('wc-send').onclick = () => {
-  const input = document.getElementById('wc-input-text');
-  if(!input.value.trim()) return;
-  
-  // Por ahora solo muestra el mensaje del user
+  const BOT_CONFIG = {
+    color: '#2563eb',
+    saludo: '¡Hola! 👋 Soy el bot de WasaChat. Preguntame por planes, precios o cómo funciona'
+  };
+
+  // 1. CARGAR LOS JSON DE /assets/data/
+  async function cargarDatos() {
+    try {
+      const [prodRes, faqRes] = await Promise.all([
+        fetch('/wasachat/data/productos.json'),
+        fetch('/wasachat/data/faq.json')
+      ]);
+      PRODUCTOS = await prodRes.json();
+      FAQS = await faqRes.json();
+      console.log('[WasaChat] Cargados:', PRODUCTOS.length, 'planes,', FAQS.length, 'faqs');
+    } catch(e) {
+      console.error('[WasaChat] Error:', e);
+      agregarMensaje('bot', 'Error cargando datos. Fijate que estén en /wasachat/assets/data/');
+    }
+  }
+
+  // 2. BUSCADOR
+  function buscar(texto) {
+    const limpiar = (str) => {
+      if (!str) return '';
+      return str.toString().toLowerCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .replace(/[¿?¡!,.;:]/g, '');
+    }
+    const palabras = limpiar(texto).split(' ').filter(p => p.length > 2);
+    if(palabras.length === 0) return [];
+
+    return [...PRODUCTOS,...FAQS].filter(item => {
+      const textoCompleto = limpiar(`
+        ${item.nombre || item.pregunta || ''}
+        ${item.descripcion || item.respuesta || ''}
+        ${item.keywords?.join(' ') || ''}
+      `);
+      return palabras.every(p => textoCompleto.includes(p));
+    });
+  }
+
+  function armarLista(items) {
+    ULTIMOS_PRODUCTOS_MOSTRADOS = items;
+    return items.map((item,i) => `
+      <div onclick="window.WasaChatLanding.verItem(${i})" style="padding:10px;border:1px solid #e2e8f0;border-radius:8px;margin:8px 0;cursor:pointer;background:#fff">
+        <div style="font-weight:600;font-size:13px">${item.nombre || item.pregunta}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:4px">${(item.descripcion || item.respuesta || '').substring(0,70)}...</div>
+        ${item.precio? `<div style="color:#16a34a;font-size:13px;font-weight:600;margin-top:4px">$${item.precio.toLocaleString('es-AR')}/mes</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function armarCard(item) {
+    if(item.pregunta) return `<b>${item.pregunta}</b><br><br>${item.respuesta}`;
+    return `
+      <b>${item.nombre} - ${item.modelo || ''}</b><br>
+      ${item.imagen? `<img src="${item.imagen}" style="width:100%;border-radius:8px;margin:8px 0">` : ''}
+      ${item.descripcion}<br>
+      ${item.precio? `<b style="color:#16a34a">$${item.precio.toLocaleString('es-AR')}/mes</b><br>` : ''}
+      ${item.link? `<a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:8px 14px;border-radius:6px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600">Ver más</a>` : ''}
+    `;
+  }
+
+  function responder(texto) {
+    const t = texto.toLowerCase();
+    if(/hola|buenas|hey/.test(t)) return BOT_CONFIG.saludo;
+
+    const encontrados = buscar(texto);
+    if(encontrados.length === 1) return armarCard(encontrados[0]);
+    if(encontrados.length > 1) return `Encontré esto: 👇<br>${armarLista(encontrados.slice(0,4))}`;
+
+    return `No encontré eso 😅 Probá: "planes", "precios", "cómo funciona", "métodos de pago"`;
+  }
+
+  // 3. UI
+  const bubble = document.getElementById('wc-bubble');
+  const window = document.getElementById('wc-window');
   const msgs = document.getElementById('wc-msgs');
-  msgs.innerHTML += `<div class="wc-msg user"><div class="wc-bubble-msg">${input.value}</div></div>`;
-  msgs.innerHTML += `<div class="wc-msg bot"><div class="wc-bubble-msg">Acá conectás la lógica de los JSON boludo 😂</div></div>`;
-  input.value = '';
-  msgs.scrollTop = 999999;
-};
+  const input = document.getElementById('wc-input-text');
+  const btn = document.getElementById('wc-send');
 
-document.getElementById('wc-input-text').onkeydown = (e) => {
-  if(e.key === 'Enter') document.getElementById('wc-send').click();
-};
+  function agregarMensaje(tipo, html) {
+    const div = document.createElement('div');
+    div.className = `wc-msg ${tipo}`;
+    div.innerHTML = `<div class="wc-bubble-msg">${html}</div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = 999999;
+  }
+
+  function enviar() {
+    if(!input.value.trim()) return;
+    const texto = input.value.trim();
+    agregarMensaje('user', texto);
+    input.value = '';
+    setTimeout(() => agregarMensaje('bot', responder(texto)), 400);
+  }
+
+  bubble.onclick = () => {
+    window.classList.add('open');
+    bubble.style.display = 'none';
+    if(!msgs.children.length) {
+      agregarMensaje('bot', BOT_CONFIG.saludo);
+    }
+  };
+
+  document.getElementById('wc-close').onclick = () => {
+    window.classList.remove('open');
+    bubble.style.display = 'flex';
+  };
+
+  input.onkeydown = e => { if(e.key === 'Enter') enviar(); };
+  btn.onclick = enviar;
+
+  window.WasaChatLanding = {
+    verItem: (index) => {
+      const item = ULTIMOS_PRODUCTOS_MOSTRADOS[index];
+      agregarMensaje('user', item.nombre || item.pregunta);
+      agregarMensaje('bot', armarCard(item));
+    }
+  };
+
+  cargarDatos();
+})();
 </script>
     
 <!-- Firebase SDKs -->
