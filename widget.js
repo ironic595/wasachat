@@ -8,17 +8,18 @@
     return;
   }
 
-  // 1. PEDIR CONFIG AL WORKER PARA EL COLOR, NOMBRE, SALUDO
+  // 1. PEDIR CONFIG AL WORKER PARA PINTAR LA BURBUJA
   fetch('https://api.wasa.chat/config', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ botId: BOT_ID })
+    body: JSON.stringify({ bot_id: BOT_ID })
   })
- .then(r => r.json())
- .then(BOT_CONFIG => {
+.then(r => r.json())
+.then(BOT_CONFIG => {
 
-    // 2. CREAR HTML DEL CHAT - ESTO SÍ VA EN EL WIDGET
+    // 2. CSS + HTML VAN ACÁ ADENTRO - ESTO DIBUJA TODO
     const styles = `
+      #wasa-widget * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
       #wasa-btn {
         position: fixed;
         bottom: 20px;
@@ -32,114 +33,144 @@
         cursor: pointer;
         z-index: 999999;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        font-size: 24px;
+        font-size: 28px;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: transform 0.2s;
       }
+      #wasa-btn:hover { transform: scale(1.1); }
       #wasa-chat {
         position: fixed;
         bottom: 90px;
         ${BOT_CONFIG.pos === 'left'? 'left: 20px;' : 'right: 20px;'}
-        width: 350px;
-        height: 500px;
-        max-height: 80vh;
+        width: 360px;
+        height: 520px;
+        max-height: calc(100vh - 120px);
+        max-width: calc(100vw - 40px);
         background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.25);
         display: none;
         flex-direction: column;
         z-index: 999999;
-        font-family: Arial, sans-serif;
+        overflow: hidden;
       }
       #wasa-header {
         background: ${BOT_CONFIG.color};
         color: #fff;
-        padding: 15px;
-        border-radius: 12px 12px 0 0;
-        font-weight: bold;
+        padding: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        font-weight: 600;
+      }
+      #wasa-header img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 10px;
+        background: #fff;
       }
       #wasa-close {
         background: none;
         border: none;
         color: #fff;
-        font-size: 20px;
+        font-size: 24px;
         cursor: pointer;
+        padding: 0 5px;
       }
       #wasa-msgs {
         flex: 1;
-        padding: 10px;
+        padding: 16px;
         overflow-y: auto;
-        background: #f5f5f5;
+        background: #f7f7f8;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
-     .wasa-msg {
-        margin: 8px 0;
-        padding: 8px 12px;
-        border-radius: 8px;
-        max-width: 80%;
+    .wasa-msg {
+        padding: 10px 14px;
+        border-radius: 18px;
+        max-width: 75%;
         word-wrap: break-word;
+        line-height: 1.4;
+        font-size: 14px;
       }
-     .wasa-user {
+    .wasa-user {
         background: ${BOT_CONFIG.color};
         color: #fff;
-        margin-left: auto;
-        text-align: right;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
       }
-     .wasa-bot {
+    .wasa-bot {
         background: #fff;
-        border: 1px solid #ddd;
+        border: 1px solid #e5e5e5;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
       }
       #wasa-input-area {
         display: flex;
-        border-top: 1px solid #ddd;
-        padding: 10px;
+        padding: 12px;
+        border-top: 1px solid #e5e5e5;
+        background: #fff;
       }
       #wasa-input {
         flex: 1;
         border: 1px solid #ddd;
-        border-radius: 20px;
-        padding: 8px 12px;
+        border-radius: 24px;
+        padding: 10px 16px;
         outline: none;
+        font-size: 14px;
       }
+      #wasa-input:focus { border-color: ${BOT_CONFIG.color}; }
       #wasa-send {
         background: ${BOT_CONFIG.color};
         color: #fff;
         border: none;
         border-radius: 50%;
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         margin-left: 8px;
         cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
+      #wasa-send:disabled { opacity: 0.5; cursor: not-allowed; }
     `;
 
     const styleSheet = document.createElement('style');
     styleSheet.innerText = styles;
     document.head.appendChild(styleSheet);
 
+    const avatarHTML = BOT_CONFIG.avatar?
+      `<img src="${BOT_CONFIG.avatar}" alt="">` : '';
+
     const chatHTML = `
-      <button id="wasa-btn">💬</button>
-      <div id="wasa-chat">
-        <div id="wasa-header">
-          <span>${BOT_CONFIG.nombre}</span>
-          <button id="wasa-close">×</button>
-        </div>
-        <div id="wasa-msgs"></div>
-        <div id="wasa-input-area">
-          <input id="wasa-input" type="text" placeholder="Escribí tu mensaje...">
-          <button id="wasa-send">➤</button>
+      <div id="wasa-widget">
+        <button id="wasa-btn">💬</button>
+        <div id="wasa-chat">
+          <div id="wasa-header">
+            <div style="display:flex;align-items:center;">
+              ${avatarHTML}
+              <span>${BOT_CONFIG.nombre}</span>
+            </div>
+            <button id="wasa-close">×</button>
+          </div>
+          <div id="wasa-msgs"></div>
+          <div id="wasa-input-area">
+            <input id="wasa-input" type="text" placeholder="Escribí tu mensaje...">
+            <button id="wasa-send">➤</button>
+          </div>
         </div>
       </div>
     `;
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = chatHTML;
-    document.body.appendChild(wrapper);
+    document.body.insertAdjacentHTML('beforeend', chatHTML);
 
-    // 3. LÓGICA DE ABRIR/CERRAR - ESTO ES LO QUE TE BORRÉ COMO UN GIL
+    // 3. LÓGICA DE ABRIR/CERRAR Y MANDAR MSJ
     const btn = document.getElementById('wasa-btn');
     const chat = document.getElementById('wasa-chat');
     const closeBtn = document.getElementById('wasa-close');
@@ -164,46 +195,50 @@
       div.innerText = text;
       msgs.appendChild(div);
       msgs.scrollTop = msgs.scrollHeight;
+      return div;
     }
 
-    // 4. LA ÚNICA LÓGICA: MANDAR AL WORKER
+    // 4. ÚNICA LÓGICA: FETCH AL WORKER - NO HAY CEREBRO ACÁ
     async function enviarMensaje() {
       const text = input.value.trim();
       if (!text) return;
 
       input.value = '';
+      sendBtn.disabled = true;
       addMsg(text, true);
-      addMsg('Escribiendo...', false);
+
+      const loadingMsg = addMsg('Escribiendo...', false);
 
       try {
         const res = await fetch('https://api.wasa.chat/chat', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ message: text, botId: BOT_ID })
+          body: JSON.stringify({ message: text, bot_id: BOT_ID })
         });
 
-        // Borrar el "Escribiendo..."
-        msgs.removeChild(msgs.lastChild);
-
+        msgs.removeChild(loadingMsg);
         const data = await res.json();
         addMsg(data.reply, false);
 
       } catch(e) {
-        msgs.removeChild(msgs.lastChild);
-        addMsg('Error de conexión 😢', false);
+        msgs.removeChild(loadingMsg);
+        addMsg('Error de conexión 😢 Intentá de nuevo.', false);
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
       }
     }
 
     sendBtn.onclick = enviarMensaje;
     input.onkeypress = (e) => {
-      if(e.key === 'Enter') enviarMensaje();
+      if(e.key === 'Enter' &&!sendBtn.disabled) enviarMensaje();
     };
 
-    // Mensaje de bienvenida
+    // Mensaje de bienvenida usando el config de Firestore
     addMsg(BOT_CONFIG.saludo, false);
 
   })
- .catch(err => {
+.catch(err => {
     console.error('[WasaChat] Error cargando config:', err);
   });
 
