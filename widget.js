@@ -8,7 +8,21 @@
     return;
   }
 
-  // 1. PEDIR CONFIG AL WORKER PARA PINTAR LA BURBUJA
+  // 1. CACHE PARA NO PEGARLE A CLOUDFLARE EN CADA REFRESH
+  const CACHE_KEY = 'wasa_config_' + BOT_ID;
+  const cached = localStorage.getItem(CACHE_KEY);
+  const cacheTime = localStorage.getItem(CACHE_KEY + '_time');
+  const UNA_HORA = 3600000;
+
+  // Si hay cache de menos de 1 hora, usamos eso
+  if (cached && Date.now() - cacheTime < UNA_HORA) {
+    const BOT_CONFIG = JSON.parse(cached);
+    if (!checkEstado(BOT_CONFIG)) return;
+    renderWidget(BOT_CONFIG);
+    return;
+  }
+
+  // 2. SI NO HAY CACHE, PEDIR CONFIG AL WORKER
   fetch('https://api.wasa.chat/config', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -17,6 +31,36 @@
 .then(r => r.json())
 .then(BOT_CONFIG => {
 
+    // GUARDAMOS CACHE
+    localStorage.setItem(CACHE_KEY, JSON.stringify(BOT_CONFIG));
+    localStorage.setItem(CACHE_KEY + '_time', Date.now());
+
+    // CHEQUEAMOS SI PAGÓ
+    if (!checkEstado(BOT_CONFIG)) return;
+
+    // SI PAGÓ, RENDERIZAMOS
+    renderWidget(BOT_CONFIG);
+})
+.catch(err => {
+    console.error('[WasaChat] Error cargando config:', err);
+});
+
+  // FUNCIÓN: VALIDAR SUSCRIPCIÓN
+  function checkEstado(config) {
+    // Estados válidos: 'activo' y 'gratis'. Todo lo demás se oculta.
+    if (config.estado!== 'activo' && config.estado!== 'gratis') {
+      console.log('[WasaChat] Bot desactivado. Estado:', config.estado);
+      return false; // No renderiza nada, 0 requests a /chat
+    }
+    if (config.error) {
+      console.log('[WasaChat] Error:', config.error);
+      return false;
+    }
+    return true;
+  }
+
+  // FUNCIÓN: DIBUJAR TODO EL WIDGET
+  function renderWidget(BOT_CONFIG) {
     // 2. CSS + HTML VAN ACÁ ADENTRO - ESTO DIBUJA TODO
     const styles = `
       #wasa-widget * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
@@ -89,7 +133,7 @@
         flex-direction: column;
         gap: 10px;
       }
-    .wasa-msg {
+     .wasa-msg {
         padding: 10px 14px;
         border-radius: 18px;
         max-width: 75%;
@@ -97,13 +141,13 @@
         line-height: 1.4;
         font-size: 14px;
       }
-    .wasa-user {
+     .wasa-user {
         background: ${BOT_CONFIG.color};
         color: #fff;
         align-self: flex-end;
         border-bottom-right-radius: 4px;
       }
-    .wasa-bot {
+     .wasa-bot {
         background: #fff;
         border: 1px solid #e5e5e5;
         align-self: flex-start;
@@ -236,10 +280,6 @@
 
     // Mensaje de bienvenida usando el config de Firestore
     addMsg(BOT_CONFIG.saludo, false);
-
-  })
-.catch(err => {
-    console.error('[WasaChat] Error cargando config:', err);
-  });
+  }
 
 })();
