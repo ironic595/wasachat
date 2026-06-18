@@ -30,6 +30,10 @@
   })
 .then(r => r.json())
 .then(BOT_CONFIG => {
+     if (BOT_CONFIG.error || BOT_CONFIG.estado!== 'activo') {
+    console.log('[WasaChat] Bot desactivado por falta de pago');
+    return; // No dibuja nada, 0 requests
+  }
 
     // GUARDAMOS CACHE
     localStorage.setItem(CACHE_KEY, JSON.stringify(BOT_CONFIG));
