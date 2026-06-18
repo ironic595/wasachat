@@ -1105,7 +1105,7 @@ function responder(texto) {
           email: user.email,
           bot_id: generarBotId(),
           nombre_usuario: user.displayName, // Dato de Auth
-          estado: "gratis",
+          estado: "desactivado",
           plan: null,
           fecha_registro: firebase.firestore.FieldValue.serverTimestamp(),
           fecha_vencimiento: null,
