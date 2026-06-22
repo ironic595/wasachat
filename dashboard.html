@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>WasaChat - Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <style>
@@ -414,20 +412,7 @@
   </div>
 
 <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCodRuBe7-ZV0zg4zkC7hTZ8yzM0OFN2Jk",
-      authDomain: "dbwasa-f07b6.firebaseapp.com",
-      projectId: "dbwasa-f07b6",
-      storageBucket: "dbwasa-f07b6.firebasestorage.app",
-      messagingSenderId: "849916257157",
-      appId: "1:849916257157:web:886d9c31dce6bfc82f1aec"
-    };
-
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
 
     let currentUser = null;
     let userData = null;
@@ -451,46 +436,39 @@
       return 'wasa_' + Math.random().toString(36).substring(2, 10);
     }
 
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = 'index.html';
-        return;
-      }
+    // NUEVO LOGIN - Sin Firebase Auth
+const botId = localStorage.getItem('bot_id');
+const userEmail = localStorage.getItem('user_email');
 
-      currentUser = user;
-      const botDocRef = db.collection('bots').doc(user.email);
-      const botDoc = await botDocRef.get();
+if (!botId || !userEmail) {
+  window.location.href = 'index.html';
+} else {
+  currentUser = { email: userEmail };
+  
+  fetch('https://api.wasa.chat/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ bot_id: botId })
+  })
+  .then(r => r.json())
+  .then(data => {
+    userData = {
+      email: userEmail,
+      bot_id: botId,
+      estado: data.estado,
+      config: data.config
+    };
+    document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
+    mostrarPanelCorrecto();
+    cargarConfigWidget();
+  })
+  .catch(e => {
+    console.error('Error:', e);
+    window.location.href = 'index.html';
+  });
+}
 
-      if (!botDoc.exists) {
-        await botDocRef.set({
-          email: user.email,
-          bot_id: generarBotId(),
-          nombre_usuario: user.displayName,
-          estado: 'inactivo',
-          domain: null,
-          config: {
-            color: '#25D366',
-            pos: 'right',
-            saludo: 'Hola 👋 ¿En qué te ayudo?',
-            nombre: 'WasaChat',
-            avatar: ''
-          },
-          data: {
-            productos: [],
-            faq: [],
-            updated_at: Date.now()
-          },
-          created_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-
-      userData = (await botDocRef.get()).data();
-
-      document.getElementById('userInfo').innerHTML = `<strong>${user.displayName}</strong> | ${user.email}`;
-      mostrarPanelCorrecto();
-      cargarConfigWidget();
-    });
-
+  
     function mostrarPanelCorrecto() {
       const stepDominio = document.getElementById('stepDominio');
       const panelPrincipal = document.getElementById('panelPrincipal');
@@ -523,52 +501,56 @@
       window.location.href = 'index.html#precios';
     }
 
-    document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
-      let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
-      if (!dominio) return alert("Ingresá un dominio válido");
+document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
+  let dominio = document.getElementById('dominioInput').value.trim();
+  dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+  if (!dominio) return alert("Ingresá un dominio válido");
 
-      showLoading(true);
-      try {
-        await db.collection('bots').doc(currentUser.email).set({
-          domain: dominio
-        }, { merge: true });
-
-        userData.domain = dominio;
-        showLoading(false);
-        showToast('✅ Dominio guardado');
-        mostrarPanelCorrecto();
-      } catch (e) {
-        showLoading(false);
-        console.error(e);
-        alert('Error al guardar: ' + e.message);
-      }
+  showLoading(true);
+  try {
+    await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
     });
+    userData.domain = dominio;
+    showLoading(false);
+    showToast('✅ Dominio guardado');
+    mostrarPanelCorrecto();
+  } catch (e) {
+    showLoading(false);
+    alert('Error: ' + e.message);
+  }
+});
 
     function mostrarCambiarDominio() {
       document.getElementById('nuevoDominioInput').value = userData.domain;
       document.getElementById('modal-cambiar-dominio').style.display = 'block';
     }
 
-    async function cambiarDominio() {
-      let nuevo = document.getElementById('nuevoDominioInput').value.trim();
-      nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
-      if (!nuevo) return alert("Ingresá un dominio");
+async function cambiarDominio() {
+  let nuevo = document.getElementById('nuevoDominioInput').value.trim();
+  nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+  if (!nuevo) return alert("Ingresá un dominio");
 
-      showLoading(true);
-      try {
-        await db.collection('bots').doc(currentUser.email).set({ domain: nuevo }, { merge: true });
-        userData.domain = nuevo;
-        document.getElementById('dominioActual').textContent = nuevo;
-        showLoading(false);
-        cerrarModales();
-        generarCodigoWidget();
-        showToast('✅ Dominio actualizado');
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
-    }
+  showLoading(true);
+  try {
+    await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
+    });
+    userData.domain = nuevo;
+    document.getElementById('dominioActual').textContent = nuevo;
+    showLoading(false);
+    cerrarModales();
+    generarCodigoWidget();
+    showToast('✅ Dominio actualizado');
+  } catch (e) {
+    showLoading(false);
+    alert('Error: ' + e.message);
+  }
+}
 
     async function cargarConfigWidget() {
       const cfg = userData.config || {};
@@ -698,10 +680,7 @@
         const url = `https://lh3.googleusercontent.com/d/${fileId}`;
         console.log('URL generada:', url);
 
-        await db.collection('bots').doc(currentUser.email).update({
-          'config.avatar': url,
-          'config.avatarUpdated': firebase.firestore.FieldValue.serverTimestamp()
-        });
+       
 
         if (!userData.config) userData.config = {};
         userData.config.avatar = url;
@@ -719,33 +698,35 @@
       document.getElementById('editor-widget').classList.remove('active');
     }
 
-    async function guardarConfigWidgetModal() {
-      const config = {
-        color: document.getElementById('colorWidgetEdit').value,
-        pos: document.getElementById('posWidgetEdit').value,
-        saludo: document.getElementById('saludoWidgetEdit').value,
-        nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
-        avatar: document.getElementById('avatarWidgetEdit').value
-      };
+   async function guardarConfigWidgetModal() {
+  const config = {
+    color: document.getElementById('colorWidgetEdit').value,
+    pos: document.getElementById('posWidgetEdit').value,
+    saludo: document.getElementById('saludoWidgetEdit').value,
+    nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
+    avatar: document.getElementById('avatarWidgetEdit').value
+  };
 
-      showLoading(true);
-      try {
-        await db.collection('bots').doc(currentUser.email).set({ config: config }, { merge: true });
-        userData.config = config;
-
-        document.getElementById('colorWidget').value = config.color;
-        document.getElementById('posWidget').value = config.pos;
-        document.getElementById('saludoWidget').value = config.saludo;
-        actualizarPreviewMini();
-
-        showLoading(false);
-        showToast('✅ Widget actualizado');
-        cerrarEditorWidget();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
-    }
+  showLoading(true);
+  try {
+    await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, config })
+    });
+    userData.config = config;
+    document.getElementById('colorWidget').value = config.color;
+    document.getElementById('posWidget').value = config.pos;
+    document.getElementById('saludoWidget').value = config.saludo;
+    actualizarPreviewMini();
+    showLoading(false);
+    showToast('✅ Widget actualizado');
+    cerrarEditorWidget();
+  } catch (e) {
+    showLoading(false);
+    alert('Error: ' + e.message);
+  }
+}
 
     function copiarCodigoModal() {
       const textarea = document.getElementById('codigoWidgetModal');
@@ -921,24 +902,29 @@
       document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
     }
 
-    async function cargarDatosDeFirestore() {
-      showLoading(true);
-      try {
-        const doc = await db.collection('bots').doc(currentUser.email).get();
-        const data = doc.data().data || {};
-
-        datosProductos = data.productos || [];
-        datosConfig = data.faq || [];
-
-        renderTablaProductos();
-        renderTablaConfig();
-        showLoading(false);
-      } catch(e) {
-        showLoading(false);
-        console.error(e);
-        showToast('Error al cargar datos', 'error');
-      }
-    }
+   async function cargarDatosDeFirestore() {
+  showLoading(true);
+  try {
+    const res = await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id })
+    });
+    const data = await res.json();
+    const botData = data.data || {};
+    
+    datosProductos = botData.productos || [];
+    datosConfig = botData.faq || [];
+    
+    renderTablaProductos();
+    renderTablaConfig();
+    showLoading(false);
+  } catch(e) {
+    showLoading(false);
+    console.error(e);
+    showToast('Error al cargar datos', 'error');
+  }
+}
 
     function renderTablaProductos() {
       const tbody = document.querySelector('#miTabla tbody');
@@ -961,28 +947,30 @@
     }
 
     async function syncProductos() {
-      try {
-        await db.collection('bots').doc(currentUser.email).update({
-          'data.productos': datosProductos,
-          'data.updated_at': Date.now()
-        });
-        showToast('✅ Guardado');
-      } catch(e) {
-        showToast('Error al guardar: ' + e.message, 'error');
-      }
-    }
+  try {
+    await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
+    });
+    showToast('✅ Guardado');
+  } catch(e) {
+    showToast('Error al guardar: ' + e.message, 'error');
+  }
+}
 
-    async function syncConfig() {
-      try {
-        await db.collection('bots').doc(currentUser.email).update({
-          'data.faq': datosConfig,
-          'data.updated_at': Date.now()
-        });
-        showToast('✅ Guardado');
-      } catch(e) {
-        showToast('Error al guardar: ' + e.message, 'error');
-      }
-    }
+async function syncConfig() {
+  try {
+    await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
+    });
+    showToast('✅ Guardado');
+  } catch(e) {
+    showToast('Error al guardar: ' + e.message, 'error');
+  }
+}
 
     document.getElementById('btnGuardar').addEventListener('click', async () => {
       const prod = document.getElementById('inputProducto').value;
@@ -1186,7 +1174,9 @@
     }
 
     function logout() {
-      auth.signOut().then(() => window.location.href = 'index.html');
+    localStorage.removeItem('bot_id');
+    localStorage.removeItem('user_email');
+    window.location.href = 'index.html';
     }
 
     document.getElementById('logoutBtn').addEventListener('click', logout);
