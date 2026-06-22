@@ -456,7 +456,9 @@ if (!botId || !userEmail) {
       email: userEmail,
       bot_id: botId,
       estado: data.estado,
-      config: data.config
+      domain: data.domain,
+      config: data.config,
+      data: data.data
     };
     document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
     mostrarPanelCorrecto();
