@@ -1075,7 +1075,11 @@ function responder(texto) {
       body: JSON.stringify({ idToken })
     });
 
+    const data = await res.json();
+      
     if (res.ok) {
+      localStorage.setItem('bot_id', data.bot_id);     // <-- LÍNEA 2 NUEVA
+      localStorage.setItem('user_email', data.email);  
       cerrarModal();
       btnLogin.textContent = "Mi Dashboard";
       btnLogin.onclick = () => window.location.href = "dashboard.html";
