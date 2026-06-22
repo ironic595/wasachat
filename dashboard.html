@@ -644,7 +644,7 @@ async function cambiarDominio() {
         console.log('Subiendo archivo:', file.name, file.size, 'bytes');
 
         const metadata = {
-          name: `wasa_avatar_${currentUser.uid}_${Date.now()}.${file.name.split('.').pop()}`,
+          name: `wasa_avatar_${currentUser.email}_${Date.now()}.${file.name.split('.').pop()}`,
           mimeType: file.type
         };
 
@@ -680,7 +680,14 @@ async function cambiarDominio() {
         const url = `https://lh3.googleusercontent.com/d/${fileId}`;
         console.log('URL generada:', url);
 
-       
+       await fetch('https://api.wasa.chat/config', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ 
+    bot_id: userData.bot_id, 
+    config: { ...userData.config, avatar: url }
+  })
+});
 
         if (!userData.config) userData.config = {};
         userData.config.avatar = url;
