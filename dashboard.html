@@ -525,6 +525,7 @@
     function abrirEditorWidget() {
       const cfg = userData.config || {};
       document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
+      document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
       document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
       document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
       document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
@@ -546,6 +547,7 @@
       renderizarPreviewWidget();
 
       document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('themeWidgetEdit').addEventListener('change', renderizarPreviewWidget);
       document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
       document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
       document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
@@ -626,6 +628,7 @@
    async function guardarConfigWidgetModal() {
   const config = {
     color: document.getElementById('colorWidgetEdit').value,
+    theme: document.getElementById('themeWidgetEdit').value,
     pos: document.getElementById('posWidgetEdit').value,
     saludo: document.getElementById('saludoWidgetEdit').value,
     nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
@@ -686,6 +689,7 @@
 
     function renderizarPreviewWidget() {
       const color = document.getElementById('colorWidgetEdit').value;
+      const theme = document.getElementById('themeWidgetEdit').value;
       const pos = document.getElementById('posWidgetEdit').value;
       const saludo = document.getElementById('saludoWidgetEdit').value;
       const nombre = document.getElementById('nombreWidgetEdit').value || 'WasaChat';
