@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WasaChat | Chatbot Commerce</title>
     <link rel="icon" href="assets/icons/favicon.ico" sizes="48x48">
-<link rel="icon" type="image/png" sizes="96x96" href="assets/icons/favicon-96x96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
-
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/icons/favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
 <style>
 :root{
   --primary:#3B5BFF;        
@@ -151,14 +150,13 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
 .testimonio-card{
   background:var(--bg-card);padding:2rem;border-radius:25px;
   border:1px solid var(--border);width:350px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.04);text-align:left;
+  box-shadow:0 4px 12px rgba(0,0,0.04);text-align:left;
 }
 .avatar-info{display:flex;align-items:center;gap:15px;margin-bottom:15px;}
 .avatar{width:50px;height:50px;background:#E2E8F0;border-radius:50%;object-fit:cover;}
 .estrellas{color:#FBBF24;font-size:0.9rem;margin-bottom:10px;}
 .testimonio-text{font-size:1rem;color:var(--dark);font-style:italic;line-height:1.4;}
 
-/* MODAL LOGIN - Tema claro opaco */
 .modal-overlay {
   position: fixed;top: 0;left: 0;width: 100%;height: 100%;
   background: rgba(15, 23, 42, 0.7);backdrop-filter: blur(8px);
@@ -206,7 +204,6 @@ ul li::before{content:"✓";color:#10B981;margin-right:12px;font-weight:900;}
   filter: drop-shadow(0 0 10px rgba(37, 211, 102, 0.6));
   transform: scale(1.03);
 }
-/* === FOOTER === */
 footer {
   background: var(--nav-bg);
   color: #CBD5E1;
@@ -296,7 +293,7 @@ footer {
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255,255,0.1);
   padding-top: 30px;
   display: flex;
   justify-content: space-between;
@@ -309,7 +306,6 @@ footer {
   margin: 0;
 }
 
-/* Responsive */
 @media(max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr 1fr;
@@ -340,7 +336,6 @@ footer {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* BURBUJA FLOTANTE */
 .wc-bubble {
   position: fixed;
   bottom: 20px;
@@ -367,7 +362,6 @@ footer {
   transform: scale(0.95);
 }
 
-/* VENTANA DEL CHAT */
 .wc-window {
   position: fixed;
   bottom: 90px;
@@ -400,7 +394,6 @@ footer {
   display: flex;
 }
 
-/* HEADER */
 .wc-header {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   color: #fff;
@@ -451,7 +444,7 @@ footer {
 }
 
 .wc-close {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 0.2);
   border: none;
   color: #fff;
   width: 32px;
@@ -466,10 +459,9 @@ footer {
 }
 
 .wc-close:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 0.3);
 }
 
-/* MENSAJES */
 .wc-msgs {
   flex: 1;
   padding: 16px;
@@ -525,7 +517,6 @@ footer {
   border-bottom-right-radius: 4px;
 }
 
-/* INPUT */
 .wc-input {
   display: flex;
   padding: 12px;
@@ -569,7 +560,6 @@ footer {
   transform: scale(0.95);
 }
 
-/* RESPONSIVE */
 @media (max-width: 480px) {
   .wc-window {
     bottom: 0;
@@ -585,19 +575,18 @@ footer {
     right: 16px;
   }
 }
-    
 </style>
 </head>
 <body>
     <nav>
         <a href="/" class="logo">
-  <img src="assets/img/waslo.png" alt="Wasa.Chat">
-</a>
+          <img src="assets/img/waslo.png" alt="Wasa.Chat">
+        </a>
         <button class="btn-login" id="btnLogin">Acceso Clientes</button>
     </nav>
     <header>
         <h1>Convertí visitantes<br>en clientes 24/7.</h1>
-<p>Chatbot con Inteligencia Artificial que responde consultas automáticamente a los visitantes de tu sitio web.</p>
+        <p>Chatbot con Inteligencia Artificial que responde consultas automáticamente a los visitantes de tu sitio web.</p>
         <a href="#precios" class="cta-main">Comenzar ahora</a>
     </header>
 
@@ -605,7 +594,6 @@ footer {
     <h3 style="font-size: 2.5rem; font-weight: 800; letter-spacing: -1px;">Configura tu bot en minutos</h3>
     <p style="color: var(--grey); margin-top:10px; font-size:1.1rem;">3 pasos simples para empezar a vender 24/7</p>
     <div class="pasos-container">
-        <!-- Paso 1 -->
         <div class="paso-card">
             <div class="numero">1</div>
             <div class="paso-icon">
@@ -614,7 +602,6 @@ footer {
             <h4>Regístrate</h4>
             <p>Crea tu cuenta de comercio de forma gratuita y vincula tu número de WhatsApp en 30 segundos.</p>
         </div>
-        <!-- Paso 2 -->
         <div class="paso-card">
             <div class="numero">2</div>
             <div class="paso-icon">
@@ -623,7 +610,6 @@ footer {
             <h4>Agrega tus productos</h4>
             <p>Carga tu catálogo y horarios en una planilla de Google Sheets muy sencilla. Sin código.</p>
         </div>
-        <!-- Paso 3 -->
         <div class="paso-card">
             <div class="numero">3</div>
             <div class="paso-icon">
@@ -639,7 +625,6 @@ footer {
     <h3 style="font-size: 2.5rem; font-weight: 800;">Planes a tu medida</h3>
     <p style="color: var(--grey); margin-bottom: 50px;">Elige el ciclo que mejor se adapte a tu negocio</p>
     <div class="precios-grid">
-        <!-- Plan Mensual -->
         <div class="card">
             <h3>Plan Mensual</h3>
             <div class="price">$25<span>/mes</span></div>
@@ -650,7 +635,6 @@ footer {
             </ul>
             <button class="btn-buy" style="background: var(--grey);" onclick="elegirPlan('mensual', 25)">Elegir Mensual</button>
         </div>
-        <!-- Plan Semestral -->
         <div class="card">
             <div class="ahorro">AHORRA 1 MES GRATIS</div>
             <h3>Plan Semestral</h3>
@@ -662,7 +646,6 @@ footer {
             </ul>
            <button class="btn-buy" onclick="elegirPlan('semestral', 125)">Elegir Semestral</button>
         </div>
-        <!-- Plan Anual DESTACADO -->
         <div class="card destacada-anual">
             <div class="badge-mejor-precio">MEJOR PRECIO</div>
             <div class="ahorro" style="background: #fff3e0; color: #ef6c00;">AHORRA 3 MESES GRATIS</div>
@@ -680,7 +663,6 @@ footer {
 <section class="carrusel-section">
     <h3 style="font-size: 2rem; font-weight: 800;">Lo que dicen nuestros clientes</h3>
     <div class="carrusel-container">
-        <!-- Tarjeta 1 -->
         <div class="testimonio-card">
             <div class="estrellas">★★★★★</div>
             <p class="testimonio-text">"Mis ventas aumentaron más de un 30% desde que uso MiBot IA. ¡Es increíble!"</p>
@@ -692,7 +674,6 @@ footer {
                 </div>
             </div>
         </div>
-        <!-- Tarjeta 2 -->
         <div class="testimonio-card">
             <div class="estrellas">★★★★★</div>
             <p class="testimonio-text">"Ya no pierdo clientes por no responder a tiempo. El bot hace todo el trabajo pesado."</p>
@@ -704,9 +685,8 @@ footer {
                 </div>
             </div>
         </div>
-        <!-- Tarjeta 3 -->
         <div class="testimonio-card">
-            <div class="estrellas">★★★★★</div>
+            <div class="estrellas">★★★</div>
             <p class="testimonio-text">"Configurarlo fue súper fácil. Mis clientes están felices con la rapidez."</p>
             <div class="avatar-info" style="margin-top:20px;">
                 <img src="assets/img/juan.png" class="avatar" alt="Cliente">
@@ -715,16 +695,17 @@ footer {
                     <span style="color:var(--grey); font-size:0.8rem;">Ferretería Central</span>
                 </div>
             </div>
-        <!-- Repetimos las tarjetas para el efecto infinito -->
+        </div>
         <div class="testimonio-card">
-            <div class="estrellas">★★★★★</div>
+            <div class="estrellas">★★★</div>
             <p class="testimonio-text">"Mis ventas aumentaron más de un 30% desde que uso MiBot IA. ¡Es increíble!"</p>
             <div class="avatar-info" style="margin-top:20px;">
                 <img src="assets/img/samuel.png" class="avatar" alt="Cliente">
                 <div><strong>Samuel Smith</strong></div>
             </div>
+        </div>
         <div class="testimonio-card">
-            <div class="estrellas">★★★★★</div>
+            <div class="estrellas">★★★</div>
             <p class="testimonio-text">"Ya no pierdo clientes por no responder a tiempo. El bot hace todo el trabajo pesado."</p>
             <div class="avatar-info" style="margin-top:20px;">
                 <img src="assets/img/maria.png" class="avatar" alt="Cliente">
@@ -734,9 +715,6 @@ footer {
     </div>
 </section>
 
-    
-
-<!-- MODAL LOGIN -->
 <div class="modal-overlay" id="modalLogin">
   <div class="modal-content">
     <button class="modal-close" id="closeModal">&times;</button>
@@ -754,10 +732,9 @@ footer {
   </div>
 </div>
 
-     <footer>
+<footer>
   <div class="footer-container">
     <div class="footer-grid">
-      <!-- Columna 1: Logo + descripción -->
       <div class="footer-col">
         <a href="/" class="footer-logo">
           <img src="assets/img/waslo.png" alt="WasaChat">
@@ -767,10 +744,10 @@ footer {
 </p>
         <div class="footer-social">
           <a href="https://instagram.com" target="_blank" aria-label="Instagram">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <svg width="20" height="20" fill="currentColor" viewBox="0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
           </a>
           <a href="https://facebook.com" target="_blank" aria-label="Facebook">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            <svg width="20" height="20" fill="currentColor" viewBox="0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           </a>
           <a href="https://twitter.com" target="_blank" aria-label="Twitter">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -778,7 +755,6 @@ footer {
         </div>
       </div>
 
-<!-- Columna 2: Producto -->
       <div class="footer-col">
         <h4>Producto</h4>
         <ul class="footer-links">
@@ -789,17 +765,15 @@ footer {
         </ul>
       </div>
 
-      <!-- Columna 3: Recursos -->
       <div class="footer-col">
         <h4>Recursos</h4>
-        <ul class="footer-links">
+                 <ul class="footer-links">
           <li><a href="tutoriales.html">Tutoriales</a></li>
           <li><a href="soporte.html">Centro de ayuda</a></li>
           <li><a href="api.html">API Docs</a></li>
         </ul>
       </div>
 
-      <!-- Columna 4: Legal -->
       <div class="footer-col">
         <h4>Legal</h4>
         <ul class="footer-links">
@@ -818,16 +792,13 @@ footer {
   </div>
 </footer>
 
-<!-- BOT FLOTANTE WASA.CHAT -->
 <div id="wc-chat">
-  <!-- Burbuja flotante -->
   <div class="wc-bubble" id="wc-bubble">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
       <path d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
 
-  <!-- Ventana del chat -->
   <div class="wc-window" id="wc-window">
     <div class="wc-header">
       <div class="wc-header-info">
@@ -836,12 +807,11 @@ footer {
           <div class="wc-title">WasaChat</div>
           <div class="wc-status">Online</div>
         </div>
+      </div>
       <button class="wc-close" id="wc-close">✕</button>
     </div>
 
-    <div class="wc-msgs" id="wc-msgs">
-      <!-- Acá van los mensajes -->
-    </div>
+    <div class="wc-msgs" id="wc-msgs"></div>
 
     <div class="wc-input">
       <input type="text" id="wc-input-text" placeholder="Preguntá por planes...">
@@ -867,7 +837,6 @@ footer {
     saludo: '¡Hola! 👋 Soy el bot de WasaChat. Preguntame por planes, precios o cómo funciona'
   };
 
-  // 1. CARGAR LOS JSON DE /assets/data/
   async function cargarDatos() {
     try {
       const [prodRes, faqRes] = await Promise.all([
@@ -883,13 +852,12 @@ footer {
     }
   }
 
-  // 2. BUSCADOR
   function buscar(texto) {
     const limpiar = (str) => {
       if (!str) return '';
       return str.toString().toLowerCase()
- .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
- .replace(/[¿?¡!,.;:]/g, '');
+.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+.replace(/[¿?¡!,.;:]/g, '');
     }
     const palabras = limpiar(texto).split(' ').filter(p => p.length > 2);
     if(palabras.length === 0) return [];
@@ -905,80 +873,79 @@ footer {
   }
 
   function armarLista(items) {
-  ULTIMOS_PRODUCTOS_MOSTRADOS = items;
-  return items.map((item,i) => `
-    <div onclick="window.WasaChatLanding.verItem(${i})" style="padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin:8px 0;cursor:pointer;background:#fff">
-      <div style="font-weight:700;font-size:14px;color:#1e293b">${item.nombre}</div>
-      <div style="font-size:12px;color:#64748b;margin:4px 0">${(item.descripcion || '').substring(0,60)}...</div>
-      <div style="margin-top:6px">
-        <span style="color:#16a34a;font-size:18px;font-weight:700">$${item.precio}</span>
-        <span style="color:#64748b;font-size:13px">${item.es_mensual? '/mes' : ' USD total'}</span>
+    ULTIMOS_PRODUCTOS_MOSTRADOS = items;
+    return items.map((item,i) => `
+      <div onclick="window.WasaChatLanding.verItem(${i})" style="padding:12px;border:1px solid #e2e8f0;border-radius:10px;margin:8px 0;cursor:pointer;background:#fff">
+        <div style="font-weight:700;font-size:14px;color:#1e293b">${item.nombre}</div>
+        <div style="font-size:12px;color:#64748b;margin:4px 0">${(item.descripcion || '').substring(0,60)}...</div>
+        <div style="margin-top:6px">
+          <span style="color:#16a34a;font-size:18px;font-weight:700">$${item.precio}</span>
+          <span style="color:#64748b;font-size:13px">${item.es_mensual? '/mes' : ' USD total'}</span>
+        </div>
+        ${!item.es_mensual? `<div style="color:#64748b;font-size:12px">Equivale a $${item.precio_mes}/mes</div>` : ''}
+        ${item.ahorro > 0? `<div style="margin-top:4px"><span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600">Ahorrás ${item.ahorro}%</span></div>` : ''}
       </div>
-      ${!item.es_mensual? `<div style="color:#64748b;font-size:12px">Equivale a $${item.precio_mes}/mes</div>` : ''}
-      ${item.ahorro > 0? `<div style="margin-top:4px"><span style="background:#dcfce7;color:#166534;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600">Ahorrás ${item.ahorro}%</span></div>` : ''}
-    </div>
-  `).join('');
-}
-
-function armarCard(item) {
-  if(item.pregunta) return `<b>${item.pregunta}</b><br><br>${item.respuesta}`;
-
-  return `
-    <b style="font-size:15px">${item.nombre}</b><br>
-    ${item.imagen? `<img src="${item.imagen}" style="width:100%;border-radius:8px;margin:8px 0">` : ''}
-    ${item.descripcion}<br><br>
-    <div style="background:#f8fafc;padding:12px;border-radius:8px;margin:8px 0">
-      <div style="font-size:24px;font-weight:700;color:#16a34a">$${item.precio} USD</div>
-      <div style="color:#64748b;font-size:13px">
-        ${item.es_mensual? 'Precio mensual - Cancelás cuando quieras' : `Pago único por ${item.duracion} meses - Equivale a $${item.precio_mes}/mes`}
-      </div>
-      ${item.ahorro > 0? `<div style="margin-top:6px"><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">🔥 Ahorrás ${item.ahorro}%</span></div>` : ''}
-    </div>
-    <a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:10px 16px;border-radius:8px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600;width:100%;text-align:center">
-      Contratar ${item.nombre}
-    </a>
-  `;
-}
-
-function responder(texto) {
-  const t = texto.toLowerCase();
-
-  if(/hola|buenas|hey|buen dia|buenas tardes/.test(t)) {
-    const saludos = [
-      '¡Hola! 👋 WasaChat desde $4.99 USD. Mismo servicio, elegís duración: 1 mes, 6 meses o 1 año. ¿Qué te sirve?',
-      '¡Hey! Arrancamos en $4.99/mes. Si pagás anual te queda $4.17/mes. ¿Querés ver opciones?',
-      '¡Buenas! Es simple: $4.99 por mes, $27.99 por 6 meses, $49.99 por año. Todo incluido.'
-    ];
-    return saludos[Math.floor(Math.random() * saludos.length)];
+    `).join('');
   }
 
-  const intencionPrecio = ['plan', 'planes', 'precio', 'precios', 'costo', 'costos', 'cuanto', 'vale', 'valen', 'ofrece', 'ofrecen', 'tienen', 'hay', 'cuesta', 'sale', 'barato'];
-  const esIntencionPrecio = intencionPrecio.some(p => t.includes(p));
+  function armarCard(item) {
+    if(item.pregunta) return `<b>${item.pregunta}</b><br><br>${item.respuesta}`;
 
-  if(esIntencionPrecio) {
-    const frases = [
-      'Desde $4.99 USD tenés WasaChat. Mirá las opciones 👇',
-      'Re barato: arranca en $4.99. Si pagás más meses, mejor precio 👇',
-      'Mismo servicio, 3 duraciones. El anual es el que más conviene 👇',
-      'Te paso los precios. Sin letra chica, todo incluido 👇'
-    ];
-    const frase = frases[Math.floor(Math.random() * frases.length)];
-    return `${frase}<br>${armarLista(PRODUCTOS)}`;
+    return `
+      <b style="font-size:15px">${item.nombre}</b><br>
+      ${item.imagen? `<img src="${item.imagen}" style="width:100%;border-radius:8px;margin:8px 0">` : ''}
+      ${item.descripcion}<br><br>
+      <div style="background:#f8fafc;padding:12px;border-radius:8px;margin:8px 0">
+        <div style="font-size:24px;font-weight:700;color:#16a34a">$${item.precio} USD</div>
+        <div style="color:#64748b;font-size:13px">
+          ${item.es_mensual? 'Precio mensual - Cancelás cuando quieras' : `Pago único por ${item.duracion} meses - Equivale a $${item.precio_mes}/mes`}
+        </div>
+        ${item.ahorro > 0? `<div style="margin-top:6px"><span style="background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">🔥 Ahorrás ${item.ahorro}%</span></div>` : ''}
+      </div>
+      <a href="${item.link}" style="background:${BOT_CONFIG.color};color:#fff;padding:10px 16px;border-radius:8px;display:inline-block;margin-top:8px;text-decoration:none;font-weight:600;width:100%;text-align:center">
+        Contratar ${item.nombre}
+      </a>
+    `;
   }
 
-  const encontrados = buscar(texto);
-  if(encontrados.length === 1) return armarCard(encontrados[0]);
-  if(encontrados.length > 1) return `Encontré esto: 👇<br>${armarLista(encontrados.slice(0,4))}`;
+  function responder(texto) {
+    const t = texto.toLowerCase();
 
-  const noEncontrado = [
-    'No tengo ese dato 😅 Pero arranca en $4.99 USD/mes. Preguntame "precio"',
-    'Mmm no encontré eso. WasaChat sale $4.99 por mes, $27.99 x6 meses, $49.99 el año. ¿Cuál querés?',
-    'No tengo esa info. Es fácil: desde $4.17/mes si pagás anual. Tirame "planes"'
-  ];
-  return noEncontrado[Math.floor(Math.random() * noEncontrado.length)];
-}
+    if(/hola|buenas|hey|buen dia|buenas tardes/.test(t)) {
+      const saludos = [
+        '¡Hola! 👋 WasaChat desde $4.99 USD. Mismo servicio, elegís duración: 1 mes, 6 meses o 1 año. ¿Qué te sirve?',
+        '¡Hey! Arrancamos en $4.99/mes. Si pagás anual te queda $4.17/mes. ¿Querés ver opciones?',
+        '¡Buenas! Es simple: $4.99 por mes, $27.99 por 6 meses, $49.99 por año. Todo incluido.'
+      ];
+      return saludos[Math.floor(Math.random() * saludos.length)];
+    }
 
-  // 3. UI
+    const intencionPrecio = ['plan', 'planes', 'precio', 'precios', 'costo', 'costos', 'cuanto', 'vale', 'valen', 'ofrece', 'ofrecen', 'tienen', 'hay', 'cuesta', 'sale', 'barato'];
+    const esIntencionPrecio = intencionPrecio.some(p => t.includes(p));
+
+    if(esIntencionPrecio) {
+      const frases = [
+        'Desde $4.99 USD tenés WasaChat. Mirá las opciones 👇',
+        'Re barato: arranca en $4.99. Si pagás más meses, mejor precio 👇',
+        'Mismo servicio, 3 duraciones. El anual es el que más conviene 👇',
+        'Te paso los precios. Sin letra chica, todo incluido 👇'
+      ];
+      const frase = frases[Math.floor(Math.random() * frases.length)];
+      return `${frase}<br>${armarLista(PRODUCTOS)}`;
+    }
+
+    const encontrados = buscar(texto);
+    if(encontrados.length === 1) return armarCard(encontrados[0]);
+    if(encontrados.length > 1) return `Encontré esto: 👇<br>${armarLista(encontrados.slice(0,4))}`;
+
+    const noEncontrado = [
+      'No tengo ese dato 😅 Pero arranca en $4.99 USD/mes. Preguntame "precio"',
+      'Mmm no encontré eso. WasaChat sale $4.99 por mes, $27.99 x6 meses, $49.99 el año. ¿Cuál querés?',
+      'No tengo esa info. Es fácil: desde $4.17/mes si pagás anual. Tirame "planes"'
+    ];
+    return noEncontrado[Math.floor(Math.random() * noEncontrado.length)];
+  }
+
   const bubble = document.getElementById('wc-bubble');
   const window = document.getElementById('wc-window');
   const msgs = document.getElementById('wc-msgs');
@@ -1029,12 +996,11 @@ function responder(texto) {
 })();
 </script>
 
-<!-- GOOGLE IDENTITY SERVICES -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
   const WORKER_URL = 'https://api.wasa.chat';
-  const GOOGLE_CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com'; // <-- Poné tu Client ID de Firebase > Authentication > Google
+  const GOOGLE_CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
 
   const btnLogin = document.getElementById('btnLogin');
   const modalLogin = document.getElementById('modalLogin');
@@ -1076,10 +1042,10 @@ function responder(texto) {
     });
 
     const data = await res.json();
-      
+
     if (res.ok) {
-      localStorage.setItem('bot_id', data.bot_id);     // <-- LÍNEA 2 NUEVA
-      localStorage.setItem('user_email', data.email);  
+      localStorage.setItem('bot_id', data.bot_id);
+      localStorage.setItem('user_email', data.email);
       cerrarModal();
       btnLogin.textContent = "Mi Dashboard";
       btnLogin.onclick = () => window.location.href = "dashboard.html";
