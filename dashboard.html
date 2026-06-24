@@ -81,63 +81,68 @@
     let userData = null;
 
     async function cargarBot() {
-      try {
-        const res = await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: botId })
-        });
-        const data = await res.json();
-        
-        // DEBUG: Mostrá qué devuelve el Worker
-        document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
-        console.log('[DEBUG] Worker response:', data);
-        
-        userData = {
-          email: userEmail,
-          bot_id: botId,
-          estado: data.estado,
-          domain: data.domain,
-          config: data.config,
-          data: data.data
-        };
-        mostrarPanelCorrecto();
-        cargarConfigWidget();
-      } catch(e) {
-        document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
-        console.error('Error:', e);
-      }
+  try {
+    const res = await fetch('https://api.wasa.chat/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: botId })
+    });
+    const data = await res.json();
+    
+    document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
+    console.log('[DEBUG] Worker response:', data);
+    
+    // Si hay error de "Bot no encontrado", cortá
+    if (data.error === 'Bot no encontrado') {
+      alert('Error: Bot no encontrado');
+      return;
     }
+    
+    userData = {
+      email: userEmail,
+      bot_id: botId,
+      estado: data.estado,
+      domain: data.domain,
+      config: data.config,
+      data: data.data
+    };
+    mostrarPanelCorrecto();
+    cargarConfigWidget();
+  } catch(e) {
+    document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
+    console.error('Error:', e);
+  }
+}
 
-    function mostrarPanelCorrecto() {
-      const stepDominio = document.getElementById('stepDominio');
-      const panelPrincipal = document.getElementById('panelPrincipal');
+  function mostrarPanelCorrecto() {
+  const stepDominio = document.getElementById('stepDominio');
+  const panelPrincipal = document.getElementById('panelPrincipal');
 
-      console.log('[DEBUG] userData.domain:', userData.domain);
+  console.log('[DEBUG] userData.domain:', userData.domain);
 
-      if (!userData.domain || userData.domain === null || userData.domain === '') {
-        stepDominio.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-      } else {
-        stepDominio.classList.add('hidden');
-        panelPrincipal.classList.remove('hidden');
-        document.getElementById('dominioActual').textContent = userData.domain;
+  if (!userData.domain || userData.domain === null || userData.domain === '') {
+    stepDominio.classList.remove('hidden');
+    panelPrincipal.classList.add('hidden');
+  } else {
+    stepDominio.classList.add('hidden');
+    panelPrincipal.classList.remove('hidden');
+    document.getElementById('dominioActual').textContent = userData.domain;
 
-        const estadoBotSpan = document.getElementById('estadoBot');
-        const btnComprar = document.getElementById('btnComprarPlan');
+    const estadoBotSpan = document.getElementById('estadoBot');
+    const btnComprar = document.getElementById('btnComprarPlan');
 
-        if (userData.estado === 'activo' || userData.estado === 'pago') {
-          estadoBotSpan.textContent = '✅ Activo';
-          estadoBotSpan.className = 'estado-activo';
-          btnComprar.classList.add('hidden');
-        } else {
-          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-          estadoBotSpan.className = 'estado-inactivo';
-          btnComprar.classList.remove('hidden');
-        }
-      }
+    if (userData.estado === 'activo' || userData.estado === 'pago') {
+      estadoBotSpan.textContent = '✅ Activo';
+      estadoBotSpan.className = 'estado-activo';
+      btnComprar.classList.add('hidden');
+    } else {
+      estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+      estadoBotSpan.className = 'estado-inactivo';
+      btnComprar.classList.remove('hidden');
     }
-
+  }
+}
+   
     function irAComprar() {
       window.location.href = 'index.html#precios';
     }
