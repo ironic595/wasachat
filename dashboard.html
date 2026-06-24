@@ -422,7 +422,7 @@
 
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
       let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0]; // Solo hostname
       if (!dominio) return alert("Ingresá un dominio válido");
 
       showLoading(true);
