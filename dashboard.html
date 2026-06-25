@@ -6,9 +6,9 @@
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <style>
-    body { font-family: sans-serif; margin: 0; background: #f5f5; }
-    .container { max-width: 900px; margin: 50px auto; padding: 20px; }
-    .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    body { font-family: sans-serif; margin: 0; background: #f5f5f5; }
+   .container { max-width: 900px; margin: 50px auto; padding: 20px; }
+   .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
     h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
     button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; }
@@ -18,10 +18,10 @@
     button.warning { background: #ff9500; }
     button.big { width: 100%; padding: 20px; font-size: 18px; margin: 10px 0; }
     input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-    .hidden { display: none!important; }
+   .hidden { display: none!important; }
     #userInfo { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 20px; }
-    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .info-row:last-child { border-bottom: none; }
+   .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+   .info-row:last-child { border-bottom: none; }
     #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
     #editor.active { display: flex; }
     #editor-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -36,28 +36,29 @@
     #editor-widget-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
     #editor-widget-header h2 { margin: 0; border: none; color: white; }
     #editor-widget-body { display: flex; flex: 1; overflow: hidden; }
-    #editor-widget-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4; overflow-y: auto; }
+    #editor-widget-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4f4; overflow-y: auto; }
     #editor-widget-resizer { width: 10px; cursor: col-resize; background: #ccc; transition: background 0.2s; }
     #editor-widget-resizer:hover { background: #4285f4; }
     #editor-widget-preview { flex: 1; background: #e5e5e5; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-    .preview-bar { padding: 16px; background: white; border-bottom: 1px solid #ddd; font-weight: 600; font-size: 14px; color: #666; }
+   .preview-bar { padding: 16px; background: white; border-bottom: 1px solid #ddd; font-weight: 600; font-size: 14px; color: #666; }
     table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
     th, td { border: 1px solid #ddd; padding: 10px; text-align: left; cursor: pointer; }
     tr.seleccionada { background-color: #d1ecf1!important; }
-    .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
+   .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
     #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: none; justify-content: center; align-items: center; z-index: 200; font-size: 20px; }
-    .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
-    .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
-    .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
-    .estado-activo { color: #28a745; font-weight: bold; }
-    .estado-inactivo { color: #dc3545; font-weight: bold; }
-    .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
-    .form-group { margin-bottom: 16px; }
-    .btn { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px 0; width: 100%; }
-    .btn-primary { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-    .btn-secondary { background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-    .input-field { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+   .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
+   .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
+   .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
+   .estado-activo { color: #28a745; font-weight: bold; }
+   .estado-inactivo { color: #dc3545; font-weight: bold; }
+   .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
+   .form-group { margin-bottom: 16px; }
+   .btn { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px 0; width: 100%; }
+   .btn-primary { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+   .btn-secondary { background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+   .input-field { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
     #debug { background: #fff3cd; padding: 12px; border-radius: 4px; margin: 20px 0; font-family: monospace; font-size: 12px; }
+   .cambios-pendientes { background: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #28a745; display: none; }
   </style>
 </head>
 <body>
@@ -130,65 +131,6 @@
     </div>
   </div>
 
-  <div id="editor">
-    <div id="editor-header">
-      <h2 id="editor-titulo">Editor</h2>
-      <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
-    </div>
-    <div id="editor-body">
-      <div id="editor-form">
-        <div id="form-productos" class="hidden">
-          <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
-          <h3 id="tituloFormProd">Agregar Producto</h3>
-          <input type="text" id="inputProducto" placeholder="Nombre del producto *">
-          <input type="number" id="inputPrecio" placeholder="Precio *">
-          <input type="number" id="inputStock" placeholder="Stock *">
-          <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
-          <input type="text" id="inputFoto" placeholder="URL de foto">
-          <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
-          <div class="help-text">* Se guarda automáticamente en Google Sheets</div>
-          <button id="btnGuardar" class="btn success">➕ Agregar Producto</button>
-          <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-          <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-          <hr style="margin: 20px 0;">
-          <h4>Cargar desde CSV</h4>
-          <input type="file" id="csvProductos" accept=".csv">
-          <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
-          <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
-        </div>
-        <div id="form-config" class="hidden">
-          <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
-          <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
-          <input type="text" id="inputPregunta" placeholder="Pregunta *">
-          <div class="help-text">Ej: ¿Cuáles son los horarios de atención?</div>
-          <textarea id="inputRespuesta" placeholder="Respuesta *" rows="4"></textarea>
-          <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs</div>
-          <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
-          <div class="help-text">Ej: horario, abierto, atender, hora</div>
-          <button id="btnGuardarConfig" class="btn success">➕ Agregar Pregunta</button>
-          <button id="btnCancelarEdicionConfig" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-          <button id="btnBorrarConfig" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-          <hr style="margin: 20px 0;">
-          <h4>Cargar desde CSV</h4>
-          <input type="file" id="csvConfig" accept=".csv">
-          <button id="btnCargarCsvConfig" class="btn">📁 Cargar CSV</button>
-          <div class="help-text">Formato: pregunta,respuesta,palabras_clave</div>
-        </div>
-      </div>
-      <div id="editor-resizer"></div>
-      <div id="editor-tabla">
-        <div id="tabla-productos" class="hidden">
-          <h3>Productos Cargados</h3>
-          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
-        </div>
-        <div id="tabla-config" class="hidden">
-          <h3>Base de Conocimiento del Bot</h3>
-          <table id="miTablaConfig"><thead><tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div id="editor-widget">
     <div id="editor-widget-header">
       <h2>🎨 Personalizar Widget</h2>
@@ -201,7 +143,7 @@
           <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
         </div>
         <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Tema</label>
           <select id="themeWidgetEdit" class="input-field"><option value="light">Light</option><option value="dark">Dark</option></select>
         </div>
         <div class="form-group">
@@ -223,24 +165,17 @@
           <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">💬</div>
           <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
         </div>
-                 <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">💾 Guardar cambios</button>
+        <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">💾 Guardar cambios</button>
         <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
           <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
           <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
-          <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">
-            📋 Copiar código
-          </button>
+          <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
         </div>
       </div>
-
       <div id="editor-widget-resizer"></div>
-
       <div id="editor-widget-preview">
-        <div class="preview-bar">
-          Vista previa en tiempo real
-        </div>
-        <div id="preview-container-widget" style="flex:1; position:relative; background:white;">
-        </div>
+        <div class="preview-bar">Vista previa en tiempo real</div>
+        <div id="preview-container-widget" style="flex:1; position:relative; background:white;"></div>
       </div>
     </div>
   </div>
@@ -250,9 +185,11 @@
       <h2 id="editor-titulo">Editor</h2>
       <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
     </div>
-
     <div id="editor-body">
       <div id="editor-form">
+        <div id="cambiosPendientes" class="cambios-pendientes">
+          📝 Tenés cambios sin guardar. Apretá "SUBIR CAMBIOS" para enviar al servidor.
+        </div>
         <div id="form-productos" class="hidden">
           <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
           <h3 id="tituloFormProd">Agregar Producto</h3>
@@ -262,17 +199,17 @@
           <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
           <input type="text" id="inputFoto" placeholder="URL de foto">
           <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
-          <div class="help-text">* Se guarda automáticamente en Google Sheets</div>
-          <button id="btnGuardar" class="btn success">➕ Agregar Producto</button>
+          <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
           <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
           <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+          <hr style="margin: 20px 0;">
+          <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
           <hr style="margin: 20px 0;">
           <h4>Cargar desde CSV</h4>
           <input type="file" id="csvProductos" accept=".csv">
           <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
           <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
         </div>
-
         <div id="form-config" class="hidden">
           <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
           <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
@@ -282,9 +219,11 @@
           <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs</div>
           <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
           <div class="help-text">Ej: horario, abierto, atender, hora</div>
-          <button id="btnGuardarConfig" class="btn success">➕ Agregar Pregunta</button>
+          <button id="btnGuardarConfig" class="btn success">➕ Agregar a tabla</button>
           <button id="btnCancelarEdicionConfig" class="btn hidden" style="background:#6c757d;">Cancelar</button>
           <button id="btnBorrarConfig" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+          <hr style="margin: 20px 0;">
+          <button id="btnSubirFaq" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
           <hr style="margin: 20px 0;">
           <h4>Cargar desde CSV</h4>
           <input type="file" id="csvConfig" accept=".csv">
@@ -292,28 +231,15 @@
           <div class="help-text">Formato: pregunta,respuesta,palabras_clave</div>
         </div>
       </div>
-
       <div id="editor-resizer"></div>
-
       <div id="editor-tabla">
         <div id="tabla-productos" class="hidden">
           <h3>Productos Cargados</h3>
-          <table id="miTabla">
-            <thead>
-              <tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
         </div>
-
         <div id="tabla-config" class="hidden">
           <h3>Base de Conocimiento del Bot</h3>
-          <table id="miTablaConfig">
-            <thead>
-              <tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+          <table id="miTablaConfig"><thead><tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
@@ -322,7 +248,7 @@
   <div id="modal-borrar" class="modal-fondo">
     <div class="modal-box">
       <h3>¿Borrar fila seleccionada?</h3>
-      <p>Se eliminará también de Google Sheets</p>
+      <p>Se eliminará de la tabla local. Recordá apretar "SUBIR CAMBIOS" para guardar en el servidor.</p>
       <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
       <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
     </div>
@@ -341,6 +267,7 @@
     let indiceEdicion = null;
     let datosProductos = [];
     let datosConfig = [];
+    let cambiosPendientes = false;
 
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
@@ -426,7 +353,7 @@
 
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
       let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0]; // Solo hostname
+      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
       if (!dominio) return alert("Ingresá un dominio válido");
 
       showLoading(true);
@@ -489,6 +416,8 @@
       datosConfig = userData.data?.faq || [];
       renderTablaProductos();
       renderTablaConfig();
+      cambiosPendientes = false;
+      document.getElementById('cambiosPendientes').style.display = 'none';
     }
 
     function generarCodigoWidget() {
@@ -582,7 +511,7 @@
           body: form
         });
 
-        if (!uploadRes.ok) {
+      if (!uploadRes.ok) {
           const err = await uploadRes.text();
           throw new Error('Error al subir a Drive: ' + err);
         }
@@ -625,36 +554,36 @@
       document.getElementById('editor-widget').classList.remove('active');
     }
 
-   async function guardarConfigWidgetModal() {
-  const config = {
-    color: document.getElementById('colorWidgetEdit').value,
-    theme: document.getElementById('themeWidgetEdit').value,
-    pos: document.getElementById('posWidgetEdit').value,
-    saludo: document.getElementById('saludoWidgetEdit').value,
-    nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
-    avatar: document.getElementById('avatarWidgetEdit').value
-  };
+    async function guardarConfigWidgetModal() {
+      const config = {
+        color: document.getElementById('colorWidgetEdit').value,
+        theme: document.getElementById('themeWidgetEdit').value,
+        pos: document.getElementById('posWidgetEdit').value,
+        saludo: document.getElementById('saludoWidgetEdit').value,
+        nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
+        avatar: document.getElementById('avatarWidgetEdit').value
+      };
 
-  showLoading(true);
-  try {
-    await fetch('https://api.wasa.chat/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bot_id: userData.bot_id, config })
-    });
-    userData.config = config;
-    document.getElementById('colorWidget').value = config.color;
-    document.getElementById('posWidget').value = config.pos;
-    document.getElementById('saludoWidget').value = config.saludo;
-    actualizarPreviewMini();
-    showLoading(false);
-    showToast('✅ Widget actualizado');
-    cerrarEditorWidget();
-  } catch (e) {
-    showLoading(false);
-    alert('Error: ' + e.message);
-  }
-}
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, config })
+        });
+        userData.config = config;
+        document.getElementById('colorWidget').value = config.color;
+        document.getElementById('posWidget').value = config.pos;
+        document.getElementById('saludoWidget').value = config.saludo;
+        actualizarPreviewMini();
+        showLoading(false);
+        showToast('✅ Widget actualizado');
+        cerrarEditorWidget();
+      } catch (e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
+    }
 
     function copiarCodigoModal() {
       const textarea = document.getElementById('codigoWidgetModal');
@@ -699,28 +628,32 @@
       const avatarUrl = avatar || '';
 
       const btnContent = avatarUrl
-   ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+  ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : '💬';
 
       const avatarHeader = avatarUrl
-   ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+  ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
         : '💬';
+
+      const bgChat = theme === 'dark'? '#1e293b' : '#fff';
+      const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f7f8';
+      const textMain = theme === 'dark'? '#e2e8f0' : '#1e293b';
 
       container.innerHTML = `
         <style>
           #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-     .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-     .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-     .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-     .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-     .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-     .wasa-btn:hover { transform: scale(1.1); }
-     .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-     .wasa-ventana.activo { display: flex; }
-     .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-     .wasa-body { flex: 1; padding: 16px; background: #f5f5f5; overflow-y: auto; }
-     .wasa-msg { background: white; color:rgba(21,20,53,1);text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-     .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+    .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+    .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+    .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+    .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+    .wasa-btn:hover { transform: scale(1.1); }
+    .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+    .wasa-ventana.activo { display: flex; }
+    .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+    .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
+    .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+    .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
  <div class="wasa-demo-page">
           <div>
@@ -772,10 +705,17 @@
       }
     });
 
+    function marcarCambiosPendientes() {
+      cambiosPendientes = true;
+      document.getElementById('cambiosPendientes').style.display = 'block';
+    }
+
     async function abrirEditor(tab) {
       currentTab = tab;
       modoEdicion = false;
       indiceEdicion = null;
+      cambiosPendientes = false;
+      document.getElementById('cambiosPendientes').style.display = 'none';
       document.getElementById('editor').classList.add('active');
       document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
 
@@ -795,10 +735,14 @@
     }
 
     function cerrarEditor() {
+      if (cambiosPendientes) {
+        if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
+      }
       document.getElementById('editor').classList.remove('active');
       filaSeleccionada = null;
       modoEdicion = false;
       indiceEdicion = null;
+      cambiosPendientes = false;
       limpiarFormProductos();
       limpiarFormConfig();
     }
@@ -810,7 +754,7 @@
       document.getElementById('inputDesc').value = '';
       document.getElementById('inputFoto').value = '';
       document.getElementById('inputUrlProd').value = '';
-      document.getElementById('btnGuardar').textContent = '➕ Agregar Producto';
+      document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
       document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
       document.getElementById('modoEdicionProd').classList.add('hidden');
       document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
@@ -820,7 +764,7 @@
       document.getElementById('inputPregunta').value = '';
       document.getElementById('inputRespuesta').value = '';
       document.getElementById('inputClaves').value = '';
-      document.getElementById('btnGuardarConfig').textContent = '➕ Agregar Pregunta';
+      document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
       document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
       document.getElementById('modoEdicionConfig').classList.add('hidden');
       document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
@@ -846,33 +790,40 @@
       });
     }
 
-    async function syncProductos() {
-  try {
-    await fetch('https://api.wasa.chat/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
-    });
-    showToast('✅ Guardado');
-  } catch(e) {
-    showToast('Error al guardar: ' + e.message, 'error');
-  }
-}
+    function seleccionarFila(row, index, tipo) {
+      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
+      row.classList.add('seleccionada');
+      filaSeleccionada = {index, tipo};
+      modoEdicion = true;
+      indiceEdicion = index;
 
-async function syncConfig() {
-  try {
-    await fetch('https://api.wasa.chat/config', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
-    });
-    showToast('✅ Guardado');
-  } catch(e) {
-    showToast('Error al guardar: ' + e.message, 'error');
-  }
-}
+      if (tipo === 'productos') {
+        const datos = datosProductos[index];
+        document.getElementById('inputProducto').value = datos.nombre || '';
+        document.getElementById('inputPrecio').value = datos.precio || '';
+        document.getElementById('inputStock').value = datos.stock || '';
+        document.getElementById('inputDesc').value = datos.desc || '';
+        document.getElementById('inputFoto').value = datos.foto || '';
+        document.getElementById('inputUrlProd').value = datos.url || '';
+        document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
+        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+        document.getElementById('modoEdicionProd').classList.remove('hidden');
+        document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
+        document.getElementById('btnBorrar').disabled = false;
+      } else {
+        const datos = datosConfig[index]; // FIX: era datosConfig, no datosConfig[index]
+        document.getElementById('inputPregunta').value = datos.pregunta || '';
+        document.getElementById('inputRespuesta').value = datos.respuesta || '';
+        document.getElementById('inputClaves').value = datos.keywords || '';
+        document.getElementById('btnGuardarConfig').textContent = '✏ Actualizar Pregunta';
+        document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
+        document.getElementById('modoEdicionConfig').classList.remove('hidden');
+        document.getElementById('btnCancelarEdicionConfig').classList.remove('hidden');
+        document.getElementById('btnBorrarConfig').disabled = false;
+      }
+    }
 
-    document.getElementById('btnGuardar').addEventListener('click', async () => {
+    document.getElementById('btnGuardar').addEventListener('click', () => {
       const prod = document.getElementById('inputProducto').value;
       const precio = document.getElementById('inputPrecio').value;
       const stock = document.getElementById('inputStock').value;
@@ -894,9 +845,7 @@ async function syncConfig() {
       }
 
       renderTablaProductos();
-      showLoading(true);
-      await syncProductos();
-      showLoading(false);
+      marcarCambiosPendientes();
     });
 
     document.getElementById('btnCancelarEdicionProd').addEventListener('click', () => {
@@ -908,7 +857,7 @@ async function syncConfig() {
       document.getElementById('btnBorrar').disabled = true;
     });
 
-    document.getElementById('btnGuardarConfig').addEventListener('click', async () => {
+    document.getElementById('btnGuardarConfig').addEventListener('click', () => {
       const pregunta = document.getElementById('inputPregunta').value;
       const respuesta = document.getElementById('inputRespuesta').value;
       const claves = document.getElementById('inputClaves').value;
@@ -927,9 +876,7 @@ async function syncConfig() {
       }
 
       renderTablaConfig();
-      showLoading(true);
-      await syncConfig();
-      showLoading(false);
+      marcarCambiosPendientes();
     });
 
     document.getElementById('btnCancelarEdicionConfig').addEventListener('click', () => {
@@ -941,171 +888,169 @@ async function syncConfig() {
       document.getElementById('btnBorrarConfig').disabled = true;
     });
 
-    function seleccionarFila(row, index, tipo) {
-      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
-      row.classList.add('seleccionada');
-      filaSeleccionada = {index, tipo};
-      modoEdicion = true;
-      indiceEdicion = index;
+    document.getElementById('btnBorrar').addEventListener('click', () => {
+      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
+    });
+    document.getElementById('btnBorrarConfig').addEventListener('click', () => {
+      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
+    });
 
-      if (tipo === 'productos') {
-        const datos = datosProductos[index];
-        document.getElementById('inputProducto').value = datos.nombre || '';
-        document.getElementById('inputPrecio').value = datos.precio || '';
-        document.getElementById('inputStock').value = datos.stock || '';
-        document.getElementById('inputDesc').value = datos.desc || '';
-        document.getElementById('inputFoto').value = datos.foto || '';
-document.getElementById('inputUrlProd').value = datos.url || '';
-document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
-document.getElementById('tituloFormProd').textContent = 'Editar Producto';
-document.getElementById('modoEdicionProd').classList.remove('hidden');
-document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
-document.getElementById('btnBorrar').disabled = false;
-} else {
-const datos = datosConfig;
-document.getElementById('inputPregunta').value = datos.pregunta || '';
-document.getElementById('inputRespuesta').value = datos.respuesta || '';
-document.getElementById('inputClaves').value = datos.keywords || '';
-document.getElementById('btnGuardarConfig').textContent = '✏ Actualizar Pregunta';
-document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
-document.getElementById('modoEdicionConfig').classList.remove('hidden');
-document.getElementById('btnCancelarEdicionConfig').classList.remove('hidden');
-document.getElementById('btnBorrarConfig').disabled = false;
-}
-}[index]
+    document.getElementById('confirmar-si').addEventListener('click', () => {
+      if (filaSeleccionada.tipo === 'productos') {
+        datosProductos.splice(filaSeleccionada.index, 1);
+        renderTablaProductos();
+        document.getElementById('btnBorrar').disabled = true;
+        limpiarFormProductos();
+      } else {
+        datosConfig.splice(filaSeleccionada.index, 1);
+        renderTablaConfig();
+        document.getElementById('btnBorrarConfig').disabled = true;
+        limpiarFormConfig();
+      }
+      cerrarModales();
+      filaSeleccionada = null;
+      modoEdicion = false;
+      indiceEdicion = null;
+      marcarCambiosPendientes();
+    });
 
-document.getElementById('btnBorrar').addEventListener('click', () => {
-  if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
-});
-document.getElementById('btnBorrarConfig').addEventListener('click', () => {
-  if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
-});
+    document.getElementById('btnSubirProductos').addEventListener('click', async () => {
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
+        });
+        cambiosPendientes = false;
+        document.getElementById('cambiosPendientes').style.display = 'none';
+        showLoading(false);
+        showToast('✅ Productos guardados en servidor');
+      } catch(e) {
+        showLoading(false);
+        showToast('Error al guardar: ' + e.message, 'error');
+      }
+    });
 
-document.getElementById('confirmar-si').addEventListener('click', async () => {
-  showLoading(true);
-  if (filaSeleccionada.tipo === 'productos') {
-    datosProductos.splice(filaSeleccionada.index, 1);
-    renderTablaProductos();
-    document.getElementById('btnBorrar').disabled = true;
-    await syncProductos();
-    limpiarFormProductos();
-  } else {
-    datosConfig.splice(filaSeleccionada.index, 1);
-    renderTablaConfig();
-    document.getElementById('btnBorrarConfig').disabled = true;
-    await syncConfig();
-    limpiarFormConfig();
-  }
-  cerrarModales();
-  filaSeleccionada = null;
-  modoEdicion = false;
-  indiceEdicion = null;
-  showLoading(false);
-});
+    document.getElementById('btnSubirFaq').addEventListener('click', async () => {
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
+        });
+        cambiosPendientes = false;
+        document.getElementById('cambiosPendientes').style.display = 'none';
+        showLoading(false);
+        showToast('✅ FAQs guardados en servidor');
+      } catch(e) {
+        showLoading(false);
+        showToast('Error al guardar: ' + e.message, 'error');
+      }
+    });
 
-document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
-  const file = document.getElementById('csvProductos').files;
-  if (!file) return alert('Seleccioná un archivo CSV');[0]
+    document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
+      const file = document.getElementById('csvProductos').files[0];
+      if (!file) return alert('Seleccioná un archivo CSV');
 
-  const text = await file.text();
-  const lines = text.split('\n').filter(l => l.trim());
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
 
-  if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
+      if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
 
-  datosProductos = lines.slice(1).map(line => {
-    const vals = line.split(',');
-    return {
-      nombre: vals[0]||'',
-      precio: vals[1]||'',
-      stock: vals[2]||'',
-      desc: vals[3]||'',
-      foto: vals[4]||'',
-      url: vals[5]||''
-    };
-  });
+      datosProductos = lines.slice(1).map(line => {
+        const vals = line.split(',');
+        return {
+          nombre: vals[0]||'',
+          precio: vals[1]||'',
+          stock: vals[2]||'',
+          desc: vals[3]||'',
+          foto: vals[4]||'',
+          url: vals[5]||''
+        };
+      });
 
-  renderTablaProductos();
-  showLoading(true);
-  await syncProductos();
-  showLoading(false);
-  document.getElementById('csvProductos').value = '';
-});
+      renderTablaProductos();
+      marcarCambiosPendientes();
+      document.getElementById('csvProductos').value = '';
+    });
 
-document.getElementById('btnCargarCsvConfig').addEventListener('click', async () => {
-  const file = document.getElementById('csvConfig').files[0];
-  if (!file) return alert('Seleccioná un archivo CSV');
+    document.getElementById('btnCargarCsvConfig').addEventListener('click', async () => {
+      const file = document.getElementById('csvConfig').files[0];
+      if (!file) return alert('Seleccioná un archivo CSV');
 
-  const text = await file.text();
-  const lines = text.split('\n').filter(l => l.trim());
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
 
-  if (!confirm(`¿Reemplazar todas las preguntas con ${lines.length-1} filas del CSV?`)) return;
+      if (!confirm(`¿Reemplazar todas las preguntas con ${lines.length-1} filas del CSV?`)) return;
 
-  datosConfig = lines.slice(1).map(line => {
-    const vals = line.split(',');
-    return {
-      pregunta: vals||'',
-      respuesta: vals||'',
-      keywords: vals||''
-    };
-  });[0][1][2]
+      datosConfig = lines.slice(1).map(line => {
+        const vals = line.split(',');
+        return {
+          pregunta: vals[0]||'',
+          respuesta: vals[1]||'',
+          keywords: vals[2]||''
+        };
+      });
 
-  renderTablaConfig();
-  showLoading(true);
-  await syncConfig();
-  showLoading(false);
-  document.getElementById('csvConfig').value = '';
-});
+      renderTablaConfig();
+      marcarCambiosPendientes();
+      document.getElementById('csvConfig').value = '';
+    });
 
-function cerrarModales() {
-  document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none');
-}
-
-function showLoading(show) {
-  document.getElementById('loading').style.display = show? 'flex' : 'none';
-}
-
-function showToast(msg, type = 'success') {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.style.background = type === 'error'? '#dc3545' : '#28a745';
-  toast.style.display = 'block';
-  setTimeout(() => toast.style.display = 'none', 3000);
-}
-
-function logout() {
-localStorage.removeItem('bot_id');
-localStorage.removeItem('user_email');
-window.location.href = 'index.html';
-}
-
-document.getElementById('logoutBtn').addEventListener('click', logout);
-
-const resizer = document.getElementById('editor-resizer');
-const leftSide = document.getElementById('editor-form');
-if (resizer && leftSide) {
-  resizer.addEventListener('mousedown', (e) => {
-    document.addEventListener('mousemove', resize);
-    document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize));
-  });
-}
-function resize(e) {
-  if (leftSide) leftSide.style.width = e.clientX + 'px';
-}
-
-const resizerWidget = document.getElementById('editor-widget-resizer');
-const leftSideWidget = document.getElementById('editor-widget-form');
-if (resizerWidget && leftSideWidget) {
-  resizerWidget.addEventListener('mousedown', (e) => {
-    document.addEventListener('mousemove', resizeWidget);
-    document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resizeWidget));
-  });
-}
-function resizeWidget(e) {
-  if (leftSideWidget) {
-    const newWidth = e.clientX;
-    if (newWidth > 250 && newWidth < 600) {
-      leftSideWidget.style.width = newWidth + 'px';
+    function cerrarModales() {
+      document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none');
     }
-  }
-}
-</script> </body></html>
+
+    function showLoading(show) {
+      document.getElementById('loading').style.display = show? 'flex' : 'none';
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.background = type === 'error'? '#dc3545' : '#28a745';
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('bot_id');
+      localStorage.removeItem('user_email');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    const resizer = document.getElementById('editor-resizer');
+    const leftSide = document.getElementById('editor-form');
+    if (resizer && leftSide) {
+      resizer.addEventListener('mousedown', (e) => {
+        document.addEventListener('mousemove', resize);
+        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize));
+      });
+    }
+    function resize(e) {
+      if (leftSide) leftSide.style.width = e.clientX + 'px';
+    }
+
+    const resizerWidget = document.getElementById('editor-widget-resizer');
+    const leftSideWidget = document.getElementById('editor-widget-form');
+    if (resizerWidget && leftSideWidget) {
+      resizerWidget.addEventListener('mousedown', (e) => {
+        document.addEventListener('mousemove', resizeWidget);
+        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resizeWidget));
+      });
+    }
+    function resizeWidget(e) {
+      if (leftSideWidget) {
+        const newWidth = e.clientX;
+        if (newWidth > 250 && newWidth < 600) {
+          leftSideWidget.style.width = newWidth + 'px';
+        }
+      }
+    }
+</script>
+</body>
+</html>
