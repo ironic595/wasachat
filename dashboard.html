@@ -1141,7 +1141,16 @@
       document.getElementById('codigoWidgetModal').value = codigo;
     }
   }
-  function showSection(section) {
+
+  // === NAVEGACIÓN DE SOLAPAS ===
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    const section = e.target.dataset.section;
+    showSection(section);
+  });
+});
+
+function showSection(section) {
   document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
   document.querySelector(`[data-section="${section}"]`).classList.add('active');
 
