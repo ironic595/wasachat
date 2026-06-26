@@ -191,25 +191,26 @@
           📝 Tenés cambios sin guardar. Apretá "SUBIR CAMBIOS" para enviar al servidor.
         </div>
         <div id="form-productos" class="hidden">
-          <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
-          <h3 id="tituloFormProd">Agregar Producto</h3>
-          <input type="text" id="inputProducto" placeholder="Nombre del producto *">
-          <input type="number" id="inputPrecio" placeholder="Precio *">
-          <input type="number" id="inputStock" placeholder="Stock *">
-          <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
-          <input type="text" id="inputFoto" placeholder="URL de foto">
-          <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
-          <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
-          <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-          <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-          <hr style="margin: 20px 0;">
-          <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
-          <hr style="margin: 20px 0;">
-          <h4>Cargar desde CSV</h4>
-          <input type="file" id="csvProductos" accept=".csv">
-          <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
-          <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
-        </div>
+  <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
+  <h3 id="tituloFormProd">Agregar Producto</h3>
+  <input type="text" id="inputProducto" placeholder="Producto / Título *">
+  <input type="number" id="inputPrecio" placeholder="Precio *">
+  <input type="text" id="inputUrlProd" placeholder="URL del producto *">
+  <input type="text" id="inputFoto" placeholder="URL imagen">
+  <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
+  <input type="text" id="inputKeywords" placeholder="Palabras clave separadas por coma">
+  <div class="help-text">* Campos obligatorios: nombre, precio y URL producto</div>
+  <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
+  <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
+  <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+  <hr style="margin: 20px 0;">
+  <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
+  <hr style="margin: 20px 0;">
+  <h4>Cargar desde CSV</h4>
+  <input type="file" id="csvProductos" accept=".csv">
+  <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
+  <div class="help-text">Formato: nombre,precio,url_producto,url_imagen,descripcion,keywords<br>Obligatorios: nombre, precio, url_producto</div>
+</div>
         <div id="form-config" class="hidden">
           <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
           <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
@@ -235,7 +236,7 @@
       <div id="editor-tabla">
         <div id="tabla-productos" class="hidden">
           <h3>Productos Cargados</h3>
-          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
+          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>URL producto</th><th>URL imagen</th><th>Descripción</th><th>Palabras clave</th></tr></thead><tbody></tbody></table>
         </div>
         <div id="tabla-config" class="hidden">
           <h3>Base de Conocimiento del Bot</h3>
@@ -750,7 +751,6 @@
     function limpiarFormProductos() {
       document.getElementById('inputProducto').value = '';
       document.getElementById('inputPrecio').value = '';
-      document.getElementById('inputStock').value = '';
       document.getElementById('inputDesc').value = '';
       document.getElementById('inputFoto').value = '';
       document.getElementById('inputUrlProd').value = '';
@@ -760,25 +760,29 @@
       document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
     }
 
-    function limpiarFormConfig() {
-      document.getElementById('inputPregunta').value = '';
-      document.getElementById('inputRespuesta').value = '';
-      document.getElementById('inputClaves').value = '';
-      document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
-      document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
-      document.getElementById('modoEdicionConfig').classList.add('hidden');
-      document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
-    }
+    function limpiarFormProductos() {
+  document.getElementById('inputProducto').value = '';
+  document.getElementById('inputPrecio').value = '';
+  document.getElementById('inputUrlProd').value = '';
+  document.getElementById('inputFoto').value = '';
+  document.getElementById('inputDesc').value = '';
+  document.getElementById('inputKeywords').value = '';
+  document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
+  document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
+  document.getElementById('modoEdicionProd').classList.add('hidden');
+  document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
+}
 
     function renderTablaProductos() {
-      const tbody = document.querySelector('#miTabla tbody');
-      tbody.innerHTML = '';
-      datosProductos.forEach((row, i) => {
-        const tr = tbody.insertRow();
-        tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.stock||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
-        tr.onclick = () => seleccionarFila(tr, i, 'productos');
-      });
-    }
+  const tbody = document.querySelector('#miTabla tbody');
+  tbody.innerHTML = '';
+  datosProductos.forEach((row, i) => {
+    const tr = tbody.insertRow();
+    const keywordsStr = Array.isArray(row.keywords)? row.keywords.join(', ') : (row.keywords || '');
+    tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.url||''}</td><td>${row.foto||''}</td><td>${row.desc||''}</td><td>${keywordsStr}</td>`;
+    tr.onclick = () => seleccionarFila(tr, i, 'productos');
+  });
+}
 
     function renderTablaConfig() {
       const tbody = document.querySelector('#miTablaConfig tbody');
@@ -791,26 +795,26 @@
     }
 
     function seleccionarFila(row, index, tipo) {
-      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
-      row.classList.add('seleccionada');
-      filaSeleccionada = {index, tipo};
-      modoEdicion = true;
-      indiceEdicion = index;
+  document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
+  row.classList.add('seleccionada');
+  filaSeleccionada = {index, tipo};
+  modoEdicion = true;
+  indiceEdicion = index;
 
-      if (tipo === 'productos') {
-        const datos = datosProductos[index];
-        document.getElementById('inputProducto').value = datos.nombre || '';
-        document.getElementById('inputPrecio').value = datos.precio || '';
-        document.getElementById('inputStock').value = datos.stock || '';
-        document.getElementById('inputDesc').value = datos.desc || '';
-        document.getElementById('inputFoto').value = datos.foto || '';
-        document.getElementById('inputUrlProd').value = datos.url || '';
-        document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
-        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
-        document.getElementById('modoEdicionProd').classList.remove('hidden');
-        document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
-        document.getElementById('btnBorrar').disabled = false;
-      } else {
+  if (tipo === 'productos') {
+    const datos = datosProductos[index];
+    document.getElementById('inputProducto').value = datos.nombre || '';
+    document.getElementById('inputPrecio').value = datos.precio || '';
+    document.getElementById('inputUrlProd').value = datos.url || '';
+    document.getElementById('inputFoto').value = datos.foto || '';
+    document.getElementById('inputDesc').value = datos.desc || '';
+    document.getElementById('inputKeywords').value = Array.isArray(datos.keywords)? datos.keywords.join(', ') : (datos.keywords || '');
+    document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
+    document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+    document.getElementById('modoEdicionProd').classList.remove('hidden');
+    document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
+    document.getElementById('btnBorrar').disabled = false;
+  } else {
         const datos = datosConfig[index]; // FIX: era datosConfig, no datosConfig[index]
         document.getElementById('inputPregunta').value = datos.pregunta || '';
         document.getElementById('inputRespuesta').value = datos.respuesta || '';
@@ -823,30 +827,32 @@
       }
     }
 
-    document.getElementById('btnGuardar').addEventListener('click', () => {
-      const prod = document.getElementById('inputProducto').value;
-      const precio = document.getElementById('inputPrecio').value;
-      const stock = document.getElementById('inputStock').value;
-      const desc = document.getElementById('inputDesc').value;
-      const foto = document.getElementById('inputFoto').value;
-      const urlProd = document.getElementById('inputUrlProd').value;
-      if(!prod ||!precio ||!stock) return alert("Completá nombre, precio y stock");
+     document.getElementById('btnGuardar').addEventListener('click', () => {
+  const prod = document.getElementById('inputProducto').value;
+  const precio = document.getElementById('inputPrecio').value;
+  const urlProd = document.getElementById('inputUrlProd').value;
+  const foto = document.getElementById('inputFoto').value;
+  const desc = document.getElementById('inputDesc').value;
+  const keywordsInput = document.getElementById('inputKeywords').value;
+  const keywords = keywordsInput? keywordsInput.split(',').map(k => k.trim()).filter(k => k) : [];
+  
+  if(!prod ||!precio ||!urlProd) return alert("Completá nombre, precio y URL producto");
 
-      const nuevoProd = {nombre: prod, precio, stock, desc, foto, url: urlProd};
+  const nuevoProd = {nombre: prod, precio, url: urlProd, foto, desc, keywords};
 
-      if (modoEdicion && indiceEdicion!== null) {
-        datosProductos[indiceEdicion] = nuevoProd;
-        modoEdicion = false;
-        indiceEdicion = null;
-        limpiarFormProductos();
-      } else {
-        datosProductos.push(nuevoProd);
-        limpiarFormProductos();
-      }
+  if (modoEdicion && indiceEdicion!== null) {
+    datosProductos[indiceEdicion] = nuevoProd;
+    modoEdicion = false;
+    indiceEdicion = null;
+    limpiarFormProductos();
+  } else {
+    datosProductos.push(nuevoProd);
+    limpiarFormProductos();
+  }
 
-      renderTablaProductos();
-      marcarCambiosPendientes();
-    });
+  renderTablaProductos();
+  marcarCambiosPendientes();
+});
 
     document.getElementById('btnCancelarEdicionProd').addEventListener('click', () => {
       modoEdicion = false;
@@ -951,30 +957,30 @@
     });
 
     document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
-      const file = document.getElementById('csvProductos').files[0];
-      if (!file) return alert('Seleccioná un archivo CSV');
+  const file = document.getElementById('csvProductos').files[0];
+  if (!file) return alert('Seleccioná un archivo CSV');
 
-      const text = await file.text();
-      const lines = text.split('\n').filter(l => l.trim());
+  const text = await file.text();
+  const lines = text.split('\n').filter(l => l.trim());
 
-      if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
+  if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
 
-      datosProductos = lines.slice(1).map(line => {
-        const vals = line.split(',');
-        return {
-          nombre: vals[0]||'',
-          precio: vals[1]||'',
-          stock: vals[2]||'',
-          desc: vals[3]||'',
-          foto: vals[4]||'',
-          url: vals[5]||''
-        };
-      });
+  datosProductos = lines.slice(1).map(line => {
+    const vals = line.split(',');
+    return {
+      nombre: vals[0]||'',
+      precio: vals[1]||'',
+      url: vals[2]||'',
+      foto: vals[3]||'',
+      desc: vals[4]||'',
+      keywords: vals[5]? vals[5].split(',').map(k => k.trim()).filter(k => k) : []
+    };
+  });
 
-      renderTablaProductos();
-      marcarCambiosPendientes();
-      document.getElementById('csvProductos').value = '';
-    });
+  renderTablaProductos();
+  marcarCambiosPendientes();
+  document.getElementById('csvProductos').value = '';
+});
 
     document.getElementById('btnCargarCsvConfig').addEventListener('click', async () => {
       const file = document.getElementById('csvConfig').files[0];
