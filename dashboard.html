@@ -258,7 +258,6 @@
 <script>
   const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev'; // CAMBIA ESTO por tu URL real de Cloudflare
   const BOT_ID = localStorage.getItem('bot_id');
-  const botId = BOT_ID;
 
 // Si no hay bot_id, lo rajamos al login
 if (!BOT_ID) {
@@ -290,7 +289,7 @@ if (!BOT_ID) {
 
     const userEmail = localStorage.getItem('user_email');
 
-    if (!botId ||!userEmail) {
+    if (!BOT_ID ||!userEmail) {
       window.location.href = 'index.html';
     } else {
       currentUser = { email: userEmail };
@@ -303,7 +302,7 @@ if (!BOT_ID) {
         const res = await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: botId })
+          body: JSON.stringify({ bot_id: BOT_ID })
         });
         const data = await res.json();
         
@@ -317,7 +316,7 @@ if (!BOT_ID) {
         
         userData = {
           email: userEmail,
-          bot_id: botId,
+          bot_id: BOT_ID,
           estado: data.estado,
           domain: data.domain,
           config: data.config,
@@ -433,8 +432,8 @@ if (!BOT_ID) {
     }
 
     function generarCodigoWidget() {
-      const botIdFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
+      const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
       if (document.getElementById('codigoWidgetModal')) {
         document.getElementById('codigoWidgetModal').value = codigo;
