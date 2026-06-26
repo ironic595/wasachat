@@ -257,8 +257,7 @@
 
 <script>
   const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev/'; // CAMBIA ESTO por tu URL real de Cloudflare
-  const BOT_ID = localStorage.getItem('wasa_bot_id');
-  const USER_EMAIL = localStorage.getItem('wasa_email');
+  const BOT_ID = localStorage.getItem('bot_id');
 
 // Si no hay bot_id, lo rajamos al login
 if (!BOT_ID) {
@@ -286,7 +285,6 @@ if (!BOT_ID) {
       callback: '',
     });
 
-    const botId = localStorage.getItem('bot_id');
     const userEmail = localStorage.getItem('user_email');
 
     if (!botId ||!userEmail) {
@@ -372,7 +370,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
+          body: JSON.stringify({ bot_id: BOT_ID, domain: dominio })
         });
         userData.domain = dominio;
         showLoading(false);
@@ -399,7 +397,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
+          body: JSON.stringify({ bot_id: BOT_ID, domain: nuevo })
         });
         userData.domain = nuevo;
         document.getElementById('dominioActual').textContent = nuevo;
@@ -432,7 +430,7 @@ if (!BOT_ID) {
     }
 
     function generarCodigoWidget() {
-      const botIdFinal = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+      const botIdFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
       const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
       if (document.getElementById('codigoWidgetModal')) {
@@ -545,7 +543,7 @@ if (!BOT_ID) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            bot_id: userData.bot_id, 
+            bot_id: BOT_ID, 
             config: {...userData.config, avatar: url }
           })
         });
@@ -580,7 +578,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, config })
+          body: JSON.stringify({ bot_id: BOT_ID, config })
         });
         userData.config = config;
         document.getElementById('colorWidget').value = config.color;
@@ -858,13 +856,11 @@ if (!BOT_ID) {
 
   if(!prod ||!precio ||!urlProd) return alert("Completá nombre, precio y URL producto");
 
-  // Mostrar loading
   const btnGuardar = document.getElementById('btnGuardar');
   const textoOriginal = btnGuardar.textContent;
   btnGuardar.textContent = 'Generando keywords...';
   btnGuardar.disabled = true;
 
-  // Llamar a /enrich-keywords para agregar sinónimos + traducciones
   try {
     const res = await fetch(API_URL + '/enrich-keywords', {
       method: 'POST',
@@ -873,11 +869,10 @@ if (!BOT_ID) {
     });
     const data = await res.json();
     if (data.keywords_auto && Array.isArray(data.keywords_auto)) {
-      // Merge sin duplicados
       keywords = [...new Set([...keywords,...data.keywords_auto])];
     }
   } catch (e) {
-    console.log('Error enriqueciendo keywords, se guarda igual', e);
+    console.log('Error enriqueciendo keywords', e);
   }
 
   btnGuardar.textContent = textoOriginal;
@@ -971,7 +966,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
+          body: JSON.stringify({ bot_id: BOT_ID, data: { productos: datosProductos } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -989,7 +984,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
+          body: JSON.stringify({ bot_id: BOT_ID, data: { faq: datosConfig } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
