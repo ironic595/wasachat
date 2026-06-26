@@ -707,9 +707,19 @@
     });
 
     function marcarCambiosPendientes() {
-      cambiosPendientes = true;
-      document.getElementById('cambiosPendientes').style.display = 'block';
-    }
+  // NO hacer JSON.stringify a datosProductos
+  fetch(API_URL + '/config', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      bot_id: BOT_ID,
+      data: {
+        productos: datosProductos, // Array directo, NO stringify
+        faq: datosFAQ
+      }
+    })
+  });
+}
 
     async function abrirEditor(tab) {
       currentTab = tab;
@@ -827,16 +837,41 @@
       }
     }
 
-     document.getElementById('btnGuardar').addEventListener('click', () => {
-  const prod = document.getElementById('inputProducto').value;
-  const precio = document.getElementById('inputPrecio').value;
-  const urlProd = document.getElementById('inputUrlProd').value;
-  const foto = document.getElementById('inputFoto').value;
-  const desc = document.getElementById('inputDesc').value;
-  const keywordsInput = document.getElementById('inputKeywords').value;
-  const keywords = keywordsInput? keywordsInput.split(',').map(k => k.trim()).filter(k => k) : [];
-  
+     document.getElementById('btnGuardar').addEventListener('click', async () => {
+  const prod = document.getElementById('inputProducto').value.trim();
+  const precio = document.getElementById('inputPrecio').value.trim();
+  const urlProd = document.getElementById('inputUrlProd').value.trim();
+  const foto = document.getElementById('inputFoto').value.trim();
+  const desc = document.getElementById('inputDesc').value.trim();
+  const keywordsInput = document.getElementById('inputKeywords').value.trim();
+  let keywords = keywordsInput? keywordsInput.split(',').map(k => k.trim()).filter(k => k) : [];
+
   if(!prod ||!precio ||!urlProd) return alert("Completá nombre, precio y URL producto");
+
+  // Mostrar loading
+  const btnGuardar = document.getElementById('btnGuardar');
+  const textoOriginal = btnGuardar.textContent;
+  btnGuardar.textContent = 'Generando keywords...';
+  btnGuardar.disabled = true;
+
+  // Llamar a /enrich-keywords para agregar sinónimos + traducciones
+  try {
+    const res = await fetch(API_URL + '/enrich-keywords', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ nombre: prod, descripcion: desc })
+    });
+    const data = await res.json();
+    if (data.keywords_auto && Array.isArray(data.keywords_auto)) {
+      // Merge sin duplicados
+      keywords = [...new Set([...keywords,...data.keywords_auto])];
+    }
+  } catch (e) {
+    console.log('Error enriqueciendo keywords, se guarda igual', e);
+  }
+
+  btnGuardar.textContent = textoOriginal;
+  btnGuardar.disabled = false;
 
   const nuevoProd = {nombre: prod, precio, url: urlProd, foto, desc, keywords};
 
