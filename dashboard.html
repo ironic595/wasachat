@@ -256,6 +256,16 @@
   </div>
 
 <script>
+  const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev/'; // CAMBIA ESTO por tu URL real de Cloudflare
+  const BOT_ID = localStorage.getItem('wasa_bot_id');
+  const USER_EMAIL = localStorage.getItem('wasa_email');
+
+// Si no hay bot_id, lo rajamos al login
+if (!BOT_ID) {
+  alert('Tenés que loguearte primero');
+  window.location.href = '/login.html'; // Cambia esto por tu página de login
+}
+  
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
 
     let currentUser = null;
