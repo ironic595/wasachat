@@ -1341,6 +1341,84 @@ window.abrirEditorWidget = abrirEditorWidget;
 window.cerrarEditorWidget = cerrarEditorWidget;
 
 console.log('✅ Todo listo - Los botones deberían funcionar ahora');
+
+  // ===== FIX ULTRA DEFINITIVO =====
+// Esto fuerza la apertura del editor directamente
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Aplicando fix ultra definitivo...');
+    
+    // Buscar todos los botones y reemplazar sus onclick
+    document.querySelectorAll('button').forEach(btn => {
+        const texto = btn.textContent.trim();
+        
+        if (texto.includes('Editar Tabla de Productos')) {
+            btn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🟢 Click en productos - FORZANDO apertura');
+                
+                // FORZAR apertura directa
+                const editor = document.getElementById('editor');
+                if (editor) {
+                    editor.style.display = 'flex';
+                    editor.style.position = 'fixed';
+                    editor.style.top = '0';
+                    editor.style.left = '0';
+                    editor.style.width = '100%';
+                    editor.style.height = '100%';
+                    editor.style.zIndex = '99999';
+                    editor.style.background = 'white';
+                    editor.style.visibility = 'visible';
+                    
+                    // Mostrar contenido
+                    document.getElementById('form-productos').classList.remove('hidden');
+                    document.getElementById('form-config').classList.add('hidden');
+                    document.getElementById('tabla-productos').classList.remove('hidden');
+                    document.getElementById('tabla-config').classList.add('hidden');
+                    document.getElementById('editor-titulo').textContent = 'Editor de Productos';
+                    
+                    console.log('✅ Editor de productos FORZADO');
+                } else {
+                    alert('ERROR: No se encontró el editor');
+                }
+            };
+        }
+        
+        if (texto.includes('Editar Preguntas y Respuestas')) {
+            btn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🟢 Click en preguntas - FORZANDO apertura');
+                
+                const editor = document.getElementById('editor');
+                if (editor) {
+                    editor.style.display = 'flex';
+                    editor.style.position = 'fixed';
+                    editor.style.top = '0';
+                    editor.style.left = '0';
+                    editor.style.width = '100%';
+                    editor.style.height = '100%';
+                    editor.style.zIndex = '99999';
+                    editor.style.background = 'white';
+                    editor.style.visibility = 'visible';
+                    
+                    document.getElementById('form-productos').classList.add('hidden');
+                    document.getElementById('form-config').classList.remove('hidden');
+                    document.getElementById('tabla-productos').classList.add('hidden');
+                    document.getElementById('tabla-config').classList.remove('hidden');
+                    document.getElementById('editor-titulo').textContent = 'Editor de FAQs';
+                    
+                    console.log('✅ Editor de preguntas FORZADO');
+                } else {
+                    alert('ERROR: No se encontró el editor');
+                }
+            };
+        }
+    });
+    
+    console.log('✅ Fix ultra definitivo aplicado');
+});
+  
 </script>
 </body>
 </html>
