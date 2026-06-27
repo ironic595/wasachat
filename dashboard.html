@@ -521,6 +521,8 @@
   }
 
   function abrirEditorWidget() {
+    document.getElementById('editor').style.display = 'none'; // ← AGREGAR
+    document.getElementById('editor-widget').style.display = 'flex'; 
     document.getElementById('editor').classList.remove('active');
     const cfg = userData.config || {};
     document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
@@ -636,7 +638,7 @@
   }
 
   function cerrarEditorWidget() {
-    document.getElementById('editor-widget').classList.remove('active');
+    document.getElementById('editor-widget').style.display = 'none';
   }
 
   async function guardarConfigWidgetModal() {
@@ -758,14 +760,16 @@
 
   function abrirEditor(tab) {
   const editor = document.getElementById('editor');
-  if (!editor) {
-    alert('ERROR: No existe <div id="editor"> en el HTML');
-    return;
-  }
+  const editorWidget = document.getElementById('editor-widget');
   
-  console.log('Abriendo editor:', tab, editor);
+  if (!editor) return alert('ERROR: No existe <div id="editor">');
   
-  document.getElementById('editor-widget').classList.remove('active');
+  console.log('Abriendo editor:', tab);
+  
+  // ESTAS 2 LÍNEAS MATAN EL BUG: fuerzan display none al otro editor
+  editorWidget.style.display = 'none';
+  editor.style.display = 'flex';
+  
   currentTab = tab;
   modoEdicion = false;
   indiceEdicion = null;
@@ -774,8 +778,6 @@
   const pendientes = document.getElementById('cambiosPendientes');
   if (pendientes) pendientes.style.display = 'none';
   
-  editor.classList.add('active');
-  editor.classList.remove('hidden');
   document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
 
   if (tab === 'productos') {
@@ -793,18 +795,19 @@
   }
 }
 
-  function cerrarEditor() {
-    if (cambiosPendientes) {
-      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
-    }
-    document.getElementById('editor').classList.remove('active');
-    filaSeleccionada = null;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    limpiarFormProductos();
-    limpiarFormConfig();
+function cerrarEditor() {
+  if (cambiosPendientes) {
+    if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
   }
+  // ESTA LÍNEA ES CLAVE: usa style directo
+  document.getElementById('editor').style.display = 'none';
+  filaSeleccionada = null;
+  modoEdicion = false;
+  indiceEdicion = null;
+  cambiosPendientes = false;
+  limpiarFormProductos();
+  limpiarFormConfig();
+}
 
   function limpiarFormProductos() {
     document.getElementById('inputProducto').value = '';
