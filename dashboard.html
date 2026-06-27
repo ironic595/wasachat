@@ -520,9 +520,11 @@
   }
 
   function abrirEditorWidget() {
-    document.getElementById('editor').style.display = 'none'; // ← AGREGAR
-    document.getElementById('editor-widget').style.display = 'flex'; 
-    document.getElementById('editor').classList.remove('active');
+     document.getElementById('editor').style.display = 'none';
+    // Abrir el editor de widget
+    const widgetEditor = document.getElementById('editor-widget');
+    widgetEditor.style.display = 'flex';
+    
     const cfg = userData.config || {};
     document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
     document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
