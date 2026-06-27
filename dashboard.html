@@ -52,9 +52,9 @@
    .info-row:last-child { border-bottom: none; }
 
     /* === EDITORES === */
-    #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 101; display: none; flex-direction: column; }
-    #editor-widget { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
-    #editor.active, #editor-widget.active { display: flex; }
+    #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 500; display: none; flex-direction: column; }
+    #editor-widget { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 500; display: none; flex-direction: column; }
+    #editor.active, #editor-widget.active { display: flex !important; }
     #editor-header, #editor-widget-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
     #editor-header h2, #editor-widget-header h2 { margin: 0; border: none; color: white; }
     #editor-body, #editor-widget-body { display: flex; flex: 1; overflow: hidden; }
@@ -522,50 +522,50 @@
   // ===== FUNCIONES PARA ABRIR EDITORES (CORREGIDAS) =====
   
   function abrirEditor(tab) {
-    console.log('🔵 abrirEditor llamado con tab:', tab);
-    
-    const editor = document.getElementById('editor');
-    const editorWidget = document.getElementById('editor-widget');
-    
-    if (!editor) {
-      console.error('❌ No se encontró el elemento #editor');
-      alert('ERROR: No existe <div id="editor">');
-      return;
-    }
-    
-    // Cerrar el widget si está abierto
-    if (editorWidget) {
-      editorWidget.style.display = 'none';
-    }
-    
-    // Abrir el editor de tablas
-    editor.style.display = 'flex';
-    console.log('✅ Editor abierto');
-    
-    currentTab = tab;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    
-    const pendientes = document.getElementById('cambiosPendientes');
-    if (pendientes) pendientes.style.display = 'none';
-    
-    document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
-
-    if (tab === 'productos') {
-      document.getElementById('form-productos').classList.remove('hidden');
-      document.getElementById('form-config').classList.add('hidden');
-      document.getElementById('tabla-productos').classList.remove('hidden');
-      document.getElementById('tabla-config').classList.add('hidden');
-      limpiarFormProductos();
-    } else {
-      document.getElementById('form-productos').classList.add('hidden');
-      document.getElementById('form-config').classList.remove('hidden');
-      document.getElementById('tabla-productos').classList.add('hidden');
-      document.getElementById('tabla-config').classList.remove('hidden');
-      limpiarFormConfig();
-    }
+  console.log('🔵 abrirEditor llamado con tab:', tab);
+  
+  const editor = document.getElementById('editor');
+  const editorWidget = document.getElementById('editor-widget');
+  
+  if (!editor) {
+    console.error('❌ No se encontró el elemento #editor');
+    return;
   }
+  
+  if (editorWidget) {
+    editorWidget.classList.remove('active');
+    editorWidget.style.display = 'none';
+  }
+  
+  // Agregamos la clase active y el estilo flex
+  editor.classList.add('active');
+  editor.style.display = 'flex';
+  
+  currentTab = tab;
+  modoEdicion = false;
+  indiceEdicion = null;
+  cambiosPendientes = false;
+  
+  const pendientes = document.getElementById('cambiosPendientes');
+  if (pendientes) pendientes.style.display = 'none';
+  
+  document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
+  
+  if (tab === 'productos') {
+    document.getElementById('form-productos').classList.remove('hidden');
+    document.getElementById('form-config').classList.add('hidden');
+    document.getElementById('tabla-productos').classList.remove('hidden');
+    document.getElementById('tabla-config').classList.add('hidden');
+    limpiarFormProductos();
+  } else {
+    document.getElementById('form-productos').classList.add('hidden');
+    document.getElementById('form-config').classList.remove('hidden');
+    document.getElementById('tabla-productos').classList.add('hidden');
+    document.getElementById('tabla-config').classList.remove('hidden');
+    limpiarFormConfig();
+  }
+}
+
 
   function cerrarEditor() {
     console.log('🔴 cerrarEditor llamado');
