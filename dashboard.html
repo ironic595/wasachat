@@ -774,6 +774,7 @@
   if (pendientes) pendientes.style.display = 'none';
   
   editor.classList.add('active');
+  editor.classList.remove('hidden');
   document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
 
   if (tab === 'productos') {
