@@ -797,17 +797,16 @@
 }
 
 function cerrarEditor() {
-  if (cambiosPendientes) {
-    if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
-  }
-  // ESTA LÍNEA ES CLAVE: usa style directo
-  document.getElementById('editor').style.display = 'none';
-  filaSeleccionada = null;
-  modoEdicion = false;
-  indiceEdicion = null;
-  cambiosPendientes = false;
-  limpiarFormProductos();
-  limpiarFormConfig();
+    if (cambiosPendientes) {
+        if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
+    }
+    document.getElementById('editor').style.display = 'none';
+    filaSeleccionada = null;
+    modoEdicion = false;
+    indiceEdicion = null;
+    cambiosPendientes = false;
+    limpiarFormProductos();
+    limpiarFormConfig();
 }
 
   function limpiarFormProductos() {
