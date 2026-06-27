@@ -1266,6 +1266,81 @@
 
   console.log('✅ Todas las funciones asignadas al window global');
   console.log('✅ Script cargado correctamente');
+
+  // ===== SOLUCIÓN DEFINITIVA PARA LOS BOTONES =====
+// Forzar que los botones tengan los onclick correctos
+(function() {
+    console.log('🔧 Aplicando fix definitivo para botones...');
+    
+    // Buscar todos los botones
+    const allButtons = document.querySelectorAll('button');
+    
+    allButtons.forEach(btn => {
+        // Buscar botón de productos
+        if (btn.textContent.includes('Editar Tabla de Productos')) {
+            console.log('✅ Fix aplicado a botón de productos');
+            // Remover cualquier onclick existente y asignar el nuestro
+            btn.removeAttribute('onclick');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🟢 Click en Editar Productos');
+                abrirEditor('productos');
+            };
+        }
+        
+        // Buscar botón de preguntas
+        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
+            console.log('✅ Fix aplicado a botón de preguntas');
+            btn.removeAttribute('onclick');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🟢 Click en Editar Preguntas');
+                abrirEditor('config');
+            };
+        }
+        
+        // Buscar botón de personalizar widget
+        if (btn.textContent.includes('Personalizar apariencia')) {
+            console.log('✅ Fix aplicado a botón de widget');
+            btn.removeAttribute('onclick');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🟢 Click en Personalizar Widget');
+                abrirEditorWidget();
+            };
+        }
+    });
+    
+    // También buscar por los onclick en el HTML y reemplazarlos
+    document.querySelectorAll('[onclick*="abrirEditor"]').forEach(el => {
+        const onclickAttr = el.getAttribute('onclick');
+        if (onclickAttr.includes("'productos'")) {
+            console.log('✅ Reemplazando onclick de productos');
+            el.removeAttribute('onclick');
+            el.onclick = function(e) {
+                e.preventDefault();
+                abrirEditor('productos');
+            };
+        } else if (onclickAttr.includes("'config'")) {
+            console.log('✅ Reemplazando onclick de config');
+            el.removeAttribute('onclick');
+            el.onclick = function(e) {
+                e.preventDefault();
+                abrirEditor('config');
+            };
+        }
+    });
+    
+    console.log('✅ Fix de botones aplicado correctamente');
+})();
+
+// También asegurar que las funciones estén en window (por si acaso)
+window.abrirEditor = abrirEditor;
+window.cerrarEditor = cerrarEditor;
+window.abrirEditorWidget = abrirEditorWidget;
+window.cerrarEditorWidget = cerrarEditorWidget;
+
+console.log('✅ Todo listo - Los botones deberían funcionar ahora');
 </script>
 </body>
 </html>
