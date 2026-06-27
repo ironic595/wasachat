@@ -497,15 +497,6 @@
     document.getElementById('cambiosPendientes').style.display = 'none';
   }
 
-  function generarCodigoWidget() {
-    const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-    const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
-    document.getElementById('codigoWidget').value = codigo;
-    if (document.getElementById('codigoWidgetModal')) {
-      document.getElementById('codigoWidgetModal').value = codigo;
-    }
-  }
-
     function copiarCodigo() {
     const textarea = document.getElementById('codigoWidget');
     textarea.select();
