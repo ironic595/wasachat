@@ -497,7 +497,7 @@
     document.getElementById('cambiosPendientes').style.display = 'none';
   }
 
-    function copiarCodigo() {
+  function copiarCodigo() {
     const textarea = document.getElementById('codigoWidget');
     textarea.select();
     document.execCommand('copy');
@@ -519,11 +519,97 @@
     });
   }
 
+  // ===== FUNCIONES PARA ABRIR EDITORES (CORREGIDAS) =====
+  
+  function abrirEditor(tab) {
+    console.log('🔵 abrirEditor llamado con tab:', tab);
+    
+    const editor = document.getElementById('editor');
+    const editorWidget = document.getElementById('editor-widget');
+    
+    if (!editor) {
+      console.error('❌ No se encontró el elemento #editor');
+      alert('ERROR: No existe <div id="editor">');
+      return;
+    }
+    
+    // Cerrar el widget si está abierto
+    if (editorWidget) {
+      editorWidget.style.display = 'none';
+    }
+    
+    // Abrir el editor de tablas
+    editor.style.display = 'flex';
+    console.log('✅ Editor abierto');
+    
+    currentTab = tab;
+    modoEdicion = false;
+    indiceEdicion = null;
+    cambiosPendientes = false;
+    
+    const pendientes = document.getElementById('cambiosPendientes');
+    if (pendientes) pendientes.style.display = 'none';
+    
+    document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
+
+    if (tab === 'productos') {
+      document.getElementById('form-productos').classList.remove('hidden');
+      document.getElementById('form-config').classList.add('hidden');
+      document.getElementById('tabla-productos').classList.remove('hidden');
+      document.getElementById('tabla-config').classList.add('hidden');
+      limpiarFormProductos();
+    } else {
+      document.getElementById('form-productos').classList.add('hidden');
+      document.getElementById('form-config').classList.remove('hidden');
+      document.getElementById('tabla-productos').classList.add('hidden');
+      document.getElementById('tabla-config').classList.remove('hidden');
+      limpiarFormConfig();
+    }
+  }
+
+  function cerrarEditor() {
+    console.log('🔴 cerrarEditor llamado');
+    
+    if (cambiosPendientes) {
+      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) {
+        return;
+      }
+    }
+    
+    const editor = document.getElementById('editor');
+    if (editor) {
+      editor.style.display = 'none';
+      console.log('✅ Editor cerrado');
+    }
+    
+    filaSeleccionada = null;
+    modoEdicion = false;
+    indiceEdicion = null;
+    cambiosPendientes = false;
+    limpiarFormProductos();
+    limpiarFormConfig();
+  }
+
   function abrirEditorWidget() {
-     document.getElementById('editor').style.display = 'none';
-    // Abrir el editor de widget
-    const widgetEditor = document.getElementById('editor-widget');
-    widgetEditor.style.display = 'flex';
+    console.log('🟢 abrirEditorWidget llamado');
+    
+    const editor = document.getElementById('editor');
+    const editorWidget = document.getElementById('editor-widget');
+    
+    if (!editorWidget) {
+      console.error('❌ No se encontró el elemento #editor-widget');
+      alert('Error: No se encontró el widget editor');
+      return;
+    }
+    
+    // Cerrar el editor de tablas si está abierto
+    if (editor) {
+      editor.style.display = 'none';
+    }
+    
+    // Abrir el widget editor
+    editorWidget.style.display = 'flex';
+    console.log('✅ Widget editor abierto');
     
     const cfg = userData.config || {};
     document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
@@ -544,9 +630,17 @@
       console.log('Token se pedirá al subir imagen');
     });
 
-    document.getElementById('editor-widget').classList.add('active');
     generarCodigoWidget();
     renderizarPreviewWidget();
+  }
+
+  function cerrarEditorWidget() {
+    console.log('🔴 cerrarEditorWidget llamado');
+    const editorWidget = document.getElementById('editor-widget');
+    if (editorWidget) {
+      editorWidget.style.display = 'none';
+      console.log('✅ Widget editor cerrado');
+    }
   }
 
   async function subirAvatarADrive(file) {
@@ -636,10 +730,6 @@
       document.getElementById('avatarPreview').innerHTML = '💬';
       console.error(err);
     }
-  }
-
-  function cerrarEditorWidget() {
-    document.getElementById('editor-widget').style.display = 'none';
   }
 
   async function guardarConfigWidgetModal() {
@@ -759,55 +849,7 @@
     `;
   }
 
-  function abrirEditor(tab) {
-  const editor = document.getElementById('editor');
-  const editorWidget = document.getElementById('editor-widget');
-  
-  if (!editor) return alert('ERROR: No existe <div id="editor">');
-  
-  console.log('Abriendo editor:', tab);
-  
-  // ESTAS 2 LÍNEAS MATAN EL BUG: fuerzan display none al otro editor
-  editorWidget.style.display = 'none';
-  editor.style.display = 'flex';
-  
-  currentTab = tab;
-  modoEdicion = false;
-  indiceEdicion = null;
-  cambiosPendientes = false;
-  
-  const pendientes = document.getElementById('cambiosPendientes');
-  if (pendientes) pendientes.style.display = 'none';
-  
-  document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
-
-  if (tab === 'productos') {
-    document.getElementById('form-productos').classList.remove('hidden');
-    document.getElementById('form-config').classList.add('hidden');
-    document.getElementById('tabla-productos').classList.remove('hidden');
-    document.getElementById('tabla-config').classList.add('hidden');
-    limpiarFormProductos();
-  } else {
-    document.getElementById('form-productos').classList.add('hidden');
-    document.getElementById('form-config').classList.remove('hidden');
-    document.getElementById('tabla-productos').classList.add('hidden');
-    document.getElementById('tabla-config').classList.remove('hidden');
-    limpiarFormConfig();
-  }
-}
-
-function cerrarEditor() {
-    if (cambiosPendientes) {
-        if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
-    }
-    document.getElementById('editor').style.display = 'none';
-    filaSeleccionada = null;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    limpiarFormProductos();
-    limpiarFormConfig();
-}
+  // ===== FUNCIONES DE TABLAS =====
 
   function limpiarFormProductos() {
     document.getElementById('inputProducto').value = '';
@@ -820,6 +862,7 @@ function cerrarEditor() {
     document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
     document.getElementById('modoEdicionProd').classList.add('hidden');
     document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
+    document.getElementById('btnBorrar').disabled = true;
   }
 
   function limpiarFormConfig() {
@@ -830,6 +873,7 @@ function cerrarEditor() {
     document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
     document.getElementById('modoEdicionConfig').classList.add('hidden');
     document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
+    document.getElementById('btnBorrarConfig').disabled = true;
   }
 
   function renderTablaProductos() {
@@ -1125,24 +1169,6 @@ function cerrarEditor() {
     }
   }
 
-  function cargarConfigWidget() {
-    const cfg = userData.config || {};
-    document.getElementById('colorWidget').value = cfg.color || '#25D366';
-    document.getElementById('posWidget').value = cfg.pos || 'right';
-    document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-    generarCodigoWidget();
-    actualizarPreviewMini();
-  }
-
-  function cargarDatosTablas() {
-    datosProductos = userData.data?.productos || [];
-    datosConfig = userData.data?.faq || [];
-    renderTablaProductos();
-    renderTablaConfig();
-    cambiosPendientes = false;
-    document.getElementById('cambiosPendientes').style.display = 'none';
-  }
-
   function generarCodigoWidget() {
     const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
     const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
@@ -1152,39 +1178,94 @@ function cerrarEditor() {
     }
   }
 
-  // === NAVEGACIÓN DE SOLAPAS ===
-document.querySelectorAll('.sidebar-item').forEach(item => {
-  item.addEventListener('click', (e) => {
-    const section = e.target.dataset.section;
-    showSection(section);
+  // ===== NAVEGACIÓN DE SOLAPAS =====
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const section = e.target.dataset.section;
+      showSection(section);
+    });
   });
-});
 
-function showSection(section) {
-  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-  document.querySelector(`[data-section="${section}"]`).classList.add('active');
+  function showSection(section) {
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    document.querySelector(`[data-section="${section}"]`).classList.add('active');
 
-  if (section === 'configuracion') {
-    document.getElementById('section-configuracion').classList.remove('hidden');
-    document.getElementById('section-analytics').classList.add('hidden');
-  } else if (section === 'analytics') {
-    document.getElementById('section-configuracion').classList.add('hidden');
-    document.getElementById('section-analytics').classList.remove('hidden');
-    cargarAnalytics();
+    if (section === 'configuracion') {
+      document.getElementById('section-configuracion').classList.remove('hidden');
+      document.getElementById('section-analytics').classList.add('hidden');
+    } else if (section === 'analytics') {
+      document.getElementById('section-configuracion').classList.add('hidden');
+      document.getElementById('section-analytics').classList.remove('hidden');
+      cargarAnalytics();
+    }
   }
-}
 
-function cargarAnalytics() {
-  if (!userData || !userData.stats) return;
-  const stats = userData.stats;
-  document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
-  document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
-  document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
-  document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
-  document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
-   ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
-    : '-';
-}
+  function cargarAnalytics() {
+    if (!userData || !userData.stats) return;
+    const stats = userData.stats;
+    document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
+    document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
+    document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
+    document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
+    document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
+     ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
+      : '-';
+  }
+
+  // ===== INICIALIZACIÓN DE BOTONES DE EDITOR =====
+  // IMPORTANTE: Estos event listeners son los que faltaban
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔵 Inicializando botones de editor...');
+    
+    // Buscar botones por ID o clase
+    const btnProductos = document.querySelector('[onclick*="abrirEditor(\'productos\')"]');
+    const btnConfig = document.querySelector('[onclick*="abrirEditor(\'config\')"]');
+    
+    console.log('Botón productos encontrado:', !!btnProductos);
+    console.log('Botón config encontrado:', !!btnConfig);
+    
+    // Si no se encontraron por onclick, buscarlos por texto
+    if (!btnProductos) {
+      const allButtons = document.querySelectorAll('button');
+      allButtons.forEach(btn => {
+        if (btn.textContent.includes('Editar Tabla de Productos')) {
+          console.log('✅ Botón productos encontrado por texto');
+          btn.onclick = function() { abrirEditor('productos'); };
+        }
+        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
+          console.log('✅ Botón config encontrado por texto');
+          btn.onclick = function() { abrirEditor('config'); };
+        }
+      });
+    }
+  });
+
+  // ASIGNAR FUNCIONES AL SCOPE GLOBAL PARA QUE LOS onclicks FUNCIONEN
+  window.abrirEditor = abrirEditor;
+  window.cerrarEditor = cerrarEditor;
+  window.abrirEditorWidget = abrirEditorWidget;
+  window.cerrarEditorWidget = cerrarEditorWidget;
+  window.guardarProducto = guardarProducto;
+  window.guardarFaq = guardarFaq;
+  window.cancelarEdicionProd = cancelarEdicionProd;
+  window.cancelarEdicionConfig = cancelarEdicionConfig;
+  window.confirmarBorrar = confirmarBorrar;
+  window.subirProductos = subirProductos;
+  window.subirFaq = subirFaq;
+  window.cargarCsvProductos = cargarCsvProductos;
+  window.cargarCsvConfig = cargarCsvConfig;
+  window.mostrarCambiarDominio = mostrarCambiarDominio;
+  window.cambiarDominio = cambiarDominio;
+  window.cerrarModales = cerrarModales;
+  window.copiarCodigo = copiarCodigo;
+  window.copiarCodigoModal = copiarCodigoModal;
+  window.guardarConfigWidgetModal = guardarConfigWidgetModal;
+  window.handleAvatarUpload = handleAvatarUpload;
+  window.irAComprar = irAComprar;
+  window.logout = logout;
+
+  console.log('✅ Todas las funciones asignadas al window global');
+  console.log('✅ Script cargado correctamente');
 </script>
 </body>
 </html>
