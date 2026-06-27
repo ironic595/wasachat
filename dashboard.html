@@ -52,7 +52,8 @@
    .info-row:last-child { border-bottom: none; }
 
     /* === EDITORES === */
-    #editor, #editor-widget { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
+    #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 101; display: none; flex-direction: column; }
+    #editor-widget { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
     #editor.active, #editor-widget.active { display: flex; }
     #editor-header, #editor-widget-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
     #editor-header h2, #editor-widget-header h2 { margin: 0; border: none; color: white; }
@@ -528,6 +529,7 @@
   }
 
   function abrirEditorWidget() {
+    document.getElementById('editor').classList.remove('active');
     const cfg = userData.config || {};
     document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
     document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
@@ -763,6 +765,7 @@
   }
 
   function abrirEditor(tab) {
+    document.getElementById('editor-widget').classList.remove('active'); // ← AGREGAR ESTA LÍNEA
     currentTab = tab;
     modoEdicion = false;
     indiceEdicion = null;
