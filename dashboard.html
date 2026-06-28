@@ -159,8 +159,8 @@
         </div>
 
         <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
-        <button class="big success" id="btnEditarProductos">📦 Editar Tabla de Productos</button>
-        <button class="big success" id="btnEditarFaq">❓ Editar Preguntas y Respuestas</button>
+        <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
+        <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
       </div>
     </div>
 
@@ -520,75 +520,42 @@
   }
 
   // ===== FUNCIONES PARA ABRIR EDITORES (CORREGIDAS) =====
-  
-  function abrirEditor(tab) {
-  console.log('🔵 abrirEditor llamado con tab:', tab);
-  
-  const editor = document.getElementById('editor');
-  const editorWidget = document.getElementById('editor-widget');
-  
-  if (!editor) {
-    console.error('❌ No se encontró el elemento #editor');
-    return;
-  }
-  
-  if (editorWidget) {
-    editorWidget.classList.remove('active');
-    editorWidget.style.display = 'none';
-  }
-  
-  // Agregamos la clase active y el estilo flex
-  editor.classList.add('active');
-  editor.style.display = 'flex';
-  
-  currentTab = tab;
-  modoEdicion = false;
-  indiceEdicion = null;
-  cambiosPendientes = false;
-  
-  const pendientes = document.getElementById('cambiosPendientes');
-  if (pendientes) pendientes.style.display = 'none';
-  
-  document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
-  
-  if (tab === 'productos') {
-    document.getElementById('form-productos').classList.remove('hidden');
-    document.getElementById('form-config').classList.add('hidden');
-    document.getElementById('tabla-productos').classList.remove('hidden');
-    document.getElementById('tabla-config').classList.add('hidden');
-    limpiarFormProductos();
-  } else {
-    document.getElementById('form-productos').classList.add('hidden');
-    document.getElementById('form-config').classList.remove('hidden');
-    document.getElementById('tabla-productos').classList.add('hidden');
-    document.getElementById('tabla-config').classList.remove('hidden');
-    limpiarFormConfig();
-  }
-}
+  async function abrirEditor(tab) {
+      currentTab = tab;
+      modoEdicion = false;
+      indiceEdicion = null;
+      cambiosPendientes = false;
+      document.getElementById('cambiosPendientes').style.display = 'none';
+      document.getElementById('editor').classList.add('active');
+      document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
 
-
-  function cerrarEditor() {
-    console.log('🔴 cerrarEditor llamado');
-    
-    if (cambiosPendientes) {
-      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) {
-        return;
+      if (tab === 'productos') {
+        document.getElementById('form-productos').classList.remove('hidden');
+        document.getElementById('form-config').classList.add('hidden');
+        document.getElementById('tabla-productos').classList.remove('hidden');
+        document.getElementById('tabla-config').classList.add('hidden');
+        limpiarFormProductos();
+      } else {
+        document.getElementById('form-productos').classList.add('hidden');
+        document.getElementById('form-config').classList.remove('hidden');
+        document.getElementById('tabla-productos').classList.add('hidden');
+        document.getElementById('tabla-config').classList.remove('hidden');
+        limpiarFormConfig();
       }
     }
-    
-    const editor = document.getElementById('editor');
-    if (editor) {
-      editor.style.display = 'none';
-      console.log('✅ Editor cerrado');
+
+    function cerrarEditor() {
+      if (cambiosPendientes) {
+        if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
+      }
+      document.getElementById('editor').classList.remove('active');
+      filaSeleccionada = null;
+      modoEdicion = false;
+      indiceEdicion = null;
+      cambiosPendientes = false;
+      limpiarFormProductos();
+      limpiarFormConfig();
     }
-    
-    filaSeleccionada = null;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    limpiarFormProductos();
-    limpiarFormConfig();
-  }
 
   function abrirEditorWidget() {
     console.log('🟢 abrirEditorWidget llamado');
