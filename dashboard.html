@@ -35,29 +35,20 @@
   flex-direction: column;
 }
 
-/* VERSIÓN MÓVIL: Menú flotante horizontal debajo del nav */
+
+     /* --- ESTILOS GENERALES Y VERSIÓN MÓVIL --- */
+
 .menubar {
   width: 100%;
-  height: 50px; /* Alto fijo para acomodar tus 2 o 3 opciones */
-  background-color: blue;
+  height: 50px; 
+  background-color: #1a1a1a; /* Un tono gris oscuro para contrastar con el nav negro */
   position: fixed;
-  top: 65px; /* Altura estimada de tu nav para que empiece abajo */
+  top: 65px; 
   left: 0;
-  display: flex;
-  justify-content: space-around; /* Distribuye las secciones horizontalmente */
-  align-items: center;
   z-index: 95;
+  box-sizing: border-box;
 }
 
-/* VERSIÓN MÓVIL: Espaciado para que no se tape el contenido */
-.container { 
-  max-width: 100%; 
-  margin: 0 auto;
-  padding: 20px; 
-  box-sizing: border-box;
-  /* Espacio superior = Alto del nav (65px) + Alto del menubar (50px) */
-  margin-top: 115px; 
-}  
 /* La lista se comporta como fila en celulares */
 .menu-lista {
   list-style: none;
@@ -90,32 +81,30 @@
 .menu-lista a:hover {
   background: #333; /* Efecto visual al pasar el cursor */
 }
-    
-      
-    /* Vista Monitor PC: El menú se vuelve lateral izquierdo y flotante */
-    @media (min-width: 992px) {
-      .allcont {
-        flex-direction: row; /* Alinea menú y contenedor lado a lado */
-      }
-      
-      .menubar {
-        width: 20%;
-        /* Calcula el alto restando la altura estimada del nav (approx 65px) */
-        height: calc(100vh - 65px); 
-        background-color: blue;
-        position: fixed;
-        top: 65px; /* Empieza exactamente debajo del nav superior */
-        left: 0;
-        z-index: 90;
-        overflow-y: auto; /* Permite scroll interno si el menú es largo */
-      }
 
-      .container { 
-        width: 80%; 
-        margin-left: 20%; /* Desplaza el contenido a la derecha para que no lo tape el menú */
-        margin-top: 50px;
-      }
-      .menu-lista {
+.container { 
+  max-width: 100%; 
+  margin: 0 auto;
+  padding: 20px; 
+  box-sizing: border-box;
+  margin-top: 115px; /* Evita que el menú tape el contenido */
+}  
+
+/* --- VERSIÓN MONITOR PC (Pantallas grandes) --- */
+@media (min-width: 992px) {
+  .allcont {
+    display: flex;
+    flex-direction: row; 
+  }
+  
+  .menubar {
+    width: 20%;
+    height: calc(100vh - 65px); 
+    top: 65px; 
+  }
+
+  /* La lista cambia a columna en monitores */
+  .menu-lista {
     flex-direction: column; /* Elementos uno abajo del otro */
     justify-content: flex-start; /* Alineados desde arriba */
     align-items: stretch;
@@ -131,8 +120,14 @@
     text-align: left; /* Texto alineado a la izquierda en PC */
     border-bottom: 1px solid #222; /* Divisor sutil entre botones */
   }
-    }
-    
+
+  .container { 
+    width: 80%; 
+    margin-left: 20%; 
+    margin-top: 50px; 
+  }
+}
+   
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
     h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
