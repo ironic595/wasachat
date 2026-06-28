@@ -5,833 +5,970 @@
   <title>WasaChat - Dashboard</title>
   <script src="https://apis.google.com/js/api.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #4a4a4a; }
+    <style>
+    body { font-family: sans-serif; margin: 0; background: #f5f5f5; }
+    
+    .logo img {
+      height: 26px;
+      width: auto;
+      transition: all 0.2s ease;
+    }
 
-    /* === HEADER === */
-   .header { background: #00d4aa; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
-   .header .logo { color: white; font-size: 28px; font-weight: 700; }
-   .header .menu-icon { color: white; font-size: 24px; cursor: pointer; }
+/* Forzamos a que el nav sea fijo de forma limpia */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 10%;
+  background: black;
+  position: fixed; /* Cambiado de sticky a fixed */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 65px; /* Fijamos una altura exacta */
+  z-index: 100;
+  box-sizing: border-box;
+}
 
-    /* === LAYOUT === */
-   .layout { display: flex; min-height: calc(100vh - 64px); }
+.allcont {
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 65px; /* Empuja todo el contenido abajo del nav principal */
+}
 
-    /* === SIDEBAR === */
-   .sidebar { width: 240px; background: #2d2d2d; color: white; padding: 24px 0; flex-shrink: 0; display: flex; flex-direction: column; }
-   .sidebar-section { padding: 0 20px 20px; border-bottom: 1px solid #3d3d3d; margin-bottom: 20px; }
-   .sidebar-title { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
-   .sidebar-email { font-size: 12px; color: #999; word-break: break-all; }
-   .sidebar-nav { padding: 0; flex: 1; }
-   .sidebar-item { padding: 14px 20px; cursor: pointer; transition: background 0.2s; font-size: 15px; }
-   .sidebar-item:hover { background: #3d3d3d; }
-   .sidebar-item.active { background: #1a1a1a; border-left: 3px solid #00d4aa; }
-   .sidebar-footer { padding: 20px; }
-   .btn-logout { background: #0066cc; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 15px; font-weight: 600; }
+/* El menú ahora se apoya directamente debajo del flujo del nav */
+.menubar {
+  width: 100%;
+  height: 50px; 
+  background-color: #1a1a1a; 
+  position: fixed;
+  top: 65px; /* Se posiciona justo donde termina el nav */
+  left: 0;
+  z-index: 95;
+  box-sizing: border-box;
+}
 
-    /* === MAIN CONTENT === */
-   .main-content { flex: 1; padding: 40px; overflow-y: auto; }
-   .content-card { background: white; border-radius: 8px; padding: 32px; max-width: 800px; margin: 0 auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.menu-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row; 
+  justify-content: space-around; 
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
 
-    /* === CARDS Y BOTONES ORIGINALES === */
-    h1 { display: none; }
-    h2 { color: #00d4aa; border-bottom: 2px solid #00d4aa; padding-bottom: 12px; margin-bottom: 24px; font-size: 20px; }
-    h3 { font-size: 18px; margin: 24px 0 16px; }
-   .card { background: white; padding: 24px; border-radius: 8px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 15px; margin: 5px; transition: opacity 0.2s; }
-    button:hover:not(:disabled) { opacity: 0.9; }
+.menu-lista li {
+  text-align: center;
+}
+
+.menu-lista a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 0;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.menu-lista a:hover {
+  background: #333; 
+}
+
+/* El contenedor de las tarjetas ahora contempla el espacio de ambos elementos */
+.container { 
+  max-width: 100%; 
+  margin: 0 auto;
+  padding: 20px; 
+  box-sizing: border-box;
+  margin-top: 50px; /* Compensación exclusiva para la barra del menú móvil */
+}  
+
+/* Ocultamos el checkbox real */
+.menu-checkbox {
+  display: none;
+}
+
+/* Estilo y contenedor del icono de hamburguesa */
+.menu-icono-btn {
+  width: 30px;
+  height: 24px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 110; /* Por encima del menú desplegable */
+}
+
+/* Las 3 líneas del icono */
+.menu-icono-btn span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* --- TRANSICIÓN A CRUZ CUANDO EL CHECKBOX ESTÁ ACTIVO --- */
+.menu-checkbox:checked + .menu-icono-btn span:nth-child(1) {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.menu-checkbox:checked + .menu-icono-btn span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.menu-checkbox:checked + .menu-icono-btn span:nth-child(3) {
+  transform: translateY(-11px) rotate(-45deg);
+}
+@media (max-width: 991.99px) {
+/* --- DISEÑO DEL PANEL DESPLEGABLE (VERSIÓN MÓVIL) --- */
+.menu-desplegable {
+  position: fixed;
+  /* Se posiciona abajo del nav superior (65px) y del menubar móvil (50px) = 115px */
+  top: 115px; 
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 115px); /* Cubre toda la pantalla restante */
+  background-color: #111;
+  z-index: 90;
+  
+  /* Animación suave de cortina/opacidad */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+}}
+
+/* Mostrar el menú suavemente al hacer clic */
+.menu-checkbox:checked ~ .menu-desplegable {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Contenido del menú */
+.desplegable-lista {
+  list-style: none;
+  padding: 30px;
+  margin: 0;
+}
+
+.desplegable-lista .titulo-seccion {
+  color: #4285f4;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #222;
+  padding-bottom: 5px;
+}
+.desplegable-lista a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 12px 0;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+.desplegable-lista a:hover {
+  color: white;
+}
+   @media (min-width: 992px) {
+  .allcont {
+    flex-direction: row; 
+    margin-top: 65px; /* Mantiene el espacio del nav superior */
+  }
+  
+  .menubar {
+    width: 20%;
+    height: calc(100vh - 65px); 
+    top: 65px; 
+    left: 0;
+    position: fixed;
+  }
+
+  .menu-lista {
+    flex-direction: column; 
+    justify-content: flex-start; 
+    align-items: stretch;
+    padding-top: 20px; 
+  }
+
+  .menu-lista li {
+    width: 100%;
+  }
+
+  .menu-lista a {
+    padding: 15px 20px;
+    text-align: left; 
+    border-bottom: 1px solid #222; 
+  }
+  .container { 
+    width: 80%; 
+    margin-left: 20%; 
+    margin-top: 20px; 
+  }
+  .menu-desplegable {
+    position: fixed; /* ¡CLAVE! Lo desvincula del flujo para obedecer al right:0 */
+    top: 65px;
+    right: 0; /* Se clava perfectamente contra el borde derecho */
+    left:auto;
+    /* Configuración de ancho óptimo */
+    width: 22%; 
+    min-width: 260px; 
+    max-width: 320px; 
+    
+    height: calc(100vh - 65px);
+    background-color: #111; 
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.5);
+    border-left: 1px solid #222;
+    
+    /* Animación de entrada lateral limpia */
+    transform: translateX(100%); 
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    opacity: 0;
+  }
+
+  /* Animación de entrada lateral para PC usando el selector global ~ */
+  .menu-checkbox:checked ~ .menu-desplegable {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+    .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { text-align: center; color: #333; }
+    h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
+    button { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; }
     button:disabled { background: #ccc; cursor: not-allowed; }
     button.danger { background: #dc3545; }
     button.success { background: #28a745; }
     button.warning { background: #ff9500; }
-    button.big { width: 100%; padding: 18px; font-size: 17px; margin: 10px 0; font-weight: 600; }
-    input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; font-size: 15px; }
-   .hidden { display: none!important; }
-    #userInfo { display: none; }
-   .info-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #eee; }
-   .info-row:last-child { border-bottom: none; }
-
-    /* === EDITORES === */
-    #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 101; display: none; flex-direction: column; }
+    button.big { width: 100%; padding: 20px; font-size: 18px; margin: 10px 0; }
+    input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    .hidden { display: none!important; }
+    #userInfo { text-align: center; padding: 15px; background: #e9ecef; border-radius: 8px; margin-bottom: 20px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .info-row:last-child { border-bottom: none; }
+    #editor { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
+    #editor.active { display: flex; }
+    #editor-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    #editor-header h2 { margin: 0; border: none; color: white; }
+    #editor-body { display: flex; flex: 1; overflow: hidden; }
+    #editor-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4f4; overflow-y: auto; }
+    #editor-resizer { width: 10px; cursor: col-resize; background: #ccc; transition: background 0.2s; }
+    #editor-resizer:hover { background: #4285f4; }
+    #editor-tabla { flex: 1; padding: 20px; overflow-y: auto; }
     #editor-widget { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; flex-direction: column; }
-    #editor.active, #editor-widget.active { display: flex; }
-    #editor-header, #editor-widget-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-    #editor-header h2, #editor-widget-header h2 { margin: 0; border: none; color: white; }
-    #editor-body, #editor-widget-body { display: flex; flex: 1; overflow: hidden; }
-    #editor-form, #editor-widget-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4f4; overflow-y: auto; }
-    #editor-resizer, #editor-widget-resizer { width: 10px; cursor: col-resize; background: #ccc; transition: background 0.2s; }
-    #editor-resizer:hover, #editor-widget-resizer:hover { background: #4285f4; }
-    #editor-tabla, #editor-widget-preview { flex: 1; padding: 20px; overflow-y: auto; background: #e5e5e5; }
-   .preview-bar { padding: 16px; background: white; border-bottom: 1px solid #ddd; font-weight: 600; font-size: 14px; color: #666; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; background: white; }
+    #editor-widget.active { display: flex; }
+    #editor-widget-header { background: #333; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    #editor-widget-header h2 { margin: 0; border: none; color: white; }
+    #editor-widget-body { display: flex; flex: 1; overflow: hidden; }
+    #editor-widget-form { min-width: 250px; width: 380px; padding: 20px; background: #f4f4f4; overflow-y: auto; }
+    #editor-widget-resizer { width: 10px; cursor: col-resize; background: #ccc; transition: background 0.2s; }
+    #editor-widget-resizer:hover { background: #4285f4; }
+    #editor-widget-preview { flex: 1; background: #e5e5e5; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .preview-bar { padding: 16px; background: white; border-bottom: 1px solid #ddd; font-weight: 600; font-size: 14px; color: #666; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
     th, td { border: 1px solid #ddd; padding: 10px; text-align: left; cursor: pointer; }
     tr.seleccionada { background-color: #d1ecf1!important; }
-   .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
+    .help-text { font-size: 12px; color: #666; margin-top: -5px; margin-bottom: 10px; }
     #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; display: none; justify-content: center; align-items: center; z-index: 200; font-size: 20px; }
-   .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
-   .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
-   .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
-   .estado-activo { color: #28a745; font-weight: bold; }
-   .estado-inactivo { color: #dc3545; font-weight: bold; }
-   .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
-   .form-group { margin-bottom: 16px; }
-   .btn { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px 0; width: 100%; }
-   .btn-primary { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-   .btn-secondary { background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
-   .input-field { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-    #debug { display: none; }
-   .cambios-pendientes { background: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #28a745; display: none; }
-   .container { max-width: none; margin: 0; padding: 0; }
-   .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 300; }
+    .modal-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; text-align: center; min-width: 300px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #28a745; color: white; padding: 15px 25px; border-radius: 4px; z-index: 400; display: none; }
+    .estado-activo { color: #28a745; font-weight: bold; }
+    .estado-inactivo { color: #dc3545; font-weight: bold; }
+    .modo-edicion { background: #fff3cd; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #ff9500; }
+    .form-group { margin-bottom: 16px; }
+    .btn { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px 0; width: 100%; }
+    .btn-primary { background: #4285f4; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    .btn-secondary { background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    .input-field { width: 100%; padding: 12px; margin: 10px 0; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+    #debug { background: #fff3cd; padding: 12px; border-radius: 4px; margin: 20px 0; font-family: monospace; font-size: 12px; }
+    .cambios-pendientes { background: #d4edda; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #28a745; display: none; }
   </style>
+
 </head>
 <body>
-<div id="loading">Guardando...</div>
-<div class="toast" id="toast"></div>
-
-<div class="header">
-  <div class="logo">wasa.chat</div>
-  <div class="menu-icon" id="menuIcon">☰</div>
-</div>
-
-<div class="layout">
-  <div class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-title">DASHBOARD</div>
-      <div class="sidebar-email" id="sidebarEmail">-</div>
-    </div>
-    <div class="sidebar-nav">
-      <div class="sidebar-item active" data-section="configuracion">Configuración</div>
-      <div class="sidebar-item" data-section="analytics">Analytics</div>
-    </div>
-    <div class="sidebar-footer">
-      <button class="btn-logout" id="logoutBtn">Cerrar sesión</button>
-    </div>
+<nav>
+  <a href="/" class="logo">
+    <img src="assets/img/waslo.png" alt="Wasa.Chat">
+  </a>
+  <!-- Icono de Hamburguesa / Cruz Dinámica -->
+  <label for="menu-toggle" class="menu-icono-btn">
+    <span></span>
+    <span></span>
+    <span></span>
+  </label>
+    <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+<!-- El nuevo Menú Desplegable -->
+  <div class="menu-desplegable">
+    <ul class="desplegable-lista">
+      <li class="titulo-seccion">Documentación</li>
+      <li><a href="#guia-inicio">Guía de Inicio</a></li>
+      <li><a href="#api-referencia">Referencia de API</a></li>
+      <li><a href="#webhooks">Webhooks</a></li>
+      <li><a href="#soporte">Soporte Técnico</a></li>
+    </ul>
   </div>
-
-  <div class="main-content">
+</nav>
+  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+<!-- El nuevo Menú Desplegable -->
+  <div class="menu-desplegable">
+    <ul class="desplegable-lista">
+      <li class="titulo-seccion">Documentación</li>
+      <li><a href="#guia-inicio">Guía de Inicio</a></li>
+      <li><a href="#api-referencia">Referencia de API</a></li>
+      <li><a href="#webhooks">Webhooks</a></li>
+      <li><a href="#soporte">Soporte Técnico</a></li>
+    </ul>
+  </div>
+<div id="loading">Guardando...</div>
+  <div class="toast" id="toast"></div>
+ <div class="allcont">
+   <div class="menubar"><ul class="menu-lista">
+    <li><a href="#seccion1">Configuración</a></li>
+    <li><a href="#seccion2">Estadísticas</a></li>
+  </ul></div>
+  <div class="container">
+    <h1>WasaChat - Panel de Control</h1>
     <div id="userInfo"></div>
     <div id="debug">Cargando datos del Worker...</div>
 
-    <div id="section-configuracion">
-      <div class="content-card" id="stepDominio">
-        <h2>1. Registrá tu dominio</h2>
-        <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
-        <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
-        <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
-        <button id="guardarDominioBtn" class="success">Guardar dominio</button>
-        <div id="dominioStatus"></div>
-      </div>
+     <div class="seccion-stats">
+      <div id="section-analytics">
+        <div class="content-card">
+          <h2>📊 Analytics</h2>
+          <p style="color: #666; margin-bottom: 24px;">Métricas de tu chatbot</p>
 
-      <div class="content-card hidden" id="panelPrincipal">
-        <h2>✅ Todo configurado</h2>
-
-        <div class="info-row">
-          <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
-          <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
-        </div>
-
-        <div class="info-row">
-          <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
-          <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
-        </div>
-
-        <div class="card" style="margin-top:30px;">
-          <h3 class="card-title">🎨 Configuración del Widget</h3>
-          <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
-            <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
-            <div style="flex:1;">
-              <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
-              <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #00d4aa;">
+              <div style="font-size: 32px; font-weight: 700; color: #00d4aa;" id="statSesiones">0</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Sesiones totales</div>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #4285f4;">
+              <div style="font-size: 32px; font-weight: 700; color: #4285f4;" id="statMensajes">0</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Mensajes totales</div>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745;">
+              <div style="font-size: 32px; font-weight: 700; color: #28a745;" id="statExitosas">0</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Respuestas exitosas</div>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #dc3545;">
+              <div style="font-size: 32px; font-weight: 700; color: #dc3545;" id="statFallidas">0</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Sin respuesta</div>
             </div>
           </div>
-          <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
-          <div class="form-group">
-            <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-            <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
-            <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-          </div>
-          <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
-          <input type="hidden" id="colorWidget">
-          <input type="hidden" id="posWidget">
-          <input type="hidden" id="saludoWidget">
-        </div>
 
-        <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
-        <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
-        <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
-      </div>
-    </div>
-
-    <div id="section-analytics" class="hidden">
-      <div class="content-card">
-        <h2>📊 Analytics</h2>
-        <p style="color: #666; margin-bottom: 24px;">Métricas de tu chatbot</p>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #00d4aa;">
-            <div style="font-size: 32px; font-weight: 700; color: #00d4aa;" id="statSesiones">0</div>
-            <div style="font-size: 14px; color: #666; margin-top: 4px;">Sesiones totales</div>
-          </div>
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #4285f4;">
-            <div style="font-size: 32px; font-weight: 700; color: #4285f4;" id="statMensajes">0</div>
-            <div style="font-size: 14px; color: #666; margin-top: 4px;">Mensajes totales</div>
-          </div>
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #28a745;">
-            <div style="font-size: 32px; font-weight: 700; color: #28a745;" id="statExitosas">0</div>
-            <div style="font-size: 14px; color: #666; margin-top: 4px;">Respuestas exitosas</div>
-          </div>
-          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #dc3545;">
-            <div style="font-size: 32px; font-weight: 700; color: #dc3545;" id="statFallidas">0</div>
-            <div style="font-size: 14px; color: #666; margin-top: 4px;">Sin respuesta</div>
+          <div style="background: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ff9500;">
+            <strong>Última actividad:</strong> <span id="statUltimaActividad">-</span>
           </div>
         </div>
+      </div>
+    </div>
+    
+<div class="seccion-config">
+    <div class="card" id="stepDominio">
+      <h2>1. Registrá tu dominio</h2>
+      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
+      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
+      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
+      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
+      <div id="dominioStatus"></div>
+    </div>
 
-        <div style="background: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ff9500;">
-          <strong>Última actividad:</strong> <span id="statUltimaActividad">-</span>
+    <div class="card hidden" id="panelPrincipal">
+      <h2>✅ Todo configurado</h2>
+
+      <div class="info-row">
+        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
+        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
+      </div>
+
+      <div class="info-row">
+        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
+        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
+      </div>
+
+      <div class="card" style="margin-top:30px;">
+        <h3 class="card-title">🎨 Configuración del Widget</h3>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
+            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+        </div>
+        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+        <input type="hidden" id="colorWidget">
+        <input type="hidden" id="posWidget">
+        <input type="hidden" id="saludoWidget">
+      </div>
+
+      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
+      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
+      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
+    </div>
+    <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
+  </div>
+</div>
+  </div>
+  <div id="modal-cambiar-dominio" class="modal-fondo">
+    <div class="modal-box">
+      <h3>Cambiar dominio</h3>
+      <input type="text" id="nuevoDominioInput" placeholder="Ej: negocio.com">
+      <div class="help-text">El chat dejará de funcionar en el dominio anterior</div>
+      <button onclick="cambiarDominio()" class="success" style="margin: 10px;">Guardar</button>
+      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="editor-widget">
+    <div id="editor-widget-header">
+      <h2>🎨 Personalizar Widget</h2>
+      <button onclick="cerrarEditorWidget()" style="background:#dc3545;">✕ Cerrar</button>
+    </div>
+    <div id="editor-widget-body">
+      <div id="editor-widget-form">
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
+          <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Tema</label>
+          <select id="themeWidgetEdit" class="input-field"><option value="light">Light</option><option value="dark">Dark</option></select>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
+          <select id="posWidgetEdit" class="input-field"><option value="right">Abajo derecha</option><option value="left">Abajo izquierda</option></select>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
+          <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
+          <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar del bot</label>
+          <input type="file" id="avatarWidgetFile" accept="image/*" style="margin-bottom:8px;">
+          <input type="hidden" id="avatarWidgetEdit">
+          <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">💬</div>
+          <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
+        </div>
+        <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">💾 Guardar cambios</button>
+        <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+        </div>
+      </div>
+      <div id="editor-widget-resizer"></div>
+      <div id="editor-widget-preview">
+        <div class="preview-bar">Vista previa en tiempo real</div>
+        <div id="preview-container-widget" style="flex:1; position:relative; background:white;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="editor">
+    <div id="editor-header">
+      <h2 id="editor-titulo">Editor</h2>
+      <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
+    </div>
+    <div id="editor-body">
+      <div id="editor-form">
+        <div id="cambiosPendientes" class="cambios-pendientes">
+          📝 Tenés cambios sin guardar. Apretá "SUBIR CAMBIOS" para enviar al servidor.
+        </div>
+        <div id="form-productos" class="hidden">
+          <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
+          <h3 id="tituloFormProd">Agregar Producto</h3>
+          <input type="text" id="inputProducto" placeholder="Nombre del producto *">
+          <input type="number" id="inputPrecio" placeholder="Precio *">
+          <input type="number" id="inputStock" placeholder="Stock *">
+          <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
+          <input type="text" id="inputFoto" placeholder="URL de foto">
+          <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
+          <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
+          <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
+          <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+          <hr style="margin: 20px 0;">
+          <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
+          <hr style="margin: 20px 0;">
+          <h4>Cargar desde CSV</h4>
+          <input type="file" id="csvProductos" accept=".csv">
+          <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
+          <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
+        </div>
+        <div id="form-config" class="hidden">
+          <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
+          <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
+          <input type="text" id="inputPregunta" placeholder="Pregunta *">
+          <div class="help-text">Ej: ¿Cuáles son los horarios de atención?</div>
+          <textarea id="inputRespuesta" placeholder="Respuesta *" rows="4"></textarea>
+          <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs</div>
+          <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
+          <div class="help-text">Ej: horario, abierto, atender, hora</div>
+          <button id="btnGuardarConfig" class="btn success">➕ Agregar a tabla</button>
+          <button id="btnCancelarEdicionConfig" class="btn hidden" style="background:#6c757d;">Cancelar</button>
+          <button id="btnBorrarConfig" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+          <hr style="margin: 20px 0;">
+          <button id="btnSubirFaq" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
+          <hr style="margin: 20px 0;">
+          <h4>Cargar desde CSV</h4>
+          <input type="file" id="csvConfig" accept=".csv">
+          <button id="btnCargarCsvConfig" class="btn">📁 Cargar CSV</button>
+          <div class="help-text">Formato: pregunta,respuesta,palabras_clave</div>
+        </div>
+      </div>
+      <div id="editor-resizer"></div>
+      <div id="editor-tabla">
+        <div id="tabla-productos" class="hidden">
+          <h3>Productos Cargados</h3>
+          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div id="tabla-config" class="hidden">
+          <h3>Base de Conocimiento del Bot</h3>
+          <table id="miTablaConfig"><thead><tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<div id="modal-cambiar-dominio" class="modal-fondo">
-  <div class="modal-box">
-    <h3>Cambiar dominio</h3>
-    <input type="text" id="nuevoDominioInput" placeholder="Ej: negocio.com">
-    <div class="help-text">El chat dejará de funcionar en el dominio anterior</div>
-    <button onclick="cambiarDominio()" class="success" style="margin: 10px;">Guardar</button>
-    <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
-  </div>
-</div>
-
-<div id="editor-widget">
-  <div id="editor-widget-header">
-    <h2>🎨 Personalizar Widget</h2>
-    <button onclick="cerrarEditorWidget()" style="background:#dc3545;">✕ Cerrar</button>
-  </div>
-  <div id="editor-widget-body">
-    <div id="editor-widget-form">
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
-        <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Tema</label>
-        <select id="themeWidgetEdit" class="input-field"><option value="light">Light</option><option value="dark">Dark</option></select>
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
-        <select id="posWidgetEdit" class="input-field"><option value="right">Abajo derecha</option><option value="left">Abajo izquierda</option></select>
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
-        <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
-        <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar del bot</label>
-        <input type="file" id="avatarWidgetFile" accept="image/*" style="margin-bottom:8px;">
-        <input type="hidden" id="avatarWidgetEdit">
-        <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">💬</div>
-        <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
-      </div>
-      <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">💾 Guardar cambios</button>
-      <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
-        <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-        <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
-        <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-      </div>
-    <div id="editor-widget-resizer"></div>
-    <div id="editor-widget-preview">
-      <div class="preview-bar">Vista previa en tiempo real</div>
-      <div id="preview-container-widget" style="flex:1; position:relative; background:white;"></div>
+  <div id="modal-borrar" class="modal-fondo">
+    <div class="modal-box">
+      <h3>¿Borrar fila seleccionada?</h3>
+      <p>Se eliminará de la tabla local. Recordá apretar "SUBIR CAMBIOS" para guardar en el servidor.</p>
+      <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
+      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
     </div>
   </div>
-</div>
-
-<div id="editor">
-  <div id="editor-header">
-    <h2 id="editor-titulo">Editor</h2>
-    <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
-  </div>
-  <div id="editor-body">
-    <div id="editor-form">
-      <div id="cambiosPendientes" class="cambios-pendientes">
-        📝 Tenés cambios sin guardar. Apretá "SUBIR CAMBIOS" para enviar al servidor.
-      </div>
-      <div id="form-productos" class="hidden">
-        <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
-        <h3 id="tituloFormProd">Agregar Producto</h3>
-        <input type="text" id="inputProducto" placeholder="Producto / Título *">
-        <input type="number" id="inputPrecio" placeholder="Precio *">
-        <input type="text" id="inputUrlProd" placeholder="URL del producto *">
-        <input type="text" id="inputFoto" placeholder="URL imagen">
-        <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
-        <input type="text" id="inputKeywords" placeholder="Palabras clave separadas por coma">
-        <div class="help-text">* Campos obligatorios: nombre, precio y URL producto</div>
-        <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
-        <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-        <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-        <hr style="margin: 20px 0;">
-        <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
-        <hr style="margin: 20px 0;">
-        <h4>Cargar desde CSV</h4>
-        <input type="file" id="csvProductos" accept=".csv">
-        <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
-        <div class="help-text">Formato: nombre,precio,url_producto,url_imagen,descripcion,keywords<br>Obligatorios: nombre, precio, url_producto</div>
-      </div>
-      <div id="form-config" class="hidden">
-        <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
-        <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
-        <input type="text" id="inputPregunta" placeholder="Pregunta *">
-        <div class="help-text">Ej: ¿Cuáles son los horarios de atención?</div>
-        <textarea id="inputRespuesta" placeholder="Respuesta *" rows="4"></textarea>
-        <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs</div>
-        <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
-        <div class="help-text">Ej: horario, abierto, atender, hora</div>
-        <button id="btnGuardarConfig" class="btn success">➕ Agregar a tabla</button>
-        <button id="btnCancelarEdicionConfig" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-        <button id="btnBorrarConfig" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-        <hr style="margin: 20px 0;">
-        <button id="btnSubirFaq" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
-        <hr style="margin: 20px 0;">
-        <h4>Cargar desde CSV</h4>
-        <input type="file" id="csvConfig" accept=".csv">
-        <button id="btnCargarCsvConfig" class="btn">📁 Cargar CSV</button>
-        <div class="help-text">Formato: pregunta,respuesta,palabras_clave</div>
-      </div>
-    </div>
-    <div id="editor-resizer"></div>
-    <div id="editor-tabla">
-      <div id="tabla-productos" class="hidden">
-        <h3>Productos Cargados</h3>
-        <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>URL producto</th><th>URL imagen</th><th>Descripción</th><th>Palabras clave</th></tr></thead><tbody></tbody></table>
-      </div>
-      <div id="tabla-config" class="hidden">
-        <h3>Base de Conocimiento del Bot</h3>
-        <table id="miTablaConfig"><thead><tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="modal-borrar" class="modal-fondo">
-  <div class="modal-box">
-    <h3>¿Borrar fila seleccionada?</h3>
-    <p>Se eliminará de la tabla local. Recordá apretar "SUBIR CAMBIOS" para guardar en el servidor.</p>
-    <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
-    <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
-  </div>
-</div>
 
 <script>
-  const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev';
-  const BOT_ID = localStorage.getItem('bot_id');
-  const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
+    const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
 
-  let currentUser = null;
-  let userData = null;
-  let tokenClient;
-  let accessToken = null;
-  let currentTab = 'productos';
-  let filaSeleccionada = null;
-  let modoEdicion = false;
-  let indiceEdicion = null;
-  let datosProductos = [];
-  let datosConfig = [];
-  let cambiosPendientes = false;
+    let currentUser = null;
+    let userData = null;
+    let tokenClient;
+    let accessToken = null;
+    let currentTab = 'productos';
+    let filaSeleccionada = null;
+    let modoEdicion = false;
+    let indiceEdicion = null;
+    let datosProductos = [];
+    let datosConfig = [];
+    let cambiosPendientes = false;
 
-  const userEmail = localStorage.getItem('user_email');
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/drive.file',
+      callback: '',
+    });
 
-  if (!BOT_ID ||!userEmail) {
-    window.location.href = 'index.html';
-  } else {
-    currentUser = { email: userEmail };
-    document.getElementById('sidebarEmail').textContent = userEmail;
-    cargarBot();
-  }
+    const botId = localStorage.getItem('bot_id');
+    const userEmail = localStorage.getItem('user_email');
 
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: 'https://www.googleapis.com/auth/drive.file',
-    callback: '',
-  });
-
-  async function cargarBot() {
-    try {
-      const res = await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bot_id: BOT_ID })
-      });
-      const data = await res.json();
-
-      document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
-      console.log('[DEBUG] Worker response:', data);
-
-      if (data.error === 'Bot no encontrado') {
-        alert('Error: Bot no encontrado');
-        return;
-      }
-
-      userData = {
-        email: userEmail,
-        bot_id: BOT_ID,
-        estado: data.estado,
-        domain: data.domain,
-        config: data.config,
-        data: data.data,
-        stats: data.stats || {}
-      };
-      mostrarPanelCorrecto();
-      cargarConfigWidget();
-      cargarDatosTablas();
-    } catch(e) {
-      document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
-      console.error('Error:', e);
-    }
-  }
-
-  function mostrarPanelCorrecto() {
-    const stepDominio = document.getElementById('stepDominio');
-    const panelPrincipal = document.getElementById('panelPrincipal');
-
-    if (!userData.domain || userData.domain === null || userData.domain === '') {
-      stepDominio.classList.remove('hidden');
-      panelPrincipal.classList.add('hidden');
+    if (!botId ||!userEmail) {
+      window.location.href = 'index.html';
     } else {
-      stepDominio.classList.add('hidden');
-      panelPrincipal.classList.remove('hidden');
-      document.getElementById('dominioActual').textContent = userData.domain;
-
-      const estadoBotSpan = document.getElementById('estadoBot');
-      const btnComprar = document.getElementById('btnComprarPlan');
-
-      if (userData.estado === 'activo' || userData.estado === 'pago') {
-        estadoBotSpan.textContent = '✅ Activo';
-        estadoBotSpan.className = 'estado-activo';
-        btnComprar.classList.add('hidden');
-      } else {
-        estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-        estadoBotSpan.className = 'estado-inactivo';
-        btnComprar.classList.remove('hidden');
-      }
+      currentUser = { email: userEmail };
+      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
+      cargarBot();
     }
-  }
 
-  function irAComprar() {
-    window.location.href = 'index.html#precios';
-  }
-
-  document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
-    let dominio = document.getElementById('dominioInput').value.trim();
-    dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
-    if (!dominio) return alert("Ingresá un dominio válido");
-
-    showLoading(true);
-    try {
-      await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bot_id: BOT_ID, domain: dominio })
-      });
-      userData.domain = dominio;
-      showLoading(false);
-      showToast('✅ Dominio guardado');
-      mostrarPanelCorrecto();
-    } catch (e) {
-      showLoading(false);
-      alert('Error: ' + e.message);
-    }
-  });
-
-  function mostrarCambiarDominio() {
-    document.getElementById('nuevoDominioInput').value = userData.domain;
-    document.getElementById('modal-cambiar-dominio').style.display = 'block';
-  }
-
-  async function cambiarDominio() {
-    let nuevo = document.getElementById('nuevoDominioInput').value.trim();
-    nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
-    if (!nuevo) return alert("Ingresá un dominio");
-
-    showLoading(true);
-    try {
-      await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bot_id: BOT_ID, domain: nuevo })
-      });
-      userData.domain = nuevo;
-      document.getElementById('dominioActual').textContent = nuevo;
-      showLoading(false);
-      cerrarModales();
-      generarCodigoWidget();
-      showToast('✅ Dominio actualizado');
-    } catch (e) {
-      showLoading(false);
-      alert('Error: ' + e.message);
-    }
-  }
-
-  function cargarConfigWidget() {
-    const cfg = userData.config || {};
-    document.getElementById('colorWidget').value = cfg.color || '#25D366';
-    document.getElementById('posWidget').value = cfg.pos || 'right';
-    document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-    generarCodigoWidget();
-    actualizarPreviewMini();
-  }
-
-  function cargarDatosTablas() {
-    datosProductos = userData.data?.productos || [];
-    datosConfig = userData.data?.faq || [];
-    renderTablaProductos();
-    renderTablaConfig();
-    cambiosPendientes = false;
-    document.getElementById('cambiosPendientes').style.display = 'none';
-  }
-
-  function copiarCodigo() {
-    const textarea = document.getElementById('codigoWidget');
-    textarea.select();
-    document.execCommand('copy');
-    showToast('📋 Código copiado');
-  }
-
-  async function asegurarTokenDrive() {
-    if (accessToken) return true;
-    return new Promise((resolve, reject) => {
-      tokenClient.callback = (resp) => {
-        if (resp.error) {
-          reject(new Error('No autorizaste Google Drive'));
+    async function cargarBot() {
+      try {
+        const res = await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: botId })
+        });
+        const data = await res.json();
+        
+        document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
+        console.log('[DEBUG] Worker response:', data);
+        
+        if (data.error === 'Bot no encontrado') {
+          alert('Error: Bot no encontrado');
           return;
         }
-        accessToken = resp.access_token;
-        resolve(true);
-      };
-      tokenClient.requestAccessToken({prompt: 'consent'});
-    });
-  }
-
-  // ===== FUNCIONES PARA ABRIR EDITORES (CORREGIDAS) =====
-  
-  function abrirEditor(tab) {
-    console.log('🔵 abrirEditor llamado con tab:', tab);
-    
-    const editor = document.getElementById('editor');
-    const editorWidget = document.getElementById('editor-widget');
-    
-    if (!editor) {
-      console.error('❌ No se encontró el elemento #editor');
-      alert('ERROR: No existe <div id="editor">');
-      return;
-    }
-    
-    // Cerrar el widget si está abierto
-    if (editorWidget) {
-      editorWidget.style.display = 'none';
-    }
-    
-    // Abrir el editor de tablas
-    editor.style.display = 'flex';
-    console.log('✅ Editor abierto');
-    
-    currentTab = tab;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    
-    const pendientes = document.getElementById('cambiosPendientes');
-    if (pendientes) pendientes.style.display = 'none';
-    
-    document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
-
-    if (tab === 'productos') {
-      document.getElementById('form-productos').classList.remove('hidden');
-      document.getElementById('form-config').classList.add('hidden');
-      document.getElementById('tabla-productos').classList.remove('hidden');
-      document.getElementById('tabla-config').classList.add('hidden');
-      limpiarFormProductos();
-    } else {
-      document.getElementById('form-productos').classList.add('hidden');
-      document.getElementById('form-config').classList.remove('hidden');
-      document.getElementById('tabla-productos').classList.add('hidden');
-      document.getElementById('tabla-config').classList.remove('hidden');
-      limpiarFormConfig();
-    }
-  }
-
-  function cerrarEditor() {
-    console.log('🔴 cerrarEditor llamado');
-    
-    if (cambiosPendientes) {
-      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) {
-        return;
+        
+        userData = {
+          email: userEmail,
+          bot_id: botId,
+          estado: data.estado,
+          domain: data.domain,
+          config: data.config,
+          data: data.data
+        };
+        mostrarPanelCorrecto();
+        cargarConfigWidget();
+        cargarDatosTablas();
+      } catch(e) {
+        document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
+        console.error('Error:', e);
       }
     }
-    
-    const editor = document.getElementById('editor');
-    if (editor) {
-      editor.style.display = 'none';
-      console.log('✅ Editor cerrado');
-    }
-    
-    filaSeleccionada = null;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    limpiarFormProductos();
-    limpiarFormConfig();
-  }
 
-  function abrirEditorWidget() {
-    console.log('🟢 abrirEditorWidget llamado');
-    
-    const editor = document.getElementById('editor');
-    const editorWidget = document.getElementById('editor-widget');
-    
-    if (!editorWidget) {
-      console.error('❌ No se encontró el elemento #editor-widget');
-      alert('Error: No se encontró el widget editor');
-      return;
-    }
-    
-    // Cerrar el editor de tablas si está abierto
-    if (editor) {
-      editor.style.display = 'none';
-    }
-    
-    // Abrir el widget editor
-    editorWidget.style.display = 'flex';
-    console.log('✅ Widget editor abierto');
-    
-    const cfg = userData.config || {};
-    document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
-    document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
-    document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
-    document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-    document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
-    document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
+    function mostrarPanelCorrecto() {
+      const stepDominio = document.getElementById('stepDominio');
+      const panelPrincipal = document.getElementById('panelPrincipal');
 
-    if (cfg.avatar) {
-      document.getElementById('avatarPreview').innerHTML =
-        `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
-    } else {
-      document.getElementById('avatarPreview').innerHTML = '💬';
+      if (!userData.domain || userData.domain === null || userData.domain === '') {
+        stepDominio.classList.remove('hidden');
+        panelPrincipal.classList.add('hidden');
+      } else {
+        stepDominio.classList.add('hidden');
+        panelPrincipal.classList.remove('hidden');
+        document.getElementById('dominioActual').textContent = userData.domain;
+
+        const estadoBotSpan = document.getElementById('estadoBot');
+        const btnComprar = document.getElementById('btnComprarPlan');
+
+        if (userData.estado === 'activo' || userData.estado === 'pago') {
+          estadoBotSpan.textContent = '✅ Activo';
+          estadoBotSpan.className = 'estado-activo';
+          btnComprar.classList.add('hidden');
+        } else {
+          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+          estadoBotSpan.className = 'estado-inactivo';
+          btnComprar.classList.remove('hidden');
+        }
+      }
     }
 
-    asegurarTokenDrive().catch(err => {
-      console.log('Token se pedirá al subir imagen');
+    function irAComprar() {
+      window.location.href = 'index.html#precios';
+    }
+
+    document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
+      let dominio = document.getElementById('dominioInput').value.trim();
+      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
+      if (!dominio) return alert("Ingresá un dominio válido");
+
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
+        });
+        userData.domain = dominio;
+        showLoading(false);
+        showToast('✅ Dominio guardado');
+        mostrarPanelCorrecto();
+      } catch (e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
     });
 
-    generarCodigoWidget();
-    renderizarPreviewWidget();
-  }
-
-  function cerrarEditorWidget() {
-    console.log('🔴 cerrarEditorWidget llamado');
-    const editorWidget = document.getElementById('editor-widget');
-    if (editorWidget) {
-      editorWidget.style.display = 'none';
-      console.log('✅ Widget editor cerrado');
-    }
-  }
-
-  async function subirAvatarADrive(file) {
-    if (!file) return null;
-    if (file.size > 2 * 1024 * 1024) {
-      throw new Error('La imagen debe pesar menos de 2MB');
-    }
-    if (!accessToken) {
-      await asegurarTokenDrive();
+    function mostrarCambiarDominio() {
+      document.getElementById('nuevoDominioInput').value = userData.domain;
+      document.getElementById('modal-cambiar-dominio').style.display = 'block';
     }
 
-    showLoading(true);
-    try {
-      const metadata = {
-        name: `wasa_avatar_${currentUser.email}_${Date.now()}.${file.name.split('.').pop()}`,
-        mimeType: file.type
-      };
+    async function cambiarDominio() {
+      let nuevo = document.getElementById('nuevoDominioInput').value.trim();
+      nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+      if (!nuevo) return alert("Ingresá un dominio");
 
-      const form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-      form.append('file', file);
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
+        });
+        userData.domain = nuevo;
+        document.getElementById('dominioActual').textContent = nuevo;
+        showLoading(false);
+        cerrarModales();
+        generarCodigoWidget();
+        showToast('✅ Dominio actualizado');
+      } catch (e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
+    }
 
-      const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${accessToken}` },
-        body: form
+    function cargarConfigWidget() {
+      const cfg = userData.config || {};
+      document.getElementById('colorWidget').value = cfg.color || '#25D366';
+      document.getElementById('posWidget').value = cfg.pos || 'right';
+      document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+      generarCodigoWidget();
+      actualizarPreviewMini();
+    }
+
+    function cargarDatosTablas() {
+      datosProductos = userData.data?.productos || [];
+      datosConfig = userData.data?.faq || [];
+      renderTablaProductos();
+      renderTablaConfig();
+      cambiosPendientes = false;
+      document.getElementById('cambiosPendientes').style.display = 'none';
+    }
+
+    function generarCodigoWidget() {
+      const botIdFinal = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
+      document.getElementById('codigoWidget').value = codigo;
+      if (document.getElementById('codigoWidgetModal')) {
+        document.getElementById('codigoWidgetModal').value = codigo;
+      }
+    }
+
+    function copiarCodigo() {
+      const textarea = document.getElementById('codigoWidget');
+      textarea.select();
+      document.execCommand('copy');
+      showToast('📋 Código copiado');
+    }
+
+    async function asegurarTokenDrive() {
+      if (accessToken) return true;
+      return new Promise((resolve, reject) => {
+        tokenClient.callback = (resp) => {
+          if (resp.error) {
+            reject(new Error('No autorizaste Google Drive'));
+            return;
+          }
+          accessToken = resp.access_token;
+          resolve(true);
+        };
+        tokenClient.requestAccessToken({prompt: 'consent'});
       });
+    }
+
+    function abrirEditorWidget() {
+      const cfg = userData.config || {};
+      document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
+      document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
+      document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
+      document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+      document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
+      document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
+
+      if (cfg.avatar) {
+        document.getElementById('avatarPreview').innerHTML =
+          `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+      } else {
+        document.getElementById('avatarPreview').innerHTML = '💬';
+      }
+
+      asegurarTokenDrive().catch(err => {
+        console.log('Token se pedirá al subir imagen');
+      });
+
+      document.getElementById('editor-widget').classList.add('active');
+      generarCodigoWidget();
+      renderizarPreviewWidget();
+
+      document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('themeWidgetEdit').addEventListener('change', renderizarPreviewWidget);
+      document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
+      document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+      document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
+    }
+
+    async function subirAvatarADrive(file) {
+      if (!file) return null;
+
+      if (file.size > 2 * 1024 * 1024) {
+        throw new Error('La imagen debe pesar menos de 2MB');
+      }
+
+      if (!accessToken) {
+        await asegurarTokenDrive();
+      }
+
+      showLoading(true);
+      try {
+        const metadata = {
+          name: `wasa_avatar_${currentUser.email}_${Date.now()}.${file.name.split('.').pop()}`,
+          mimeType: file.type
+        };
+
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', file);
+
+        const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${accessToken}` },
+          body: form
+        });
 
       if (!uploadRes.ok) {
-        const err = await uploadRes.text();
-        throw new Error('Error al subir a Drive: ' + err);
-      }
+          const err = await uploadRes.text();
+          throw new Error('Error al subir a Drive: ' + err);
+        }
 
-      const fileData = await uploadRes.json();
-      const fileId = fileData.id;
+        const fileData = await uploadRes.json();
+        const fileId = fileData.id;
 
-      await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ role: 'reader', type: 'anyone' })
-      });
+        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ role: 'reader', type: 'anyone' })
+        });
 
-      const url = `https://lh3.googleusercontent.com/d/${fileId}`;
+        const url = `https://lh3.googleusercontent.com/d/${fileId}`;
 
-      await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bot_id: BOT_ID,
-          config: {...userData.config, avatar: url }
-        })
-      });
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            bot_id: userData.bot_id, 
+            config: {...userData.config, avatar: url }
+          })
+        });
 
-      if (!userData.config) userData.config = {};
-      userData.config.avatar = url;
+        if (!userData.config) userData.config = {};
+        userData.config.avatar = url;
 
-      showLoading(false);
-      return url;
-    } catch (e) {
-      showLoading(false);
-      throw e;
-    }
-  }
-
-  async function handleAvatarUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      document.getElementById('avatarPreview').innerHTML =
-        `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-    };
-    reader.readAsDataURL(file);
-
-    try {
-      const url = await subirAvatarADrive(file);
-      document.getElementById('avatarWidgetEdit').value = url;
-      renderizarPreviewWidget();
-      actualizarPreviewMini();
-      showToast('✅ Avatar subido y guardado');
-    } catch (err) {
-      showToast('Error: ' + err.message, 'error');
-      document.getElementById('avatarPreview').innerHTML = '💬';
-      console.error(err);
-    }
-  }
-
-  async function guardarConfigWidgetModal() {
-    const config = {
-      color: document.getElementById('colorWidgetEdit').value,
-      theme: document.getElementById('themeWidgetEdit').value,
-      pos: document.getElementById('posWidgetEdit').value,
-      saludo: document.getElementById('saludoWidgetEdit').value,
-      nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
-      avatar: document.getElementById('avatarWidgetEdit').value
-    };
-
-    showLoading(true);
-    try {
-      await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bot_id: BOT_ID, config })
-      });
-      userData.config = config;
-      document.getElementById('colorWidget').value = config.color;
-      document.getElementById('posWidget').value = config.pos;
-      document.getElementById('saludoWidget').value = config.saludo;
-      actualizarPreviewMini();
-      showLoading(false);
-      showToast('✅ Widget actualizado');
-      cerrarEditorWidget();
-    } catch (e) {
-      showLoading(false);
-      alert('Error: ' + e.message);
-    }
-  }
-
-  function copiarCodigoModal() {
-    const textarea = document.getElementById('codigoWidgetModal');
-    textarea.select();
-    document.execCommand('copy');
-    showToast('📋 Código copiado');
-  }
-
-  function actualizarPreviewMini() {
-    const cfg = userData.config || {};
-    const color = cfg.color || '#25D366';
-    const nombre = cfg.nombre || 'WasaChat';
-    const saludo = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-
-    const previewMini = document.getElementById('widget-preview-mini');
-    if (previewMini) {
-      previewMini.style.background = color;
-      if (cfg.avatar) {
-        previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-      } else {
-        previewMini.innerHTML = '💬';
+        showLoading(false);
+        return url;
+      } catch (e) {
+        showLoading(false);
+        throw e;
       }
     }
 
-    document.getElementById('widget-nombre-preview').textContent = nombre;
-    document.getElementById('widget-saludo-preview').textContent = saludo;
-  }
+    function cerrarEditorWidget() {
+      document.getElementById('editor-widget').classList.remove('active');
+    }
 
-  function renderizarPreviewWidget() {
-    const color = document.getElementById('colorWidgetEdit').value;
-    const theme = document.getElementById('themeWidgetEdit').value;
-    const pos = document.getElementById('posWidgetEdit').value;
-    const saludo = document.getElementById('saludoWidgetEdit').value;
-    const nombre = document.getElementById('nombreWidgetEdit').value || 'WasaChat';
-    const avatar = document.getElementById('avatarWidgetEdit').value;
+    async function guardarConfigWidgetModal() {
+      const config = {
+        color: document.getElementById('colorWidgetEdit').value,
+        theme: document.getElementById('themeWidgetEdit').value,
+        pos: document.getElementById('posWidgetEdit').value,
+        saludo: document.getElementById('saludoWidgetEdit').value,
+        nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
+        avatar: document.getElementById('avatarWidgetEdit').value
+      };
 
-    const container = document.getElementById('preview-container-widget');
-    const btnContent = avatar
-     ? `<img src="${avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
-      : '💬';
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, config })
+        });
+        userData.config = config;
+        document.getElementById('colorWidget').value = config.color;
+        document.getElementById('posWidget').value = config.pos;
+        document.getElementById('saludoWidget').value = config.saludo;
+        actualizarPreviewMini();
+        showLoading(false);
+        showToast('✅ Widget actualizado');
+        cerrarEditorWidget();
+      } catch (e) {
+        showLoading(false);
+        alert('Error: ' + e.message);
+      }
+    }
 
-    const avatarHeader = avatar
-     ? `<img src="${avatar}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
-      : '💬';
+    function copiarCodigoModal() {
+      const textarea = document.getElementById('codigoWidgetModal');
+      textarea.select();
+      document.execCommand('copy');
+      showToast('📋 Código copiado');
+    }
 
-    const bgChat = theme === 'dark'? '#1e293b' : '#fff';
-    const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f7f8';
-    const textMain = theme === 'dark'? '#e2e8f0' : '#1e293b';
+    function actualizarPreviewMini() {
+      const cfg = userData.config || {};
+      const color = cfg.color || '#25D366';
+      const nombre = cfg.nombre || 'WasaChat';
+      const saludo = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
 
-    container.innerHTML = `
-      <style>
-        #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-       .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-       .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-       .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-       .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-       .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-       .wasa-btn:hover { transform: scale(1.1); }
-       .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-       .wasa-ventana.activo { display: flex; }
-       .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-       .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
-       .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-       .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-      </style>
-      <div class="wasa-demo-page">
-        <div>
-          <h2>Tu Sitio Web</h2>
-          <p>Así se verá el widget en tu página</p>
-        </div>
+      const previewMini = document.getElementById('widget-preview-mini');
+      if (previewMini) {
+        previewMini.style.background = color;
+        if (cfg.avatar) {
+          previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        } else {
+          previewMini.innerHTML = '💬';
+        }
+      }
+
+      if (document.getElementById('widget-nombre-preview')) {
+        document.getElementById('widget-nombre-preview').textContent = nombre;
+      }
+      if (document.getElementById('widget-saludo-preview')) {
+        document.getElementById('widget-saludo-preview').textContent = saludo;
+      }
+    }
+
+    function renderizarPreviewWidget() {
+      const color = document.getElementById('colorWidgetEdit').value;
+      const theme = document.getElementById('themeWidgetEdit').value;
+      const pos = document.getElementById('posWidgetEdit').value;
+      const saludo = document.getElementById('saludoWidgetEdit').value;
+      const nombre = document.getElementById('nombreWidgetEdit').value || 'WasaChat';
+      const avatar = document.getElementById('avatarWidgetEdit').value;
+
+      const container = document.getElementById('preview-container-widget');
+      const avatarUrl = avatar || '';
+
+      const btnContent = avatarUrl
+  ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+        : '💬';
+
+      const avatarHeader = avatarUrl
+  ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+        : '💬';
+
+      const bgChat = theme === 'dark'? '#1e293b' : '#fff';
+      const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f7f8';
+      const textMain = theme === 'dark'? '#e2e8f0' : '#1e293b';
+
+      container.innerHTML = `
+        <style>
+          #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+    .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+    .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+    .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+    .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+    .wasa-btn:hover { transform: scale(1.1); }
+    .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+    .wasa-ventana.activo { display: flex; }
+    .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+    .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
+    .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+    .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+        </style>
+ <div class="wasa-demo-page">
+          <div>
+            <h2>Tu Sitio Web</h2>
+            <p>Así se verá el widget en tu página</p>
+          </div>
         <div class="wasa-widget">
           <div class="wasa-ventana" id="wasa-ventana-preview">
             <div class="wasa-header">
@@ -845,580 +982,384 @@
           </div>
           <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">${btnContent}</button>
         </div>
-      </div>
-    `;
-  }
-
-  // ===== FUNCIONES DE TABLAS =====
-
-  function limpiarFormProductos() {
-    document.getElementById('inputProducto').value = '';
-    document.getElementById('inputPrecio').value = '';
-    document.getElementById('inputUrlProd').value = '';
-    document.getElementById('inputFoto').value = '';
-    document.getElementById('inputDesc').value = '';
-    document.getElementById('inputKeywords').value = '';
-    document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
-    document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
-    document.getElementById('modoEdicionProd').classList.add('hidden');
-    document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
-    document.getElementById('btnBorrar').disabled = true;
-  }
-
-  function limpiarFormConfig() {
-    document.getElementById('inputPregunta').value = '';
-    document.getElementById('inputRespuesta').value = '';
-    document.getElementById('inputClaves').value = '';
-    document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
-    document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
-    document.getElementById('modoEdicionConfig').classList.add('hidden');
-    document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
-    document.getElementById('btnBorrarConfig').disabled = true;
-  }
-
-  function renderTablaProductos() {
-    const tbody = document.querySelector('#miTabla tbody');
-    tbody.innerHTML = '';
-    datosProductos.forEach((row, i) => {
-      const tr = tbody.insertRow();
-      const keywordsStr = Array.isArray(row.keywords)? row.keywords.join(', ') : (row.keywords || '');
-      tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.url||''}</td><td>${row.foto||''}</td><td>${row.desc||''}</td><td>${keywordsStr}</td>`;
-      tr.onclick = () => seleccionarFila(tr, i, 'productos');
-    });
-  }
-
-  function renderTablaConfig() {
-    const tbody = document.querySelector('#miTablaConfig tbody');
-    tbody.innerHTML = '';
-    datosConfig.forEach((row, i) => {
-      const tr = tbody.insertRow();
-      tr.innerHTML = `<td>${row.pregunta||''}</td><td>${row.respuesta||''}</td><td>${row.keywords||''}</td>`;
-      tr.onclick = () => seleccionarFila(tr, i, 'config');
-    });
-  }
-
-  function seleccionarFila(row, index, tipo) {
-    document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
-    row.classList.add('seleccionada');
-    filaSeleccionada = {index, tipo};
-    modoEdicion = true;
-    indiceEdicion = index;
-
-    if (tipo === 'productos') {
-      const datos = datosProductos[index];
-      document.getElementById('inputProducto').value = datos.nombre || '';
-      document.getElementById('inputPrecio').value = datos.precio || '';
-      document.getElementById('inputUrlProd').value = datos.url || '';
-      document.getElementById('inputFoto').value = datos.foto || '';
-      document.getElementById('inputDesc').value = datos.desc || '';
-      document.getElementById('inputKeywords').value = Array.isArray(datos.keywords)? datos.keywords.join(', ') : (datos.keywords || '');
-      document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
-      document.getElementById('tituloFormProd').textContent = 'Editar Producto';
-      document.getElementById('modoEdicionProd').classList.remove('hidden');
-      document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
-      document.getElementById('btnBorrar').disabled = false;
-    } else {
-      const datos = datosConfig[index];
-      document.getElementById('inputPregunta').value = datos.pregunta || '';
-      document.getElementById('inputRespuesta').value = datos.respuesta || '';
-      document.getElementById('inputClaves').value = datos.keywords || '';
-      document.getElementById('btnGuardarConfig').textContent = '✏ Actualizar Pregunta';
-      document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
-      document.getElementById('modoEdicionConfig').classList.remove('hidden');
-      document.getElementById('btnCancelarEdicionConfig').classList.remove('hidden');
-      document.getElementById('btnBorrarConfig').disabled = false;
+      `;
     }
-  }
 
-  async function guardarProducto() {
-    const prod = document.getElementById('inputProducto').value.trim();
-    const precio = document.getElementById('inputPrecio').value.trim();
-    const urlProd = document.getElementById('inputUrlProd').value.trim();
-    const foto = document.getElementById('inputFoto').value.trim();
-    const desc = document.getElementById('inputDesc').value.trim();
-    const keywordsInput = document.getElementById('inputKeywords').value.trim();
-    let keywords = keywordsInput? keywordsInput.split(',').map(k => k.trim()).filter(k => k) : [];
+    document.addEventListener('DOMContentLoaded', () => {
+      const fileInput = document.getElementById('avatarWidgetFile');
+      if (fileInput) {
+        fileInput.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
 
-    if(!prod ||!precio ||!urlProd) return alert("Completá nombre, precio y URL producto");
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById('avatarPreview').innerHTML =
+              `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+          };
+          reader.readAsDataURL(file);
 
-    const btnGuardar = document.getElementById('btnGuardar');
-    const textoOriginal = btnGuardar.textContent;
-    btnGuardar.textContent = 'Generando keywords...';
-    btnGuardar.disabled = true;
-
-    try {
-      const res = await fetch(API_URL + '/enrich-keywords', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ nombre: prod, descripcion: desc })
-      });
-      const data = await res.json();
-      if (data.keywords_auto && Array.isArray(data.keywords_auto)) {
-        keywords = [...new Set([...keywords,...data.keywords_auto])];
+          try {
+            const url = await subirAvatarADrive(file);
+            document.getElementById('avatarWidgetEdit').value = url;
+            renderizarPreviewWidget();
+            actualizarPreviewMini();
+            showToast('✅ Avatar subido y guardado');
+          } catch (err) {
+            showToast('Error: ' + err.message, 'error');
+            document.getElementById('avatarPreview').innerHTML = '💬';
+            console.error(err);
+          }
+        });
       }
-    } catch (e) {
-      console.log('Error enriqueciendo keywords', e);
+    });
+
+    function marcarCambiosPendientes() {
+      cambiosPendientes = true;
+      document.getElementById('cambiosPendientes').style.display = 'block';
     }
 
-    btnGuardar.textContent = textoOriginal;
-    btnGuardar.disabled = false;
-
-    const nuevoProd = {nombre: prod, precio, url: urlProd, foto, desc, keywords};
-
-    if (modoEdicion && indiceEdicion!== null) {
-      datosProductos[indiceEdicion] = nuevoProd;
+    async function abrirEditor(tab) {
+      currentTab = tab;
       modoEdicion = false;
       indiceEdicion = null;
-      limpiarFormProductos();
-    } else {
-      datosProductos.push(nuevoProd);
-      limpiarFormProductos();
+      cambiosPendientes = false;
+      document.getElementById('cambiosPendientes').style.display = 'none';
+      document.getElementById('editor').classList.add('active');
+      document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
+
+      if (tab === 'productos') {
+        document.getElementById('form-productos').classList.remove('hidden');
+        document.getElementById('form-config').classList.add('hidden');
+        document.getElementById('tabla-productos').classList.remove('hidden');
+        document.getElementById('tabla-config').classList.add('hidden');
+        limpiarFormProductos();
+      } else {
+        document.getElementById('form-productos').classList.add('hidden');
+        document.getElementById('form-config').classList.remove('hidden');
+        document.getElementById('tabla-productos').classList.add('hidden');
+        document.getElementById('tabla-config').classList.remove('hidden');
+        limpiarFormConfig();
+      }
     }
 
-    renderTablaProductos();
-    marcarCambiosPendientes();
-  }
-
-  function cancelarEdicionProd() {
-    modoEdicion = false;
-    indiceEdicion = null;
-    filaSeleccionada = null;
-    limpiarFormProductos();
-    document.querySelectorAll('#miTabla tbody tr').forEach(r => r.classList.remove('seleccionada'));
-    document.getElementById('btnBorrar').disabled = true;
-  }
-
-  function guardarFaq() {
-    const pregunta = document.getElementById('inputPregunta').value;
-    const respuesta = document.getElementById('inputRespuesta').value;
-    const claves = document.getElementById('inputClaves').value;
-    if(!pregunta ||!respuesta ||!claves) return alert("Completá los 3 campos");
-
-    const nuevaFaq = {pregunta, respuesta, keywords: claves};
-
-    if (modoEdicion && indiceEdicion!== null) {
-      datosConfig[indiceEdicion] = nuevaFaq;
+    function cerrarEditor() {
+      if (cambiosPendientes) {
+        if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
+      }
+      document.getElementById('editor').classList.remove('active');
+      filaSeleccionada = null;
       modoEdicion = false;
       indiceEdicion = null;
-      limpiarFormConfig();
-    } else {
-      datosConfig.push(nuevaFaq);
+      cambiosPendientes = false;
+      limpiarFormProductos();
       limpiarFormConfig();
     }
 
-    renderTablaConfig();
-    marcarCambiosPendientes();
-  }
+    function limpiarFormProductos() {
+      document.getElementById('inputProducto').value = '';
+      document.getElementById('inputPrecio').value = '';
+      document.getElementById('inputStock').value = '';
+      document.getElementById('inputDesc').value = '';
+      document.getElementById('inputFoto').value = '';
+      document.getElementById('inputUrlProd').value = '';
+      document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
+      document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
+      document.getElementById('modoEdicionProd').classList.add('hidden');
+      document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
+    }
 
-  function cancelarEdicionConfig() {
-    modoEdicion = false;
-    indiceEdicion = null;
-    filaSeleccionada = null;
-    limpiarFormConfig();
-    document.querySelectorAll('#miTablaConfig tbody tr').forEach(r => r.classList.remove('seleccionada'));
-    document.getElementById('btnBorrarConfig').disabled = true;
-  }
+    function limpiarFormConfig() {
+      document.getElementById('inputPregunta').value = '';
+      document.getElementById('inputRespuesta').value = '';
+      document.getElementById('inputClaves').value = '';
+      document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
+      document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
+      document.getElementById('modoEdicionConfig').classList.add('hidden');
+      document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
+    }
 
-  function confirmarBorrar() {
-    if (filaSeleccionada.tipo === 'productos') {
-      datosProductos.splice(filaSeleccionada.index, 1);
+    function renderTablaProductos() {
+      const tbody = document.querySelector('#miTabla tbody');
+      tbody.innerHTML = '';
+      datosProductos.forEach((row, i) => {
+        const tr = tbody.insertRow();
+        tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.stock||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
+        tr.onclick = () => seleccionarFila(tr, i, 'productos');
+      });
+    }
+
+    function renderTablaConfig() {
+      const tbody = document.querySelector('#miTablaConfig tbody');
+      tbody.innerHTML = '';
+      datosConfig.forEach((row, i) => {
+        const tr = tbody.insertRow();
+        tr.innerHTML = `<td>${row.pregunta||''}</td><td>${row.respuesta||''}</td><td>${row.keywords||''}</td>`;
+        tr.onclick = () => seleccionarFila(tr, i, 'config');
+      });
+    }
+
+    function seleccionarFila(row, index, tipo) {
+      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
+      row.classList.add('seleccionada');
+      filaSeleccionada = {index, tipo};
+      modoEdicion = true;
+      indiceEdicion = index;
+
+      if (tipo === 'productos') {
+        const datos = datosProductos[index];
+        document.getElementById('inputProducto').value = datos.nombre || '';
+        document.getElementById('inputPrecio').value = datos.precio || '';
+        document.getElementById('inputStock').value = datos.stock || '';
+        document.getElementById('inputDesc').value = datos.desc || '';
+        document.getElementById('inputFoto').value = datos.foto || '';
+        document.getElementById('inputUrlProd').value = datos.url || '';
+        document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
+        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+        document.getElementById('modoEdicionProd').classList.remove('hidden');
+        document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
+        document.getElementById('btnBorrar').disabled = false;
+      } else {
+        const datos = datosConfig[index]; // FIX: era datosConfig, no datosConfig[index]
+        document.getElementById('inputPregunta').value = datos.pregunta || '';
+        document.getElementById('inputRespuesta').value = datos.respuesta || '';
+        document.getElementById('inputClaves').value = datos.keywords || '';
+        document.getElementById('btnGuardarConfig').textContent = '✏ Actualizar Pregunta';
+        document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
+        document.getElementById('modoEdicionConfig').classList.remove('hidden');
+        document.getElementById('btnCancelarEdicionConfig').classList.remove('hidden');
+        document.getElementById('btnBorrarConfig').disabled = false;
+      }
+    }
+
+    document.getElementById('btnGuardar').addEventListener('click', () => {
+      const prod = document.getElementById('inputProducto').value;
+      const precio = document.getElementById('inputPrecio').value;
+      const stock = document.getElementById('inputStock').value;
+      const desc = document.getElementById('inputDesc').value;
+      const foto = document.getElementById('inputFoto').value;
+      const urlProd = document.getElementById('inputUrlProd').value;
+      if(!prod ||!precio ||!stock) return alert("Completá nombre, precio y stock");
+
+      const nuevoProd = {nombre: prod, precio, stock, desc, foto, url: urlProd};
+
+      if (modoEdicion && indiceEdicion!== null) {
+        datosProductos[indiceEdicion] = nuevoProd;
+        modoEdicion = false;
+        indiceEdicion = null;
+        limpiarFormProductos();
+      } else {
+        datosProductos.push(nuevoProd);
+        limpiarFormProductos();
+      }
+
       renderTablaProductos();
-      document.getElementById('btnBorrar').disabled = true;
+      marcarCambiosPendientes();
+    });
+
+    document.getElementById('btnCancelarEdicionProd').addEventListener('click', () => {
+      modoEdicion = false;
+      indiceEdicion = null;
+      filaSeleccionada = null;
       limpiarFormProductos();
-    } else {
-      datosConfig.splice(filaSeleccionada.index, 1);
+      document.querySelectorAll('#miTabla tbody tr').forEach(r => r.classList.remove('seleccionada'));
+      document.getElementById('btnBorrar').disabled = true;
+    });
+
+    document.getElementById('btnGuardarConfig').addEventListener('click', () => {
+      const pregunta = document.getElementById('inputPregunta').value;
+      const respuesta = document.getElementById('inputRespuesta').value;
+      const claves = document.getElementById('inputClaves').value;
+      if(!pregunta ||!respuesta ||!claves) return alert("Completá los 3 campos");
+
+      const nuevaFaq = {pregunta, respuesta, keywords: claves};
+
+      if (modoEdicion && indiceEdicion!== null) {
+        datosConfig[indiceEdicion] = nuevaFaq;
+        modoEdicion = false;
+        indiceEdicion = null;
+        limpiarFormConfig();
+      } else {
+        datosConfig.push(nuevaFaq);
+        limpiarFormConfig();
+      }
+
       renderTablaConfig();
-      document.getElementById('btnBorrarConfig').disabled = true;
+      marcarCambiosPendientes();
+    });
+
+    document.getElementById('btnCancelarEdicionConfig').addEventListener('click', () => {
+      modoEdicion = false;
+      indiceEdicion = null;
+      filaSeleccionada = null;
       limpiarFormConfig();
-    }
-    cerrarModales();
-    filaSeleccionada = null;
-    modoEdicion = false;
-    indiceEdicion = null;
-    marcarCambiosPendientes();
-  }
-
-  async function subirProductos() {
-    showLoading(true);
-    try {
-      await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bot_id: BOT_ID, data: { productos: datosProductos } })
-      });
-      cambiosPendientes = false;
-      document.getElementById('cambiosPendientes').style.display = 'none';
-      showLoading(false);
-      showToast('✅ Productos guardados en servidor');
-    } catch(e) {
-      showLoading(false);
-      showToast('Error al guardar: ' + e.message, 'error');
-    }
-  }
-
-  async function subirFaq() {
-    showLoading(true);
-    try {
-      await fetch('https://api.wasa.chat/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bot_id: BOT_ID, data: { faq: datosConfig } })
-      });
-      cambiosPendientes = false;
-      document.getElementById('cambiosPendientes').style.display = 'none';
-      showLoading(false);
-      showToast('✅ FAQs guardados en servidor');
-    } catch(e) {
-      showLoading(false);
-      showToast('Error al guardar: ' + e.message, 'error');
-    }
-  }
-
-  async function cargarCsvProductos() {
-    const file = document.getElementById('csvProductos').files[0];
-    if (!file) return alert('Seleccioná un archivo CSV');
-
-    const text = await file.text();
-    const lines = text.split('\n').filter(l => l.trim());
-
-    if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
-
-    datosProductos = lines.slice(1).map(line => {
-      const vals = line.split(',');
-      return {
-        nombre: vals[0]||'',
-        precio: vals[1]||'',
-        url: vals[2]||'',
-        foto: vals[3]||'',
-        desc: vals[4]||'',
-        keywords: vals[5]? vals[5].split(',').map(k => k.trim()).filter(k => k) : []
-      };
+      document.querySelectorAll('#miTablaConfig tbody tr').forEach(r => r.classList.remove('seleccionada'));
+      document.getElementById('btnBorrarConfig').disabled = true;
     });
 
-    renderTablaProductos();
-    marcarCambiosPendientes();
-    document.getElementById('csvProductos').value = '';
-  }
-
-  async function cargarCsvConfig() {
-    const file = document.getElementById('csvConfig').files[0];
-    if (!file) return alert('Seleccioná un archivo CSV');
-
-    const text = await file.text();
-    const lines = text.split('\n').filter(l => l.trim());
-
-    if (!confirm(`¿Reemplazar todas las preguntas con ${lines.length-1} filas del CSV?`)) return;
-
-    datosConfig = lines.slice(1).map(line => {
-      const vals = line.split(',');
-      return {
-        pregunta: vals[0]||'',
-        respuesta: vals[1]||'',
-        keywords: vals[2]||''
-      };
+    document.getElementById('btnBorrar').addEventListener('click', () => {
+      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
+    });
+    document.getElementById('btnBorrarConfig').addEventListener('click', () => {
+      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
     });
 
-    renderTablaConfig();
-    marcarCambiosPendientes();
-    document.getElementById('csvConfig').value = '';
-  }
+    document.getElementById('confirmar-si').addEventListener('click', () => {
+      if (filaSeleccionada.tipo === 'productos') {
+        datosProductos.splice(filaSeleccionada.index, 1);
+        renderTablaProductos();
+        document.getElementById('btnBorrar').disabled = true;
+        limpiarFormProductos();
+      } else {
+        datosConfig.splice(filaSeleccionada.index, 1);
+        renderTablaConfig();
+        document.getElementById('btnBorrarConfig').disabled = true;
+        limpiarFormConfig();
+      }
+      cerrarModales();
+      filaSeleccionada = null;
+      modoEdicion = false;
+      indiceEdicion = null;
+      marcarCambiosPendientes();
+    });
 
-  function marcarCambiosPendientes() {
-    cambiosPendientes = true;
-    document.getElementById('cambiosPendientes').style.display = 'block';
-  }
+    document.getElementById('btnSubirProductos').addEventListener('click', async () => {
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
+        });
+        cambiosPendientes = false;
+        document.getElementById('cambiosPendientes').style.display = 'none';
+        showLoading(false);
+        showToast('✅ Productos guardados en servidor');
+      } catch(e) {
+        showLoading(false);
+        showToast('Error al guardar: ' + e.message, 'error');
+      }
+    });
 
-  function cerrarModales() {
-    document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none');
-  }
+    document.getElementById('btnSubirFaq').addEventListener('click', async () => {
+      showLoading(true);
+      try {
+        await fetch('https://api.wasa.chat/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
+        });
+        cambiosPendientes = false;
+        document.getElementById('cambiosPendientes').style.display = 'none';
+        showLoading(false);
+        showToast('✅ FAQs guardados en servidor');
+      } catch(e) {
+        showLoading(false);
+        showToast('Error al guardar: ' + e.message, 'error');
+      }
+    });
 
-  function showLoading(show) {
-    document.getElementById('loading').style.display = show? 'flex' : 'none';
-  }
+    document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
+      const file = document.getElementById('csvProductos').files[0];
+      if (!file) return alert('Seleccioná un archivo CSV');
 
-  function showToast(msg, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.style.background = type === 'error'? '#dc3545' : '#28a745';
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 3000);
-  }
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
 
-  function logout() {
-    localStorage.removeItem('bot_id');
-    localStorage.removeItem('user_email');
-    window.location.href = 'index.html';
-  }
+      if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
 
-  document.getElementById('logoutBtn').addEventListener('click', logout);
+      datosProductos = lines.slice(1).map(line => {
+        const vals = line.split(',');
+        return {
+          nombre: vals[0]||'',
+          precio: vals[1]||'',
+          stock: vals[2]||'',
+          desc: vals[3]||'',
+          foto: vals[4]||'',
+          url: vals[5]||''
+        };
+      });
 
-  function setupResizer(resizerId, formId) {
-    const resizer = document.getElementById(resizerId);
-    const leftSide = document.getElementById(formId);
+      renderTablaProductos();
+      marcarCambiosPendientes();
+      document.getElementById('csvProductos').value = '';
+    });
+
+    document.getElementById('btnCargarCsvConfig').addEventListener('click', async () => {
+      const file = document.getElementById('csvConfig').files[0];
+      if (!file) return alert('Seleccioná un archivo CSV');
+
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
+
+      if (!confirm(`¿Reemplazar todas las preguntas con ${lines.length-1} filas del CSV?`)) return;
+
+      datosConfig = lines.slice(1).map(line => {
+        const vals = line.split(',');
+        return {
+          pregunta: vals[0]||'',
+          respuesta: vals[1]||'',
+          keywords: vals[2]||''
+        };
+      });
+
+      renderTablaConfig();
+      marcarCambiosPendientes();
+      document.getElementById('csvConfig').value = '';
+    });
+
+    function cerrarModales() {
+      document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none');
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').style.display = show? 'flex' : 'none';
+    }
+
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.background = type === 'error'? '#dc3545' : '#28a745';
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    function logout() {
+      localStorage.removeItem('bot_id');
+      localStorage.removeItem('user_email');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    const resizer = document.getElementById('editor-resizer');
+    const leftSide = document.getElementById('editor-form');
     if (resizer && leftSide) {
       resizer.addEventListener('mousedown', (e) => {
-        const resize = (e) => {
-          const newWidth = e.clientX;
-          if (newWidth > 250 && newWidth < 600) {
-            leftSide.style.width = newWidth + 'px';
-          }
-        };
         document.addEventListener('mousemove', resize);
         document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize));
       });
     }
-  }
-
-  function generarCodigoWidget() {
-    const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-    const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
-    document.getElementById('codigoWidget').value = codigo;
-    if (document.getElementById('codigoWidgetModal')) {
-      document.getElementById('codigoWidgetModal').value = codigo;
+    function resize(e) {
+      if (leftSide) leftSide.style.width = e.clientX + 'px';
     }
-  }
 
-  // ===== NAVEGACIÓN DE SOLAPAS =====
-  document.querySelectorAll('.sidebar-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      const section = e.target.dataset.section;
-      showSection(section);
-    });
-  });
-
-  function showSection(section) {
-    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-    document.querySelector(`[data-section="${section}"]`).classList.add('active');
-
-    if (section === 'configuracion') {
-      document.getElementById('section-configuracion').classList.remove('hidden');
-      document.getElementById('section-analytics').classList.add('hidden');
-    } else if (section === 'analytics') {
-      document.getElementById('section-configuracion').classList.add('hidden');
-      document.getElementById('section-analytics').classList.remove('hidden');
-      cargarAnalytics();
-    }
-  }
-
-  function cargarAnalytics() {
-    if (!userData || !userData.stats) return;
-    const stats = userData.stats;
-    document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
-    document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
-    document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
-    document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
-    document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
-     ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
-      : '-';
-  }
-
-  // ===== INICIALIZACIÓN DE BOTONES DE EDITOR =====
-  // IMPORTANTE: Estos event listeners son los que faltaban
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔵 Inicializando botones de editor...');
-    
-    // Buscar botones por ID o clase
-    const btnProductos = document.querySelector('[onclick*="abrirEditor(\'productos\')"]');
-    const btnConfig = document.querySelector('[onclick*="abrirEditor(\'config\')"]');
-    
-    console.log('Botón productos encontrado:', !!btnProductos);
-    console.log('Botón config encontrado:', !!btnConfig);
-    
-    // Si no se encontraron por onclick, buscarlos por texto
-    if (!btnProductos) {
-      const allButtons = document.querySelectorAll('button');
-      allButtons.forEach(btn => {
-        if (btn.textContent.includes('Editar Tabla de Productos')) {
-          console.log('✅ Botón productos encontrado por texto');
-          btn.onclick = function() { abrirEditor('productos'); };
-        }
-        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
-          console.log('✅ Botón config encontrado por texto');
-          btn.onclick = function() { abrirEditor('config'); };
-        }
+    const resizerWidget = document.getElementById('editor-widget-resizer');
+    const leftSideWidget = document.getElementById('editor-widget-form');
+    if (resizerWidget && leftSideWidget) {
+      resizerWidget.addEventListener('mousedown', (e) => {
+        document.addEventListener('mousemove', resizeWidget);
+        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resizeWidget));
       });
     }
-  });
-
-  // ASIGNAR FUNCIONES AL SCOPE GLOBAL PARA QUE LOS onclicks FUNCIONEN
-  window.abrirEditor = abrirEditor;
-  window.cerrarEditor = cerrarEditor;
-  window.abrirEditorWidget = abrirEditorWidget;
-  window.cerrarEditorWidget = cerrarEditorWidget;
-  window.guardarProducto = guardarProducto;
-  window.guardarFaq = guardarFaq;
-  window.cancelarEdicionProd = cancelarEdicionProd;
-  window.cancelarEdicionConfig = cancelarEdicionConfig;
-  window.confirmarBorrar = confirmarBorrar;
-  window.subirProductos = subirProductos;
-  window.subirFaq = subirFaq;
-  window.cargarCsvProductos = cargarCsvProductos;
-  window.cargarCsvConfig = cargarCsvConfig;
-  window.mostrarCambiarDominio = mostrarCambiarDominio;
-  window.cambiarDominio = cambiarDominio;
-  window.cerrarModales = cerrarModales;
-  window.copiarCodigo = copiarCodigo;
-  window.copiarCodigoModal = copiarCodigoModal;
-  window.guardarConfigWidgetModal = guardarConfigWidgetModal;
-  window.handleAvatarUpload = handleAvatarUpload;
-  window.irAComprar = irAComprar;
-  window.logout = logout;
-
-  console.log('✅ Todas las funciones asignadas al window global');
-  console.log('✅ Script cargado correctamente');
-
-  // ===== SOLUCIÓN DEFINITIVA PARA LOS BOTONES =====
-// Forzar que los botones tengan los onclick correctos
-(function() {
-    console.log('🔧 Aplicando fix definitivo para botones...');
-    
-    // Buscar todos los botones
-    const allButtons = document.querySelectorAll('button');
-    
-    allButtons.forEach(btn => {
-        // Buscar botón de productos
-        if (btn.textContent.includes('Editar Tabla de Productos')) {
-            console.log('✅ Fix aplicado a botón de productos');
-            // Remover cualquier onclick existente y asignar el nuestro
-            btn.removeAttribute('onclick');
-            btn.onclick = function(e) {
-                e.preventDefault();
-                console.log('🟢 Click en Editar Productos');
-                abrirEditor('productos');
-            };
+    function resizeWidget(e) {
+      if (leftSideWidget) {
+        const newWidth = e.clientX;
+        if (newWidth > 250 && newWidth < 600) {
+          leftSideWidget.style.width = newWidth + 'px';
         }
-        
-        // Buscar botón de preguntas
-        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
-            console.log('✅ Fix aplicado a botón de preguntas');
-            btn.removeAttribute('onclick');
-            btn.onclick = function(e) {
-                e.preventDefault();
-                console.log('🟢 Click en Editar Preguntas');
-                abrirEditor('config');
-            };
-        }
-        
-        // Buscar botón de personalizar widget
-        if (btn.textContent.includes('Personalizar apariencia')) {
-            console.log('✅ Fix aplicado a botón de widget');
-            btn.removeAttribute('onclick');
-            btn.onclick = function(e) {
-                e.preventDefault();
-                console.log('🟢 Click en Personalizar Widget');
-                abrirEditorWidget();
-            };
-        }
-    });
-    
-    // También buscar por los onclick en el HTML y reemplazarlos
-    document.querySelectorAll('[onclick*="abrirEditor"]').forEach(el => {
-        const onclickAttr = el.getAttribute('onclick');
-        if (onclickAttr.includes("'productos'")) {
-            console.log('✅ Reemplazando onclick de productos');
-            el.removeAttribute('onclick');
-            el.onclick = function(e) {
-                e.preventDefault();
-                abrirEditor('productos');
-            };
-        } else if (onclickAttr.includes("'config'")) {
-            console.log('✅ Reemplazando onclick de config');
-            el.removeAttribute('onclick');
-            el.onclick = function(e) {
-                e.preventDefault();
-                abrirEditor('config');
-            };
-        }
-    });
-    
-    console.log('✅ Fix de botones aplicado correctamente');
-})();
-
-// También asegurar que las funciones estén en window (por si acaso)
-window.abrirEditor = abrirEditor;
-window.cerrarEditor = cerrarEditor;
-window.abrirEditorWidget = abrirEditorWidget;
-window.cerrarEditorWidget = cerrarEditorWidget;
-
-console.log('✅ Todo listo - Los botones deberían funcionar ahora');
-
-  // ===== FIX ULTRA DEFINITIVO =====
-// Esto fuerza la apertura del editor directamente
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Aplicando fix ultra definitivo...');
-    
-    // Buscar todos los botones y reemplazar sus onclick
-    document.querySelectorAll('button').forEach(btn => {
-        const texto = btn.textContent.trim();
-        
-        if (texto.includes('Editar Tabla de Productos')) {
-            btn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🟢 Click en productos - FORZANDO apertura');
-                
-                // FORZAR apertura directa
-                const editor = document.getElementById('editor');
-                if (editor) {
-                    editor.style.display = 'flex';
-                    editor.style.position = 'fixed';
-                    editor.style.top = '0';
-                    editor.style.left = '0';
-                    editor.style.width = '100%';
-                    editor.style.height = '100%';
-                    editor.style.zIndex = '99999';
-                    editor.style.background = 'white';
-                    editor.style.visibility = 'visible';
-                    
-                    // Mostrar contenido
-                    document.getElementById('form-productos').classList.remove('hidden');
-                    document.getElementById('form-config').classList.add('hidden');
-                    document.getElementById('tabla-productos').classList.remove('hidden');
-                    document.getElementById('tabla-config').classList.add('hidden');
-                    document.getElementById('editor-titulo').textContent = 'Editor de Productos';
-                    
-                    console.log('✅ Editor de productos FORZADO');
-                } else {
-                    alert('ERROR: No se encontró el editor');
-                }
-            };
-        }
-        
-        if (texto.includes('Editar Preguntas y Respuestas')) {
-            btn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🟢 Click en preguntas - FORZANDO apertura');
-                
-                const editor = document.getElementById('editor');
-                if (editor) {
-                    editor.style.display = 'flex';
-                    editor.style.position = 'fixed';
-                    editor.style.top = '0';
-                    editor.style.left = '0';
-                    editor.style.width = '100%';
-                    editor.style.height = '100%';
-                    editor.style.zIndex = '99999';
-                    editor.style.background = 'white';
-                    editor.style.visibility = 'visible';
-                    
-                    document.getElementById('form-productos').classList.add('hidden');
-                    document.getElementById('form-config').classList.remove('hidden');
-                    document.getElementById('tabla-productos').classList.add('hidden');
-                    document.getElementById('tabla-config').classList.remove('hidden');
-                    document.getElementById('editor-titulo').textContent = 'Editor de FAQs';
-                    
-                    console.log('✅ Editor de preguntas FORZADO');
-                } else {
-                    alert('ERROR: No se encontró el editor');
-                }
-            };
-        }
-    });
-    
-    console.log('✅ Fix ultra definitivo aplicado');
-});
-  
+      }
+    }
 </script>
 </body>
 </html>
