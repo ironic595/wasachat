@@ -58,6 +58,39 @@
   /* Espacio superior = Alto del nav (65px) + Alto del menubar (50px) */
   margin-top: 115px; 
 }  
+/* La lista se comporta como fila en celulares */
+.menu-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row; /* Elementos uno al lado del otro */
+  justify-content: space-around; /* Distribución simétrica */
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.menu-lista li {
+  flex: 1;
+  text-align: center;
+}
+
+/* Estilo para los enlaces de tu menú */
+.menu-lista a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 0;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.menu-lista a:hover {
+  background: #333; /* Efecto visual al pasar el cursor */
+}
+    
       
     /* Vista Monitor PC: El menú se vuelve lateral izquierdo y flotante */
     @media (min-width: 992px) {
@@ -82,6 +115,22 @@
         margin-left: 20%; /* Desplaza el contenido a la derecha para que no lo tape el menú */
         margin-top: 50px;
       }
+      .menu-lista {
+    flex-direction: column; /* Elementos uno abajo del otro */
+    justify-content: flex-start; /* Alineados desde arriba */
+    align-items: stretch;
+    padding-top: 20px; /* Separación inicial con el nav */
+  }
+
+  .menu-lista li {
+    width: 100%;
+  }
+
+  .menu-lista a {
+    padding: 15px 20px;
+    text-align: left; /* Texto alineado a la izquierda en PC */
+    border-bottom: 1px solid #222; /* Divisor sutil entre botones */
+  }
     }
     
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -148,7 +197,10 @@
 <div id="loading">Guardando...</div>
   <div class="toast" id="toast"></div>
  <div class="allcont">
-   <div class="menubar"></div>
+   <div class="menubar"><ul class="menu-lista">
+    <li><a href="#seccion1">Configuración</a></li>
+    <li><a href="#seccion2">Estadísticas</a></li>
+  </ul></div>
   <div class="container">
     <h1>WasaChat - Panel de Control</h1>
     <div id="userInfo"></div>
