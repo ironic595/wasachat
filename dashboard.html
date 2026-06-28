@@ -1278,25 +1278,7 @@
         }
     });
     
-    // También buscar por los onclick en el HTML y reemplazarlos
-    document.querySelectorAll('[onclick*="abrirEditor"]').forEach(el => {
-        const onclickAttr = el.getAttribute('onclick');
-        if (onclickAttr.includes("'productos'")) {
-            console.log('✅ Reemplazando onclick de productos');
-            el.removeAttribute('onclick');
-            el.onclick = function(e) {
-                e.preventDefault();
-                abrirEditor('productos');
-            };
-        } else if (onclickAttr.includes("'config'")) {
-            console.log('✅ Reemplazando onclick de config');
-            el.removeAttribute('onclick');
-            el.onclick = function(e) {
-                e.preventDefault();
-                abrirEditor('config');
-            };
-        }
-    });
+
     
     console.log('✅ Fix de botones aplicado correctamente');
 })();
