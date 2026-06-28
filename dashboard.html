@@ -129,21 +129,31 @@ nav {
     margin-left: 20%; 
     margin-top: 20px; /* En PC el menú es lateral, por lo que no requiere margen superior extra */
   }
-    .menu-desplegable {
+     .menu-desplegable {
     /* En PC empieza inmediatamente debajo del nav (65px) */
     top: 65px;
     left: auto;
-    right: 0; /* Se despliega desde el borde derecho */
-    width: 320px; /* Abarca solo una zona lateral */
+    right: 0; /* Se despliega pegado al borde derecho */
+    
+    /* Configuración de ancho óptimo */
+    width: 22%; /* Un 20-22% emula perfectamente el diseño simétrico */
+    min-width: 260px; /* Evita que el texto se rompa en pantallas intermedias */
+    max-width: 320px; /* Evita que se estire demasiado en monitores gigantes */
+    
     height: calc(100vh - 65px);
-    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    background-color: #111; /* Asegura el fondo oscuro solo en su caja */
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.5);
     border-left: 1px solid #222;
-    transform: translateX(30px); /* Transición de lado en PC */
+    
+    /* Animación de entrada lateral limpia */
+    transform: translateX(100%); /* Oculto completamente a la derecha */
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
   }
 
   /* Animación de entrada lateral para PC */
   .menu-checkbox:checked ~ .menu-desplegable {
     transform: translateX(0);
+    opacity: 1;
   }
 }
 /* Ocultamos el checkbox real */
