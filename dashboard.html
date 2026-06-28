@@ -124,14 +124,124 @@ nav {
     text-align: left; 
     border-bottom: 1px solid #222; 
   }
-
   .container { 
     width: 80%; 
     margin-left: 20%; 
     margin-top: 20px; /* En PC el menú es lateral, por lo que no requiere margen superior extra */
   }
+    .menu-desplegable {
+    /* En PC empieza inmediatamente debajo del nav (65px) */
+    top: 65px;
+    left: auto;
+    right: 0; /* Se despliega desde el borde derecho */
+    width: 320px; /* Abarca solo una zona lateral */
+    height: calc(100vh - 65px);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+    border-left: 1px solid #222;
+    transform: translateX(30px); /* Transición de lado en PC */
+  }
+
+  /* Animación de entrada lateral para PC */
+  .menu-checkbox:checked ~ .menu-desplegable {
+    transform: translateX(0);
+  }
+}
+/* Ocultamos el checkbox real */
+.menu-checkbox {
+  display: none;
 }
 
+/* Estilo y contenedor del icono de hamburguesa */
+.menu-icono-btn {
+  width: 30px;
+  height: 24px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 110; /* Por encima del menú desplegable */
+}
+
+/* Las 3 líneas del icono */
+.menu-icono-btn span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* --- TRANSICIÓN A CRUZ CUANDO EL CHECKBOX ESTÁ ACTIVO --- */
+.menu-checkbox:checked + .menu-icono-btn span:nth-child(1) {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.menu-checkbox:checked + .menu-icono-btn span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.menu-checkbox:checked + .menu-icono-btn span:nth-child(3) {
+  transform: translateY(-11px) rotate(-45deg);
+}
+
+/* --- DISEÑO DEL PANEL DESPLEGABLE (VERSIÓN MÓVIL) --- */
+.menu-desplegable {
+  position: fixed;
+  /* Se posiciona abajo del nav superior (65px) y del menubar móvil (50px) = 115px */
+  top: 115px; 
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 115px); /* Cubre toda la pantalla restante */
+  background-color: #111;
+  z-index: 90;
+  
+  /* Animación suave de cortina/opacidad */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Mostrar el menú suavemente al hacer clic */
+.menu-checkbox:checked ~ .menu-desplegable {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Contenido del menú */
+.desplegable-lista {
+  list-style: none;
+  padding: 30px;
+  margin: 0;
+}
+
+.desplegable-lista .titulo-seccion {
+  color: #4285f4;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #222;
+  padding-bottom: 5px;
+}
+
+.desplegable-lista a {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 12px 0;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.desplegable-lista a:hover {
+  color: white;
+}
    
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
@@ -189,11 +299,29 @@ nav {
 </head>
 <body>
 <nav>
-<a href="/" class="logo">
-<img src="assets/img/waslo.png" alt="Wasa.Chat">
-</a>
-<button class="btn-login" id="btnLogin">Entrar/Registrar</button>
-</nav>  
+  <a href="/" class="logo">
+    <img src="assets/img/waslo.png" alt="Wasa.Chat">
+  </a>
+  <!-- Control de estado oculto (Checkbox Hack) -->
+  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+  <!-- Icono de Hamburguesa / Cruz Dinámica -->
+  <label for="menu-toggle" class="menu-icono-btn">
+    <span></span>
+    <span></span>
+    <span></span>
+  </label>
+  <!-- El nuevo Menú Desplegable -->
+  <div class="menu-desplegable">
+    <ul class="desplegable-lista">
+      <li class="titulo-seccion">Documentación</li>
+      <li><a href="#guia-inicio">Guía de Inicio</a></li>
+      <li><a href="#api-referencia">Referencia de API</a></li>
+      <li><a href="#webhooks">Webhooks</a></li>
+      <li><a href="#soporte">Soporte Técnico</a></li>
+    </ul>
+  </div>
+</nav>
+
 <div id="loading">Guardando...</div>
   <div class="toast" id="toast"></div>
  <div class="allcont">
