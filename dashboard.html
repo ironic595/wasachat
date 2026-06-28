@@ -246,6 +246,79 @@ nav {
     opacity: 1;
   }
 }
+
+/* ========================================================
+   LOGICA CSS PARA CAMBIAR DE SECCIÓN (CONMUTACIÓN)
+   ======================================================== */
+
+/* 1. Ocultamos los inputs de radio para que no aparezcan en la pantalla */
+.radio-tab {
+  display: none;
+}
+
+/* 2. Por defecto, ocultamos ambas secciones del contenedor principal */
+.seccion-config,
+.seccion-stats {
+  display: none;
+}
+
+/* 3. Cuando el botón de Configuración está seleccionado, mostramos su sección */
+#tab-config:checked ~ .allcont .seccion-config {
+  display: block;
+}
+
+/* 4. Cuando el botón de Estadísticas está seleccionado, mostramos su sección */
+#tab-stats:checked ~ .allcont .seccion-stats {
+  display: block;
+}
+
+
+/* ========================================================
+   ESTILOS DE LOS BOTONES DE NAVEGACIÓN (LABELS)
+   ======================================================== */
+
+/* Convertimos los labels del menubar para que actúen como botones clickeables */
+.menu-btn {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 0;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menu-btn:hover {
+  background: #333;
+}
+
+/* --- EFECTO VISUAL DE PESTAÑA ACTIVA --- */
+/* Resalta el botón de la sección que el usuario está viendo actualmente */
+#tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
+#tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
+  background: #222;
+  color: #4285f4;
+  border-bottom: 2px solid #4285f4;
+}
+
+/* --- AJUSTE DE LOS BOTONES PARA PANTALLAS GRANDES (PC) --- */
+@media (min-width: 992px) {
+  .menu-btn {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #222;
+  }
+  
+  /* Cambiamos la línea decorativa de abajo hacia el costado izquierdo en monitores */
+  #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
+  #tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
+    border-bottom: 1px solid #222;
+    border-left: 4px solid #4285f4;
+  }
+}
+    
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
     h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
