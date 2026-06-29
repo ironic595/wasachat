@@ -377,6 +377,7 @@ nav {
 <!-- Interruptores de sección para Alternar entre Configuración y Estadísticas -->
 <input type="radio" id="tab-config" name="secciones-panel" class="radio-tab" checked>
 <input type="radio" id="tab-stats" name="secciones-panel" class="radio-tab">
+<input type="radio" id="tab-refs" name="secciones-panel" class="radio-tab">
 
 <nav>
   <a href="/" class="logo">
@@ -408,9 +409,9 @@ nav {
   <!-- El menú lateral ahora usa labels enlazados a los inputs tipo radio -->
   <div class="menubar">
     <ul class="menu-lista">
-      <li><label for="tab-config" class="menu-btn">⚙️ Configuración</label></li>
+      <li><label for="tab-config" class="menu-btn">⚙ Configuración</label></li>
       <li><label for="tab-stats" class="menu-btn">📈 Estadísticas</label></li>
-      <li><label for="tab-refs" class="menu-btn"> Referidos</label></li>
+      <li><label for="tab-refs" class="menu-btn">🎁 Referidos</label></li>
     </ul>
   </div>
 
@@ -451,26 +452,32 @@ nav {
         </div>
       </div>
     </div>
-    </div>
 	<div class="seccion-refs">
       <div id="section-referidos">
         <div class="content-card">
-          <h2>Referidos</h2>
+          <h2>🎁 Referidos</h2>
           <p style="color: #666; margin-bottom: 24px;">Métricas de referidos</p>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
             <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #00d4aa;">
-              <div style="font-size: 32px; font-weight: 700; color: #00d4aa;" id="statSesiones">0</div>
+              <div style="font-size: 32px; font-weight: 700; color: #00d4aa;" id="statReferidosTotal">0</div>
               <div style="font-size: 14px; color: #666; margin-top: 4px;">Referidos totales</div>
             </div>
             <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #4285f4;">
-              <div style="font-size: 32px; font-weight: 700; color: #4285f4;" id="statMensajes">0</div>
-              <div style="font-size: 14px; color: #666; margin-top: 4px;">Recompensas totales</div>
+              <div style="font-size: 32px; font-weight: 700; color: #4285f4;" id="statRecompensasTotal">$0.00</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Recompensas ganadas</div>
             </div>
           </div>
 
-          <div style="background: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ff9500;">
-            <strong>Última actividad:</strong> <span id="statUltimaActividad">-</span>
+          <div style="background: #f0f9ff; padding: 16px; border-radius: 8px; border-left: 4px solid #3b82f6;">
+            <strong>Tu link de invitación:</strong>
+            <div style="display:flex;gap:10px;margin-top:10px;">
+              <input id="linkReferido" readonly style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:monospace;font-size:14px;">
+              <button onclick="copiarLinkReferido()" class="btn-blue">Copiar</button>
+            </div>
+            <p style="margin-top:10px;font-size:13px;color:#666;">
+              Por cada amigo que pague, ganás <strong>$0.50 en créditos</strong>
+            </p>
           </div>
         </div>
       </div>
