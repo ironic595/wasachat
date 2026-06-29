@@ -377,7 +377,6 @@ nav {
 <!-- Interruptores de sección para Alternar entre Configuración y Estadísticas -->
 <input type="radio" id="tab-config" name="secciones-panel" class="radio-tab" checked>
 <input type="radio" id="tab-stats" name="secciones-panel" class="radio-tab">
-<input type="radio" id="tab-refs" name="secciones-panel" class="radio-tab">
 
 <nav>
   <a href="/" class="logo">
@@ -1477,17 +1476,9 @@ function showSection(section) {
   if (section === 'configuracion') {
     document.getElementById('section-configuracion').classList.remove('hidden');
     document.getElementById('section-analytics').classList.add('hidden');
-	document.getElementById('section-referidos').classList.add('hidden');
   } else if (section === 'analytics') {
     document.getElementById('section-configuracion').classList.add('hidden');
     document.getElementById('section-analytics').classList.remove('hidden');
-	document.getElementById('section-referidos').classList.add('hidden');
-    cargarAnalytics();
-  }
-	else if (section === 'referidos') {
-    document.getElementById('section-configuracion').classList.add('hidden');
-    document.getElementById('section-analytics').classList.add('hidden');
-	document.getElementById('section-referidos').classList.remove('hidden');
     cargarAnalytics();
   }
 }
