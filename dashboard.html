@@ -1,3 +1,47 @@
+Skip to content
+ironic595
+wasachat
+Repository navigation
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security and quality
+1
+ (1)
+Insights
+Settings
+Files
+Go to file
+t
+T
+assets
+data
+CNAME
+checkout.html
+cookies.html
+dashboard.html
+index.html
+legal.css
+privacidad.html
+site.webmanifest
+terminos.html
+widget.js
+wasachat
+/dashboard.html
+ironic595
+ironic595
+Update dashboard.html
+2f8d6ab
+ · 
+2 hours ago
+
+Code
+
+Blame
+1438 lines (1287 loc) · 58.4 KB
 <!DOCTYPE html>
 <html>
 <head>
@@ -310,6 +354,7 @@ nav {
     text-align: left;
     border-bottom: 1px solid #222;
   }
+  
   /* Cambiamos la línea decorativa de abajo hacia el costado izquierdo en monitores */
   #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
   #tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
@@ -317,57 +362,7 @@ nav {
     border-left: 4px solid #4285f4;
   }
 }
-      /* Ocultamos los selectores radio del flujo visual */
-.radio-tab {
-  display: none !important;
-}
-/* Ocultamos ambas pantallas del Dashboard por defecto */
-.seccion-config,
-.seccion-stats {
-  display: none;
-}
-/* Si se selecciona Configuración, se activa su bloque */
-#tab-config:checked ~ .allcont .seccion-config {
-  display: block;
-}
-/* Si se selecciona Estadísticas, se activa su bloque */
-#tab-stats:checked ~ .allcont .seccion-stats {
-  display: block;
-}
-/* Convierte los labels del menú en botones interactivos */
-.menu-btn {
-  display: block;
-  color: white;
-  text-decoration: none;
-  padding: 15px 0;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.2s, color 0.2s;
-}
-.menu-btn:hover {
-  background: #333;
-}
-/* Resalta visualmente el botón que está activo */
-#tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
-#tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
-  background: #222;
-  color: #4285f4;
-  border-bottom: 2px solid #4285f4;
-}
-@media (min-width: 992px) {
-  .menu-btn {
-    padding: 15px 20px;
-    text-align: left;
-    border-bottom: 1px solid #222;
-  }
-  #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
-  #tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
-    border-bottom: 1px solid #222;
-    border-left: 4px solid #4285f4;
-  }
-}
+    
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
     h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
@@ -423,14 +418,6 @@ nav {
 
 </head>
 <body>
-
-<!-- Interruptor del menú desplegable de documentación -->
-<input type="checkbox" id="menu-toggle" class="menu-checkbox">
-
-<!-- Interruptores de sección para Alternar entre Configuración y Estadísticas -->
-<input type="radio" id="tab-config" name="secciones-panel" class="radio-tab" checked>
-<input type="radio" id="tab-stats" name="secciones-panel" class="radio-tab">
-
 <nav>
   <a href="/" class="logo">
     <img src="assets/img/waslo.png" alt="Wasa.Chat">
@@ -441,34 +428,41 @@ nav {
     <span></span>
     <span></span>
   </label>
-</nav>
-
-<!-- Menú Desplegable de Documentación -->
-<div class="menu-desplegable">
-  <ul class="desplegable-lista">
-    <li class="titulo-seccion">Documentación</li>
-    <li><a href="#guia-inicio">Guía de Inicio</a></li>
-    <li><a href="#api-referencia">Referencia de API</a></li>
-    <li><a href="#webhooks">Webhooks</a></li>
-    <li><a href="#soporte">Soporte Técnico</a></li>
-  </ul>
-</div>
-
-<div id="loading">Guardando...</div>
-<div class="toast" id="toast"></div>
-
-<div class="allcont">
-  <!-- El menú lateral ahora usa labels enlazados a los inputs tipo radio -->
-  <div class="menubar">
-    <ul class="menu-lista">
-      <li><label for="tab-config" class="menu-btn">⚙️ Configuración</label></li>
-      <li><label for="tab-stats" class="menu-btn">📈 Estadísticas</label></li>
+    <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+<!-- El nuevo Menú Desplegable -->
+  <div class="menu-desplegable">
+    <ul class="desplegable-lista">
+      <li class="titulo-seccion">Documentación</li>
+      <li><a href="#guia-inicio">Guía de Inicio</a></li>
+      <li><a href="#api-referencia">Referencia de API</a></li>
+      <li><a href="#webhooks">Webhooks</a></li>
+      <li><a href="#soporte">Soporte Técnico</a></li>
     </ul>
   </div>
-
+</nav>
+  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
+<!-- El nuevo Menú Desplegable -->
+  <div class="menu-desplegable">
+    <ul class="desplegable-lista">
+      <li class="titulo-seccion">Documentación</li>
+      <li><a href="#guia-inicio">Guía de Inicio</a></li>
+      <li><a href="#api-referencia">Referencia de API</a></li>
+      <li><a href="#webhooks">Webhooks</a></li>
+      <li><a href="#soporte">Soporte Técnico</a></li>
+    </ul>
+  </div>
+<div id="loading">Guardando...</div>
+  <div class="toast" id="toast"></div>
+ <div class="allcont">
+   <div class="menubar"><ul class="menu-lista">
+    <li><a href="#seccion1">Configuración</a></li>
+    <li><a href="#seccion2">Estadísticas</a></li>
+  </ul></div>
   <div class="container">
     <h1>WasaChat - Panel de Control</h1>
-    <div id="userInfo"><button id="logoutBtn" class="danger" style="width:70px;margin:10px;">Cerrar sesión</button></div>
+    <div id="userInfo"></div>
+    <div id="debug">Cargando datos del Worker...</div>
+
      <div class="seccion-stats">
       <div id="section-analytics">
         <div class="content-card">
@@ -549,10 +543,9 @@ nav {
       <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
       <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
     </div>
+    <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
   </div>
-    
 </div>
-  
   </div>
   <div id="modal-cambiar-dominio" class="modal-fondo">
     <div class="modal-box">
@@ -688,19 +681,7 @@ nav {
   </div>
 
 <script>
-  const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev'; // CAMBIA ESTO por tu URL real de Cloudflare
-  const BOT_ID = localStorage.getItem('bot_id');
-  const botId = BOT_ID;
-
-// Si no hay bot_id, lo rajamos al login
-if (!BOT_ID) {
-  alert('Tenés que loguearte primero');
-  window.location.href = '/index.html'; // Cambia esto por tu página de login
-}
-  
-   
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
-
 
     let currentUser = null;
     let userData = null;
@@ -720,6 +701,7 @@ if (!BOT_ID) {
       callback: '',
     });
 
+    const botId = localStorage.getItem('bot_id');
     const userEmail = localStorage.getItem('user_email');
 
     if (!botId ||!userEmail) {
@@ -805,7 +787,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: BOT_ID, domain: dominio })
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
         });
         userData.domain = dominio;
         showLoading(false);
@@ -832,7 +814,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: BOT_ID, domain: nuevo })
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
         });
         userData.domain = nuevo;
         document.getElementById('dominioActual').textContent = nuevo;
@@ -865,7 +847,7 @@ if (!BOT_ID) {
     }
 
     function generarCodigoWidget() {
-      const botIdFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+      const botIdFinal = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
       const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
       if (document.getElementById('codigoWidgetModal')) {
@@ -978,7 +960,7 @@ if (!BOT_ID) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            bot_id: BOT_ID, 
+            bot_id: userData.bot_id, 
             config: {...userData.config, avatar: url }
           })
         });
@@ -1013,7 +995,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: BOT_ID, config })
+          body: JSON.stringify({ bot_id: userData.bot_id, config })
         });
         userData.config = config;
         document.getElementById('colorWidget').value = config.color;
@@ -1150,19 +1132,9 @@ if (!BOT_ID) {
     });
 
     function marcarCambiosPendientes() {
-  // NO hacer JSON.stringify a datosProductos
-  fetch(API_URL + '/config', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      bot_id: BOT_ID,
-      data: {
-        productos: datosProductos, // Array directo, NO stringify
-        faq: datosFAQ
-      }
-    })
-  });
-}
+      cambiosPendientes = true;
+      document.getElementById('cambiosPendientes').style.display = 'block';
+    }
 
     async function abrirEditor(tab) {
       currentTab = tab;
@@ -1204,6 +1176,7 @@ if (!BOT_ID) {
     function limpiarFormProductos() {
       document.getElementById('inputProducto').value = '';
       document.getElementById('inputPrecio').value = '';
+      document.getElementById('inputStock').value = '';
       document.getElementById('inputDesc').value = '';
       document.getElementById('inputFoto').value = '';
       document.getElementById('inputUrlProd').value = '';
@@ -1213,29 +1186,25 @@ if (!BOT_ID) {
       document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
     }
 
-    function limpiarFormProductos() {
-  document.getElementById('inputProducto').value = '';
-  document.getElementById('inputPrecio').value = '';
-  document.getElementById('inputUrlProd').value = '';
-  document.getElementById('inputFoto').value = '';
-  document.getElementById('inputDesc').value = '';
-  document.getElementById('inputKeywords').value = '';
-  document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
-  document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
-  document.getElementById('modoEdicionProd').classList.add('hidden');
-  document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
-}
+    function limpiarFormConfig() {
+      document.getElementById('inputPregunta').value = '';
+      document.getElementById('inputRespuesta').value = '';
+      document.getElementById('inputClaves').value = '';
+      document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
+      document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
+      document.getElementById('modoEdicionConfig').classList.add('hidden');
+      document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
+    }
 
     function renderTablaProductos() {
-  const tbody = document.querySelector('#miTabla tbody');
-  tbody.innerHTML = '';
-  datosProductos.forEach((row, i) => {
-    const tr = tbody.insertRow();
-    const keywordsStr = Array.isArray(row.keywords)? row.keywords.join(', ') : (row.keywords || '');
-    tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.url||''}</td><td>${row.foto||''}</td><td>${row.desc||''}</td><td>${keywordsStr}</td>`;
-    tr.onclick = () => seleccionarFila(tr, i, 'productos');
-  });
-}
+      const tbody = document.querySelector('#miTabla tbody');
+      tbody.innerHTML = '';
+      datosProductos.forEach((row, i) => {
+        const tr = tbody.insertRow();
+        tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.stock||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
+        tr.onclick = () => seleccionarFila(tr, i, 'productos');
+      });
+    }
 
     function renderTablaConfig() {
       const tbody = document.querySelector('#miTablaConfig tbody');
@@ -1248,26 +1217,26 @@ if (!BOT_ID) {
     }
 
     function seleccionarFila(row, index, tipo) {
-  document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
-  row.classList.add('seleccionada');
-  filaSeleccionada = {index, tipo};
-  modoEdicion = true;
-  indiceEdicion = index;
+      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
+      row.classList.add('seleccionada');
+      filaSeleccionada = {index, tipo};
+      modoEdicion = true;
+      indiceEdicion = index;
 
-  if (tipo === 'productos') {
-    const datos = datosProductos[index];
-    document.getElementById('inputProducto').value = datos.nombre || '';
-    document.getElementById('inputPrecio').value = datos.precio || '';
-    document.getElementById('inputUrlProd').value = datos.url || '';
-    document.getElementById('inputFoto').value = datos.foto || '';
-    document.getElementById('inputDesc').value = datos.desc || '';
-    document.getElementById('inputKeywords').value = Array.isArray(datos.keywords)? datos.keywords.join(', ') : (datos.keywords || '');
-    document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
-    document.getElementById('tituloFormProd').textContent = 'Editar Producto';
-    document.getElementById('modoEdicionProd').classList.remove('hidden');
-    document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
-    document.getElementById('btnBorrar').disabled = false;
-  } else {
+      if (tipo === 'productos') {
+        const datos = datosProductos[index];
+        document.getElementById('inputProducto').value = datos.nombre || '';
+        document.getElementById('inputPrecio').value = datos.precio || '';
+        document.getElementById('inputStock').value = datos.stock || '';
+        document.getElementById('inputDesc').value = datos.desc || '';
+        document.getElementById('inputFoto').value = datos.foto || '';
+        document.getElementById('inputUrlProd').value = datos.url || '';
+        document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
+        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+        document.getElementById('modoEdicionProd').classList.remove('hidden');
+        document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
+        document.getElementById('btnBorrar').disabled = false;
+      } else {
         const datos = datosConfig[index]; // FIX: era datosConfig, no datosConfig[index]
         document.getElementById('inputPregunta').value = datos.pregunta || '';
         document.getElementById('inputRespuesta').value = datos.respuesta || '';
@@ -1280,54 +1249,30 @@ if (!BOT_ID) {
       }
     }
 
-     document.getElementById('btnGuardar').addEventListener('click', async () => {
-  const prod = document.getElementById('inputProducto').value.trim();
-  const precio = document.getElementById('inputPrecio').value.trim();
-  const urlProd = document.getElementById('inputUrlProd').value.trim();
-  const foto = document.getElementById('inputFoto').value.trim();
-  const desc = document.getElementById('inputDesc').value.trim();
-  const keywordsInput = document.getElementById('inputKeywords').value.trim();
-  let keywords = keywordsInput? keywordsInput.split(',').map(k => k.trim()).filter(k => k) : [];
+    document.getElementById('btnGuardar').addEventListener('click', () => {
+      const prod = document.getElementById('inputProducto').value;
+      const precio = document.getElementById('inputPrecio').value;
+      const stock = document.getElementById('inputStock').value;
+      const desc = document.getElementById('inputDesc').value;
+      const foto = document.getElementById('inputFoto').value;
+      const urlProd = document.getElementById('inputUrlProd').value;
+      if(!prod ||!precio ||!stock) return alert("Completá nombre, precio y stock");
 
-  if(!prod ||!precio ||!urlProd) return alert("Completá nombre, precio y URL producto");
+      const nuevoProd = {nombre: prod, precio, stock, desc, foto, url: urlProd};
 
-  const btnGuardar = document.getElementById('btnGuardar');
-  const textoOriginal = btnGuardar.textContent;
-  btnGuardar.textContent = 'Generando keywords...';
-  btnGuardar.disabled = true;
+      if (modoEdicion && indiceEdicion!== null) {
+        datosProductos[indiceEdicion] = nuevoProd;
+        modoEdicion = false;
+        indiceEdicion = null;
+        limpiarFormProductos();
+      } else {
+        datosProductos.push(nuevoProd);
+        limpiarFormProductos();
+      }
 
-  try {
-    const res = await fetch(API_URL + '/enrich-keywords', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ nombre: prod, descripcion: desc })
+      renderTablaProductos();
+      marcarCambiosPendientes();
     });
-    const data = await res.json();
-    if (data.keywords_auto && Array.isArray(data.keywords_auto)) {
-      keywords = [...new Set([...keywords,...data.keywords_auto])];
-    }
-  } catch (e) {
-    console.log('Error enriqueciendo keywords', e);
-  }
-
-  btnGuardar.textContent = textoOriginal;
-  btnGuardar.disabled = false;
-
-  const nuevoProd = {nombre: prod, precio, url: urlProd, foto, desc, keywords};
-
-  if (modoEdicion && indiceEdicion!== null) {
-    datosProductos[indiceEdicion] = nuevoProd;
-    modoEdicion = false;
-    indiceEdicion = null;
-    limpiarFormProductos();
-  } else {
-    datosProductos.push(nuevoProd);
-    limpiarFormProductos();
-  }
-
-  renderTablaProductos();
-  marcarCambiosPendientes();
-});
 
     document.getElementById('btnCancelarEdicionProd').addEventListener('click', () => {
       modoEdicion = false;
@@ -1401,7 +1346,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: BOT_ID, data: { productos: datosProductos } })
+          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -1419,7 +1364,7 @@ if (!BOT_ID) {
         await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: BOT_ID, data: { faq: datosConfig } })
+          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -1432,30 +1377,30 @@ if (!BOT_ID) {
     });
 
     document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
-  const file = document.getElementById('csvProductos').files[0];
-  if (!file) return alert('Seleccioná un archivo CSV');
+      const file = document.getElementById('csvProductos').files[0];
+      if (!file) return alert('Seleccioná un archivo CSV');
 
-  const text = await file.text();
-  const lines = text.split('\n').filter(l => l.trim());
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
 
-  if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
+      if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
 
-  datosProductos = lines.slice(1).map(line => {
-    const vals = line.split(',');
-    return {
-      nombre: vals[0]||'',
-      precio: vals[1]||'',
-      url: vals[2]||'',
-      foto: vals[3]||'',
-      desc: vals[4]||'',
-      keywords: vals[5]? vals[5].split(',').map(k => k.trim()).filter(k => k) : []
-    };
-  });
+      datosProductos = lines.slice(1).map(line => {
+        const vals = line.split(',');
+        return {
+          nombre: vals[0]||'',
+          precio: vals[1]||'',
+          stock: vals[2]||'',
+          desc: vals[3]||'',
+          foto: vals[4]||'',
+          url: vals[5]||''
+        };
+      });
 
-  renderTablaProductos();
-  marcarCambiosPendientes();
-  document.getElementById('csvProductos').value = '';
-});
+      renderTablaProductos();
+      marcarCambiosPendientes();
+      document.getElementById('csvProductos').value = '';
+    });
 
     document.getElementById('btnCargarCsvConfig').addEventListener('click', async () => {
       const file = document.getElementById('csvConfig').files[0];
