@@ -855,7 +855,16 @@ nav {
     document.getElementById('cambiosPendientes').style.display = 'none';
   }
 
-  function copiarCodigo() {
+  function generarCodigoWidget() {
+    const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+    const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
+    document.getElementById('codigoWidget').value = codigo;
+    if (document.getElementById('codigoWidgetModal')) {
+      document.getElementById('codigoWidgetModal').value = codigo;
+    }
+  }
+
+    function copiarCodigo() {
     const textarea = document.getElementById('codigoWidget');
     textarea.select();
     document.execCommand('copy');
@@ -877,98 +886,7 @@ nav {
     });
   }
 
-  // ===== FUNCIONES PARA ABRIR EDITORES (CORREGIDAS) =====
-  
-  function abrirEditor(tab) {
-    console.log('🔵 abrirEditor llamado con tab:', tab);
-    
-    const editor = document.getElementById('editor');
-    const editorWidget = document.getElementById('editor-widget');
-    
-    if (!editor) {
-      console.error('❌ No se encontró el elemento #editor');
-      alert('ERROR: No existe <div id="editor">');
-      return;
-    }
-    
-    // Cerrar el widget si está abierto
-    if (editorWidget) {
-      editorWidget.style.display = 'none';
-    }
-    
-    // Abrir el editor de tablas
-    editor.style.display = 'flex';
-    console.log('✅ Editor abierto');
-    
-    currentTab = tab;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    
-    const pendientes = document.getElementById('cambiosPendientes');
-    if (pendientes) pendientes.style.display = 'none';
-    
-    document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
-
-    if (tab === 'productos') {
-      document.getElementById('form-productos').classList.remove('hidden');
-      document.getElementById('form-config').classList.add('hidden');
-      document.getElementById('tabla-productos').classList.remove('hidden');
-      document.getElementById('tabla-config').classList.add('hidden');
-      limpiarFormProductos();
-    } else {
-      document.getElementById('form-productos').classList.add('hidden');
-      document.getElementById('form-config').classList.remove('hidden');
-      document.getElementById('tabla-productos').classList.add('hidden');
-      document.getElementById('tabla-config').classList.remove('hidden');
-      limpiarFormConfig();
-    }
-  }
-
-  function cerrarEditor() {
-    console.log('🔴 cerrarEditor llamado');
-    
-    if (cambiosPendientes) {
-      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) {
-        return;
-      }
-    }
-    
-    const editor = document.getElementById('editor');
-    if (editor) {
-      editor.style.display = 'none';
-      console.log('✅ Editor cerrado');
-    }
-    
-    filaSeleccionada = null;
-    modoEdicion = false;
-    indiceEdicion = null;
-    cambiosPendientes = false;
-    limpiarFormProductos();
-    limpiarFormConfig();
-  }
-
   function abrirEditorWidget() {
-    console.log('🟢 abrirEditorWidget llamado');
-    
-    const editor = document.getElementById('editor');
-    const editorWidget = document.getElementById('editor-widget');
-    
-    if (!editorWidget) {
-      console.error('❌ No se encontró el elemento #editor-widget');
-      alert('Error: No se encontró el widget editor');
-      return;
-    }
-    
-    // Cerrar el editor de tablas si está abierto
-    if (editor) {
-      editor.style.display = 'none';
-    }
-    
-    // Abrir el widget editor
-    editorWidget.style.display = 'flex';
-    console.log('✅ Widget editor abierto');
-    
     const cfg = userData.config || {};
     document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
     document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
@@ -988,17 +906,9 @@ nav {
       console.log('Token se pedirá al subir imagen');
     });
 
+    document.getElementById('editor-widget').classList.add('active');
     generarCodigoWidget();
     renderizarPreviewWidget();
-  }
-
-  function cerrarEditorWidget() {
-    console.log('🔴 cerrarEditorWidget llamado');
-    const editorWidget = document.getElementById('editor-widget');
-    if (editorWidget) {
-      editorWidget.style.display = 'none';
-      console.log('✅ Widget editor cerrado');
-    }
   }
 
   async function subirAvatarADrive(file) {
@@ -1088,6 +998,10 @@ nav {
       document.getElementById('avatarPreview').innerHTML = '💬';
       console.error(err);
     }
+  }
+
+  function cerrarEditorWidget() {
+    document.getElementById('editor-widget').classList.remove('active');
   }
 
   async function guardarConfigWidgetModal() {
@@ -1207,7 +1121,42 @@ nav {
     `;
   }
 
-  // ===== FUNCIONES DE TABLAS =====
+  function abrirEditor(tab) {
+    currentTab = tab;
+    modoEdicion = false;
+    indiceEdicion = null;
+    cambiosPendientes = false;
+    document.getElementById('cambiosPendientes').style.display = 'none';
+    document.getElementById('editor').classList.add('active');
+    document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
+
+    if (tab === 'productos') {
+      document.getElementById('form-productos').classList.remove('hidden');
+      document.getElementById('form-config').classList.add('hidden');
+      document.getElementById('tabla-productos').classList.remove('hidden');
+      document.getElementById('tabla-config').classList.add('hidden');
+      limpiarFormProductos();
+    } else {
+      document.getElementById('form-productos').classList.add('hidden');
+      document.getElementById('form-config').classList.remove('hidden');
+      document.getElementById('tabla-productos').classList.add('hidden');
+      document.getElementById('tabla-config').classList.remove('hidden');
+      limpiarFormConfig();
+    }
+  }
+
+  function cerrarEditor() {
+    if (cambiosPendientes) {
+      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
+    }
+    document.getElementById('editor').classList.remove('active');
+    filaSeleccionada = null;
+    modoEdicion = false;
+    indiceEdicion = null;
+    cambiosPendientes = false;
+    limpiarFormProductos();
+    limpiarFormConfig();
+  }
 
   function limpiarFormProductos() {
     document.getElementById('inputProducto').value = '';
@@ -1220,7 +1169,6 @@ nav {
     document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
     document.getElementById('modoEdicionProd').classList.add('hidden');
     document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
-    document.getElementById('btnBorrar').disabled = true;
   }
 
   function limpiarFormConfig() {
@@ -1231,7 +1179,6 @@ nav {
     document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
     document.getElementById('modoEdicionConfig').classList.add('hidden');
     document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
-    document.getElementById('btnBorrarConfig').disabled = true;
   }
 
   function renderTablaProductos() {
@@ -1527,6 +1474,24 @@ nav {
     }
   }
 
+  function cargarConfigWidget() {
+    const cfg = userData.config || {};
+    document.getElementById('colorWidget').value = cfg.color || '#25D366';
+    document.getElementById('posWidget').value = cfg.pos || 'right';
+    document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+    generarCodigoWidget();
+    actualizarPreviewMini();
+  }
+
+  function cargarDatosTablas() {
+    datosProductos = userData.data?.productos || [];
+    datosConfig = userData.data?.faq || [];
+    renderTablaProductos();
+    renderTablaConfig();
+    cambiosPendientes = false;
+    document.getElementById('cambiosPendientes').style.display = 'none';
+  }
+
   function generarCodigoWidget() {
     const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
     const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
@@ -1535,250 +1500,32 @@ nav {
       document.getElementById('codigoWidgetModal').value = codigo;
     }
   }
-
-  // ===== NAVEGACIÓN DE SOLAPAS =====
-  document.querySelectorAll('.sidebar-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      const section = e.target.dataset.section;
-      showSection(section);
-    });
-  });
-
   function showSection(section) {
-    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-    document.querySelector(`[data-section="${section}"]`).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+  document.querySelector(`[data-section="${section}"]`).classList.add('active');
 
-    if (section === 'configuracion') {
-      document.getElementById('section-configuracion').classList.remove('hidden');
-      document.getElementById('section-analytics').classList.add('hidden');
-    } else if (section === 'analytics') {
-      document.getElementById('section-configuracion').classList.add('hidden');
-      document.getElementById('section-analytics').classList.remove('hidden');
-      cargarAnalytics();
-    }
+  if (section === 'configuracion') {
+    document.getElementById('section-configuracion').classList.remove('hidden');
+    document.getElementById('section-analytics').classList.add('hidden');
+  } else if (section === 'analytics') {
+    document.getElementById('section-configuracion').classList.add('hidden');
+    document.getElementById('section-analytics').classList.remove('hidden');
+    cargarAnalytics();
   }
+}
 
-  function cargarAnalytics() {
-    if (!userData || !userData.stats) return;
-    const stats = userData.stats;
-    document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
-    document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
-    document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
-    document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
-    document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
-     ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
-      : '-';
-  }
-
-  // ===== INICIALIZACIÓN DE BOTONES DE EDITOR =====
-  // IMPORTANTE: Estos event listeners son los que faltaban
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔵 Inicializando botones de editor...');
-    
-    // Buscar botones por ID o clase
-    const btnProductos = document.querySelector('[onclick*="abrirEditor(\'productos\')"]');
-    const btnConfig = document.querySelector('[onclick*="abrirEditor(\'config\')"]');
-    
-    console.log('Botón productos encontrado:', !!btnProductos);
-    console.log('Botón config encontrado:', !!btnConfig);
-    
-    // Si no se encontraron por onclick, buscarlos por texto
-    if (!btnProductos) {
-      const allButtons = document.querySelectorAll('button');
-      allButtons.forEach(btn => {
-        if (btn.textContent.includes('Editar Tabla de Productos')) {
-          console.log('✅ Botón productos encontrado por texto');
-          btn.onclick = function() { abrirEditor('productos'); };
-        }
-        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
-          console.log('✅ Botón config encontrado por texto');
-          btn.onclick = function() { abrirEditor('config'); };
-        }
-      });
-    }
-  });
-
-  // ASIGNAR FUNCIONES AL SCOPE GLOBAL PARA QUE LOS onclicks FUNCIONEN
-  window.abrirEditor = abrirEditor;
-  window.cerrarEditor = cerrarEditor;
-  window.abrirEditorWidget = abrirEditorWidget;
-  window.cerrarEditorWidget = cerrarEditorWidget;
-  window.guardarProducto = guardarProducto;
-  window.guardarFaq = guardarFaq;
-  window.cancelarEdicionProd = cancelarEdicionProd;
-  window.cancelarEdicionConfig = cancelarEdicionConfig;
-  window.confirmarBorrar = confirmarBorrar;
-  window.subirProductos = subirProductos;
-  window.subirFaq = subirFaq;
-  window.cargarCsvProductos = cargarCsvProductos;
-  window.cargarCsvConfig = cargarCsvConfig;
-  window.mostrarCambiarDominio = mostrarCambiarDominio;
-  window.cambiarDominio = cambiarDominio;
-  window.cerrarModales = cerrarModales;
-  window.copiarCodigo = copiarCodigo;
-  window.copiarCodigoModal = copiarCodigoModal;
-  window.guardarConfigWidgetModal = guardarConfigWidgetModal;
-  window.handleAvatarUpload = handleAvatarUpload;
-  window.irAComprar = irAComprar;
-  window.logout = logout;
-
-  console.log('✅ Todas las funciones asignadas al window global');
-  console.log('✅ Script cargado correctamente');
-
-  // ===== SOLUCIÓN DEFINITIVA PARA LOS BOTONES =====
-// Forzar que los botones tengan los onclick correctos
-(function() {
-    console.log('🔧 Aplicando fix definitivo para botones...');
-    
-    // Buscar todos los botones
-    const allButtons = document.querySelectorAll('button');
-    
-    allButtons.forEach(btn => {
-        // Buscar botón de productos
-        if (btn.textContent.includes('Editar Tabla de Productos')) {
-            console.log('✅ Fix aplicado a botón de productos');
-            // Remover cualquier onclick existente y asignar el nuestro
-            btn.removeAttribute('onclick');
-            btn.onclick = function(e) {
-                e.preventDefault();
-                console.log('🟢 Click en Editar Productos');
-                abrirEditor('productos');
-            };
-        }
-        
-        // Buscar botón de preguntas
-        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
-            console.log('✅ Fix aplicado a botón de preguntas');
-            btn.removeAttribute('onclick');
-            btn.onclick = function(e) {
-                e.preventDefault();
-                console.log('🟢 Click en Editar Preguntas');
-                abrirEditor('config');
-            };
-        }
-        
-        // Buscar botón de personalizar widget
-        if (btn.textContent.includes('Personalizar apariencia')) {
-            console.log('✅ Fix aplicado a botón de widget');
-            btn.removeAttribute('onclick');
-            btn.onclick = function(e) {
-                e.preventDefault();
-                console.log('🟢 Click en Personalizar Widget');
-                abrirEditorWidget();
-            };
-        }
-    });
-    
-    // También buscar por los onclick en el HTML y reemplazarlos
-    document.querySelectorAll('[onclick*="abrirEditor"]').forEach(el => {
-        const onclickAttr = el.getAttribute('onclick');
-        if (onclickAttr.includes("'productos'")) {
-            console.log('✅ Reemplazando onclick de productos');
-            el.removeAttribute('onclick');
-            el.onclick = function(e) {
-                e.preventDefault();
-                abrirEditor('productos');
-            };
-        } else if (onclickAttr.includes("'config'")) {
-            console.log('✅ Reemplazando onclick de config');
-            el.removeAttribute('onclick');
-            el.onclick = function(e) {
-                e.preventDefault();
-                abrirEditor('config');
-            };
-        }
-    });
-    
-    console.log('✅ Fix de botones aplicado correctamente');
-})();
-
-// También asegurar que las funciones estén en window (por si acaso)
-window.abrirEditor = abrirEditor;
-window.cerrarEditor = cerrarEditor;
-window.abrirEditorWidget = abrirEditorWidget;
-window.cerrarEditorWidget = cerrarEditorWidget;
-
-console.log('✅ Todo listo - Los botones deberían funcionar ahora');
-
-  // ===== FIX ULTRA DEFINITIVO =====
-// Esto fuerza la apertura del editor directamente
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Aplicando fix ultra definitivo...');
-    
-    // Buscar todos los botones y reemplazar sus onclick
-    document.querySelectorAll('button').forEach(btn => {
-        const texto = btn.textContent.trim();
-        
-        if (texto.includes('Editar Tabla de Productos')) {
-            btn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🟢 Click en productos - FORZANDO apertura');
-                
-                // FORZAR apertura directa
-                const editor = document.getElementById('editor');
-                if (editor) {
-                    editor.style.display = 'flex';
-                    editor.style.position = 'fixed';
-                    editor.style.top = '0';
-                    editor.style.left = '0';
-                    editor.style.width = '100%';
-                    editor.style.height = '100%';
-                    editor.style.zIndex = '99999';
-                    editor.style.background = 'white';
-                    editor.style.visibility = 'visible';
-                    
-                    // Mostrar contenido
-                    document.getElementById('form-productos').classList.remove('hidden');
-                    document.getElementById('form-config').classList.add('hidden');
-                    document.getElementById('tabla-productos').classList.remove('hidden');
-                    document.getElementById('tabla-config').classList.add('hidden');
-                    document.getElementById('editor-titulo').textContent = 'Editor de Productos';
-                    
-                    console.log('✅ Editor de productos FORZADO');
-                } else {
-                    alert('ERROR: No se encontró el editor');
-                }
-            };
-        }
-        
-        if (texto.includes('Editar Preguntas y Respuestas')) {
-            btn.onclick = function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('🟢 Click en preguntas - FORZANDO apertura');
-                
-                const editor = document.getElementById('editor');
-                if (editor) {
-                    editor.style.display = 'flex';
-                    editor.style.position = 'fixed';
-                    editor.style.top = '0';
-                    editor.style.left = '0';
-                    editor.style.width = '100%';
-                    editor.style.height = '100%';
-                    editor.style.zIndex = '99999';
-                    editor.style.background = 'white';
-                    editor.style.visibility = 'visible';
-                    
-                    document.getElementById('form-productos').classList.add('hidden');
-                    document.getElementById('form-config').classList.remove('hidden');
-                    document.getElementById('tabla-productos').classList.add('hidden');
-                    document.getElementById('tabla-config').classList.remove('hidden');
-                    document.getElementById('editor-titulo').textContent = 'Editor de FAQs';
-                    
-                    console.log('✅ Editor de preguntas FORZADO');
-                } else {
-                    alert('ERROR: No se encontró el editor');
-                }
-            };
-        }
-    });
-    
-    console.log('✅ Fix ultra definitivo aplicado');
-});
-  
+function cargarAnalytics() {
+  if (!userData || !userData.stats) return;
+  const stats = userData.stats;
+  document.getElementById('statSesiones').textContent = stats.sesiones_totales || '0';
+  document.getElementById('statMensajes').textContent = stats.mensajes_totales || '0';
+  document.getElementById('statExitosas').textContent = stats.respuestas_exitosas || '0';
+  document.getElementById('statFallidas').textContent = stats.respuestas_fallidas || '0';
+  document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
+   ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
+    : '-';
+}
 </script>
-
 </body>
 </html>
  
