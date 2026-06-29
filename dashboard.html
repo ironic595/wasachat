@@ -318,6 +318,66 @@ nav {
     border-left: 4px solid #4285f4;
   }
 }
+
+      /* Ocultamos los selectores radio del flujo visual */
+.radio-tab {
+  display: none !important;
+}
+
+/* Ocultamos ambas pantallas del Dashboard por defecto */
+.seccion-config,
+.seccion-stats {
+  display: none;
+}
+
+/* Si se selecciona Configuración, se activa su bloque */
+#tab-config:checked ~ .allcont .seccion-config {
+  display: block;
+}
+
+/* Si se selecciona Estadísticas, se activa su bloque */
+#tab-stats:checked ~ .allcont .seccion-stats {
+  display: block;
+}
+
+/* Convierte los labels del menú en botones interactivos */
+.menu-btn {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 0;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menu-btn:hover {
+  background: #333;
+}
+
+/* Resalta visualmente el botón que está activo */
+#tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
+#tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
+  background: #222;
+  color: #4285f4;
+  border-bottom: 2px solid #4285f4;
+}
+
+@media (min-width: 992px) {
+  .menu-btn {
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 1px solid #222;
+  }
+  #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
+  #tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
+    border-bottom: 1px solid #222;
+    border-left: 4px solid #4285f4;
+  }
+}
+
     
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
@@ -374,6 +434,14 @@ nav {
 
 </head>
 <body>
+
+<!-- Interruptor del menú desplegable de documentación -->
+<input type="checkbox" id="menu-toggle" class="menu-checkbox">
+
+<!-- Interruptores de sección para Alternar entre Configuración y Estadísticas -->
+<input type="radio" id="tab-config" name="secciones-panel" class="radio-tab" checked>
+<input type="radio" id="tab-stats" name="secciones-panel" class="radio-tab">
+
 <nav>
   <a href="/" class="logo">
     <img src="assets/img/waslo.png" alt="Wasa.Chat">
@@ -384,40 +452,36 @@ nav {
     <span></span>
     <span></span>
   </label>
-    <input type="checkbox" id="menu-toggle" class="menu-checkbox">
-<!-- El nuevo Menú Desplegable -->
-  <div class="menu-desplegable">
-    <ul class="desplegable-lista">
-      <li class="titulo-seccion">Documentación</li>
-      <li><a href="#guia-inicio">Guía de Inicio</a></li>
-      <li><a href="#api-referencia">Referencia de API</a></li>
-      <li><a href="#webhooks">Webhooks</a></li>
-      <li><a href="#soporte">Soporte Técnico</a></li>
-    </ul>
-  </div>
 </nav>
-  <input type="checkbox" id="menu-toggle" class="menu-checkbox">
-<!-- El nuevo Menú Desplegable -->
-  <div class="menu-desplegable">
-    <ul class="desplegable-lista">
-      <li class="titulo-seccion">Documentación</li>
-      <li><a href="#guia-inicio">Guía de Inicio</a></li>
-      <li><a href="#api-referencia">Referencia de API</a></li>
-      <li><a href="#webhooks">Webhooks</a></li>
-      <li><a href="#soporte">Soporte Técnico</a></li>
+
+<!-- Menú Desplegable de Documentación -->
+<div class="menu-desplegable">
+  <ul class="desplegable-lista">
+    <li class="titulo-seccion">Documentación</li>
+    <li><a href="#guia-inicio">Guía de Inicio</a></li>
+    <li><a href="#api-referencia">Referencia de API</a></li>
+    <li><a href="#webhooks">Webhooks</a></li>
+    <li><a href="#soporte">Soporte Técnico</a></li>
+  </ul>
+</div>
+
+<div id="loading">Guardando...</div>
+<div class="toast" id="toast"></div>
+
+<div class="allcont">
+  <!-- El menú lateral ahora usa labels enlazados a los inputs tipo radio -->
+  <div class="menubar">
+    <ul class="menu-lista">
+      <li><label for="tab-config" class="menu-btn">⚙️ Configuración</label></li>
+      <li><label for="tab-stats" class="menu-btn">📈 Estadísticas</label></li>
     </ul>
   </div>
-<div id="loading">Guardando...</div>
-  <div class="toast" id="toast"></div>
- <div class="allcont">
-   <div class="menubar"><ul class="menu-lista">
-    <li><a href="#seccion1">Configuración</a></li>
-    <li><a href="#seccion2">Estadísticas</a></li>
-  </ul></div>
+
   <div class="container">
     <h1>WasaChat - Panel de Control</h1>
     <div id="userInfo"></div>
     <div id="debug">Cargando datos del Worker...</div>
+
 
      <div class="seccion-stats">
       <div id="section-analytics">
@@ -499,9 +563,9 @@ nav {
       <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
       <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
     </div>
-    <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
   </div>
 </div>
+  <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
   </div>
   <div id="modal-cambiar-dominio" class="modal-fondo">
     <div class="modal-box">
@@ -1436,4 +1500,3 @@ nav {
 </script>
 </body>
 </html>
- 
