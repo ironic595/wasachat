@@ -474,6 +474,9 @@ footer {
     </div>
     <div class="modal-body">
       <div id="g_id_signin"></div>
+        <div id="codigo-ref-msg" style="display:none;margin-top:15px;padding:10px;background:#dcfce7;border-radius:8px;text-align:center;font-size:14px;">
+  🎁 Usando código: <strong id="codigo-ref-text"></strong>
+</div>
       <div class="divider"><span>o</span></div>
       <p class="modal-footer-text">
         ¿No tenés cuenta? <a href="#precios">Creá una gratis</a>
@@ -738,6 +741,13 @@ footer {
     document.body.style.overflow = 'auto';
   }
 
+// Leer ?ref=WASA-XXX de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const codigoRef = urlParams.get('ref') || '';
+if (codigoRef) {
+  localStorage.setItem('codigo_referido', codigoRef.toUpperCase());
+}
+    
   window.onload = function () {
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
@@ -750,32 +760,43 @@ footer {
   };
 
   async function handleCredentialResponse(response) {
-    const idToken = response.credential;
+  const idToken = response.credential;
+  const codigo_referido = localStorage.getItem('codigo_referido') || ''; // <- NUEVO
 
-    try {
-      const res = await fetch(`${WORKER_URL}/auth`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken })
-      });
+  try {
+    const res = await fetch(`${WORKER_URL}/auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken, codigo_referido }) // <- MANDÁS EL CÓDIGO
+    });
 
-      const data = await res.json();
-      
-      if (res.ok && data.bot_id && data.email) {
-        localStorage.setItem('bot_id', data.bot_id);
-        localStorage.setItem('user_email', data.email);
-        cerrarModal();
-        btnLogin.textContent = "Mi Dashboard";
-        btnLogin.onclick = () => window.location.href = "dashboard.html";
-        window.location.href = "dashboard.html";
-      } else {
-        alert("Error al iniciar sesión: " + (data.error || 'desconocido'));
-      }
-    } catch (e) {
-      alert("Error de conexión: " + e.message);
+    const data = await res.json();
+    
+    if (res.ok && data.bot_id && data.email) {
+      localStorage.setItem('bot_id', data.bot_id);
+      localStorage.setItem('user_email', data.email);
+      localStorage.removeItem('codigo_referido'); // <- LIMPIAR DESPUÉS DE USAR
+      cerrarModal();
+      btnLogin.textContent = "Mi Dashboard";
+      btnLogin.onclick = () => window.location.href = "dashboard.html";
+      window.location.href = "dashboard.html";
+    } else {
+      alert("Error al iniciar sesión: " + (data.error || 'desconocido'));
     }
+  } catch (e) {
+    alert("Error de conexión: " + e.message);
   }
+}
 
+const urlParams = new URLSearchParams(window.location.search);
+const codigoRef = urlParams.get('ref') || '';
+if (codigoRef) {
+  localStorage.setItem('codigo_referido', codigoRef.toUpperCase());
+  // Mostrar en el modal
+  document.getElementById('codigo-ref-msg').style.display = 'block';
+  document.getElementById('codigo-ref-text').textContent = codigoRef.toUpperCase();
+}
+    
   function elegirPlan(tipo, precio) {
     localStorage.setItem('planElegido', JSON.stringify({
       tipo: tipo,
