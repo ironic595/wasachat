@@ -763,6 +763,7 @@ nav {
         mostrarPanelCorrecto();
         cargarConfigWidget();
         cargarDatosTablas();
+        cargarAnalytics(); 
       } catch(e) {
         document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
         console.error('Error:', e);
