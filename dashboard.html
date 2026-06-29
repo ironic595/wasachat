@@ -715,7 +715,7 @@ nav {
       window.location.href = 'index.html';
     } else {
       currentUser = { email: userEmail };
-      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
+      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button id="logoutBtn" class="danger" style="width:70px;margin:30px;">Cerrar sesión</button>`;
       cargarBot();
     }
 
