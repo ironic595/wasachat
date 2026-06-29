@@ -565,7 +565,7 @@ nav {
     </div>
   </div>
 </div>
-  <button id="logoutBtn" class="danger" style="width:100%;margin-top:20px;">Cerrar sesión</button>
+  
   </div>
   <div id="modal-cambiar-dominio" class="modal-fondo">
     <div class="modal-box">
@@ -728,7 +728,7 @@ nav {
       window.location.href = 'index.html';
     } else {
       currentUser = { email: userEmail };
-      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
+      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button id="logoutBtn" class="danger" style="width:60px;margin:20px;">Cerrar sesión</button>`;
       cargarBot();
     }
 
