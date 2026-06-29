@@ -701,411 +701,508 @@ nav {
   </div>
 
 <script>
-    const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
+  const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev';
+  const BOT_ID = localStorage.getItem('bot_id');
+  const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
 
-    let currentUser = null;
-    let userData = null;
-    let tokenClient;
-    let accessToken = null;
-    let currentTab = 'productos';
-    let filaSeleccionada = null;
-    let modoEdicion = false;
-    let indiceEdicion = null;
-    let datosProductos = [];
-    let datosConfig = [];
-    let cambiosPendientes = false;
+  let currentUser = null;
+  let userData = null;
+  let tokenClient;
+  let accessToken = null;
+  let currentTab = 'productos';
+  let filaSeleccionada = null;
+  let modoEdicion = false;
+  let indiceEdicion = null;
+  let datosProductos = [];
+  let datosConfig = [];
+  let cambiosPendientes = false;
 
-    tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/drive.file',
-      callback: '',
-    });
+  const userEmail = localStorage.getItem('user_email');
 
-    const botId = localStorage.getItem('bot_id');
-    const userEmail = localStorage.getItem('user_email');
+  if (!BOT_ID ||!userEmail) {
+    window.location.href = 'index.html';
+  } else {
+    currentUser = { email: userEmail };
+    document.getElementById('sidebarEmail').textContent = userEmail;
+    cargarBot();
+  }
 
-    if (!botId ||!userEmail) {
-      window.location.href = 'index.html';
-    } else {
-      currentUser = { email: userEmail };
-      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button id="logoutBtn" class="danger" style="width:60px;margin:20px;">Cerrar sesión</button>`;
-      cargarBot();
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: '',
+  });
+
+  async function cargarBot() {
+    try {
+      const res = await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: BOT_ID })
+      });
+      const data = await res.json();
+
+      document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
+      console.log('[DEBUG] Worker response:', data);
+
+      if (data.error === 'Bot no encontrado') {
+        alert('Error: Bot no encontrado');
+        return;
+      }
+
+      userData = {
+        email: userEmail,
+        bot_id: BOT_ID,
+        estado: data.estado,
+        domain: data.domain,
+        config: data.config,
+        data: data.data,
+        stats: data.stats || {}
+      };
+      mostrarPanelCorrecto();
+      cargarConfigWidget();
+      cargarDatosTablas();
+    } catch(e) {
+      document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
+      console.error('Error:', e);
     }
+  }
 
-    async function cargarBot() {
-      try {
-        const res = await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: botId })
-        });
-        const data = await res.json();
-        
-        document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
-        console.log('[DEBUG] Worker response:', data);
-        
-        if (data.error === 'Bot no encontrado') {
-          alert('Error: Bot no encontrado');
+  function mostrarPanelCorrecto() {
+    const stepDominio = document.getElementById('stepDominio');
+    const panelPrincipal = document.getElementById('panelPrincipal');
+
+    if (!userData.domain || userData.domain === null || userData.domain === '') {
+      stepDominio.classList.remove('hidden');
+      panelPrincipal.classList.add('hidden');
+    } else {
+      stepDominio.classList.add('hidden');
+      panelPrincipal.classList.remove('hidden');
+      document.getElementById('dominioActual').textContent = userData.domain;
+
+      const estadoBotSpan = document.getElementById('estadoBot');
+      const btnComprar = document.getElementById('btnComprarPlan');
+
+      if (userData.estado === 'activo' || userData.estado === 'pago') {
+        estadoBotSpan.textContent = '✅ Activo';
+        estadoBotSpan.className = 'estado-activo';
+        btnComprar.classList.add('hidden');
+      } else {
+        estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+        estadoBotSpan.className = 'estado-inactivo';
+        btnComprar.classList.remove('hidden');
+      }
+    }
+  }
+
+  function irAComprar() {
+    window.location.href = 'index.html#precios';
+  }
+
+  document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
+    let dominio = document.getElementById('dominioInput').value.trim();
+    dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
+    if (!dominio) return alert("Ingresá un dominio válido");
+
+    showLoading(true);
+    try {
+      await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: BOT_ID, domain: dominio })
+      });
+      userData.domain = dominio;
+      showLoading(false);
+      showToast('✅ Dominio guardado');
+      mostrarPanelCorrecto();
+    } catch (e) {
+      showLoading(false);
+      alert('Error: ' + e.message);
+    }
+  });
+
+  function mostrarCambiarDominio() {
+    document.getElementById('nuevoDominioInput').value = userData.domain;
+    document.getElementById('modal-cambiar-dominio').style.display = 'block';
+  }
+
+  async function cambiarDominio() {
+    let nuevo = document.getElementById('nuevoDominioInput').value.trim();
+    nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
+    if (!nuevo) return alert("Ingresá un dominio");
+
+    showLoading(true);
+    try {
+      await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: BOT_ID, domain: nuevo })
+      });
+      userData.domain = nuevo;
+      document.getElementById('dominioActual').textContent = nuevo;
+      showLoading(false);
+      cerrarModales();
+      generarCodigoWidget();
+      showToast('✅ Dominio actualizado');
+    } catch (e) {
+      showLoading(false);
+      alert('Error: ' + e.message);
+    }
+  }
+
+  function cargarConfigWidget() {
+    const cfg = userData.config || {};
+    document.getElementById('colorWidget').value = cfg.color || '#25D366';
+    document.getElementById('posWidget').value = cfg.pos || 'right';
+    document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+    generarCodigoWidget();
+    actualizarPreviewMini();
+  }
+
+  function cargarDatosTablas() {
+    datosProductos = userData.data?.productos || [];
+    datosConfig = userData.data?.faq || [];
+    renderTablaProductos();
+    renderTablaConfig();
+    cambiosPendientes = false;
+    document.getElementById('cambiosPendientes').style.display = 'none';
+  }
+
+  function copiarCodigo() {
+    const textarea = document.getElementById('codigoWidget');
+    textarea.select();
+    document.execCommand('copy');
+    showToast('📋 Código copiado');
+  }
+
+  async function asegurarTokenDrive() {
+    if (accessToken) return true;
+    return new Promise((resolve, reject) => {
+      tokenClient.callback = (resp) => {
+        if (resp.error) {
+          reject(new Error('No autorizaste Google Drive'));
           return;
         }
-        
-        userData = {
-          email: userEmail,
-          bot_id: botId,
-          estado: data.estado,
-          domain: data.domain,
-          config: data.config,
-          data: data.data
-        };
-        mostrarPanelCorrecto();
-        cargarConfigWidget();
-        cargarDatosTablas();
-      } catch(e) {
-        document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
-        console.error('Error:', e);
+        accessToken = resp.access_token;
+        resolve(true);
+      };
+      tokenClient.requestAccessToken({prompt: 'consent'});
+    });
+  }
+
+  // ===== FUNCIONES PARA ABRIR EDITORES (CORREGIDAS) =====
+  
+  function abrirEditor(tab) {
+  console.log('🔵 abrirEditor llamado con tab:', tab);
+  
+  const editor = document.getElementById('editor');
+  const editorWidget = document.getElementById('editor-widget');
+  
+  if (!editor) {
+    console.error('❌ No se encontró el elemento #editor');
+    return;
+  }
+  
+  if (editorWidget) {
+    editorWidget.classList.remove('active');
+    editorWidget.style.display = 'none';
+  }
+  
+  // Agregamos la clase active y el estilo flex
+  editor.classList.add('active');
+  editor.style.display = 'flex';
+  
+  currentTab = tab;
+  modoEdicion = false;
+  indiceEdicion = null;
+  cambiosPendientes = false;
+  
+  const pendientes = document.getElementById('cambiosPendientes');
+  if (pendientes) pendientes.style.display = 'none';
+  
+  document.getElementById('editor-titulo').textContent = tab === 'productos' ? 'Editor de Productos' : 'Editor de FAQs';
+  
+  if (tab === 'productos') {
+    document.getElementById('form-productos').classList.remove('hidden');
+    document.getElementById('form-config').classList.add('hidden');
+    document.getElementById('tabla-productos').classList.remove('hidden');
+    document.getElementById('tabla-config').classList.add('hidden');
+    limpiarFormProductos();
+  } else {
+    document.getElementById('form-productos').classList.add('hidden');
+    document.getElementById('form-config').classList.remove('hidden');
+    document.getElementById('tabla-productos').classList.add('hidden');
+    document.getElementById('tabla-config').classList.remove('hidden');
+    limpiarFormConfig();
+  }
+}
+
+
+  function cerrarEditor() {
+    console.log('🔴 cerrarEditor llamado');
+    
+    if (cambiosPendientes) {
+      if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) {
+        return;
       }
     }
+    
+    const editor = document.getElementById('editor');
+    if (editor) {
+      editor.style.display = 'none';
+      console.log('✅ Editor cerrado');
+    }
+    
+    filaSeleccionada = null;
+    modoEdicion = false;
+    indiceEdicion = null;
+    cambiosPendientes = false;
+    limpiarFormProductos();
+    limpiarFormConfig();
+  }
 
-    function mostrarPanelCorrecto() {
-      const stepDominio = document.getElementById('stepDominio');
-      const panelPrincipal = document.getElementById('panelPrincipal');
+  function abrirEditorWidget() {
+    console.log('🟢 abrirEditorWidget llamado');
+    
+    const editor = document.getElementById('editor');
+    const editorWidget = document.getElementById('editor-widget');
+    
+    if (!editorWidget) {
+      console.error('❌ No se encontró el elemento #editor-widget');
+      alert('Error: No se encontró el widget editor');
+      return;
+    }
+    
+    // Cerrar el editor de tablas si está abierto
+    if (editor) {
+      editor.style.display = 'none';
+    }
+    
+    // Abrir el widget editor
+    editorWidget.style.display = 'flex';
+    console.log('✅ Widget editor abierto');
+    
+    const cfg = userData.config || {};
+    document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
+    document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
+    document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
+    document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+    document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
+    document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
 
-      if (!userData.domain || userData.domain === null || userData.domain === '') {
-        stepDominio.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-      } else {
-        stepDominio.classList.add('hidden');
-        panelPrincipal.classList.remove('hidden');
-        document.getElementById('dominioActual').textContent = userData.domain;
-
-        const estadoBotSpan = document.getElementById('estadoBot');
-        const btnComprar = document.getElementById('btnComprarPlan');
-
-        if (userData.estado === 'activo' || userData.estado === 'pago') {
-          estadoBotSpan.textContent = '✅ Activo';
-          estadoBotSpan.className = 'estado-activo';
-          btnComprar.classList.add('hidden');
-        } else {
-          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-          estadoBotSpan.className = 'estado-inactivo';
-          btnComprar.classList.remove('hidden');
-        }
-      }
+    if (cfg.avatar) {
+      document.getElementById('avatarPreview').innerHTML =
+        `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
+    } else {
+      document.getElementById('avatarPreview').innerHTML = '💬';
     }
 
-    function irAComprar() {
-      window.location.href = 'index.html#precios';
-    }
-
-    document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
-      let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
-      if (!dominio) return alert("Ingresá un dominio válido");
-
-      showLoading(true);
-      try {
-        await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
-        });
-        userData.domain = dominio;
-        showLoading(false);
-        showToast('✅ Dominio guardado');
-        mostrarPanelCorrecto();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
+    asegurarTokenDrive().catch(err => {
+      console.log('Token se pedirá al subir imagen');
     });
 
-    function mostrarCambiarDominio() {
-      document.getElementById('nuevoDominioInput').value = userData.domain;
-      document.getElementById('modal-cambiar-dominio').style.display = 'block';
+    generarCodigoWidget();
+    renderizarPreviewWidget();
+  }
+
+  function cerrarEditorWidget() {
+    console.log('🔴 cerrarEditorWidget llamado');
+    const editorWidget = document.getElementById('editor-widget');
+    if (editorWidget) {
+      editorWidget.style.display = 'none';
+      console.log('✅ Widget editor cerrado');
+    }
+  }
+
+  async function subirAvatarADrive(file) {
+    if (!file) return null;
+    if (file.size > 2 * 1024 * 1024) {
+      throw new Error('La imagen debe pesar menos de 2MB');
+    }
+    if (!accessToken) {
+      await asegurarTokenDrive();
     }
 
-    async function cambiarDominio() {
-      let nuevo = document.getElementById('nuevoDominioInput').value.trim();
-      nuevo = nuevo.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '');
-      if (!nuevo) return alert("Ingresá un dominio");
-
-      showLoading(true);
-      try {
-        await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
-        });
-        userData.domain = nuevo;
-        document.getElementById('dominioActual').textContent = nuevo;
-        showLoading(false);
-        cerrarModales();
-        generarCodigoWidget();
-        showToast('✅ Dominio actualizado');
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
-    }
-
-    function cargarConfigWidget() {
-      const cfg = userData.config || {};
-      document.getElementById('colorWidget').value = cfg.color || '#25D366';
-      document.getElementById('posWidget').value = cfg.pos || 'right';
-      document.getElementById('saludoWidget').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-      generarCodigoWidget();
-      actualizarPreviewMini();
-    }
-
-    function cargarDatosTablas() {
-      datosProductos = userData.data?.productos || [];
-      datosConfig = userData.data?.faq || [];
-      renderTablaProductos();
-      renderTablaConfig();
-      cambiosPendientes = false;
-      document.getElementById('cambiosPendientes').style.display = 'none';
-    }
-
-    function generarCodigoWidget() {
-      const botIdFinal = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
-      document.getElementById('codigoWidget').value = codigo;
-      if (document.getElementById('codigoWidgetModal')) {
-        document.getElementById('codigoWidgetModal').value = codigo;
-      }
-    }
-
-    function copiarCodigo() {
-      const textarea = document.getElementById('codigoWidget');
-      textarea.select();
-      document.execCommand('copy');
-      showToast('📋 Código copiado');
-    }
-
-    async function asegurarTokenDrive() {
-      if (accessToken) return true;
-      return new Promise((resolve, reject) => {
-        tokenClient.callback = (resp) => {
-          if (resp.error) {
-            reject(new Error('No autorizaste Google Drive'));
-            return;
-          }
-          accessToken = resp.access_token;
-          resolve(true);
-        };
-        tokenClient.requestAccessToken({prompt: 'consent'});
-      });
-    }
-
-    function abrirEditorWidget() {
-      const cfg = userData.config || {};
-      document.getElementById('colorWidgetEdit').value = cfg.color || '#25D366';
-      document.getElementById('themeWidgetEdit').value = cfg.theme || 'light';
-      document.getElementById('posWidgetEdit').value = cfg.pos || 'right';
-      document.getElementById('saludoWidgetEdit').value = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
-      document.getElementById('nombreWidgetEdit').value = cfg.nombre || 'WasaChat';
-      document.getElementById('avatarWidgetEdit').value = cfg.avatar || '';
-
-      if (cfg.avatar) {
-        document.getElementById('avatarPreview').innerHTML =
-          `<img src="${cfg.avatar}" style="width:100%; height:100%; object-fit:cover;">`;
-      } else {
-        document.getElementById('avatarPreview').innerHTML = '💬';
-      }
-
-      asegurarTokenDrive().catch(err => {
-        console.log('Token se pedirá al subir imagen');
-      });
-
-      document.getElementById('editor-widget').classList.add('active');
-      generarCodigoWidget();
-      renderizarPreviewWidget();
-
-      document.getElementById('colorWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-      document.getElementById('themeWidgetEdit').addEventListener('change', renderizarPreviewWidget);
-      document.getElementById('posWidgetEdit').addEventListener('change', renderizarPreviewWidget);
-      document.getElementById('saludoWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-      document.getElementById('nombreWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-      document.getElementById('avatarWidgetEdit').addEventListener('input', renderizarPreviewWidget);
-    }
-
-    async function subirAvatarADrive(file) {
-      if (!file) return null;
-
-      if (file.size > 2 * 1024 * 1024) {
-        throw new Error('La imagen debe pesar menos de 2MB');
-      }
-
-      if (!accessToken) {
-        await asegurarTokenDrive();
-      }
-
-      showLoading(true);
-      try {
-        const metadata = {
-          name: `wasa_avatar_${currentUser.email}_${Date.now()}.${file.name.split('.').pop()}`,
-          mimeType: file.type
-        };
-
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', file);
-
-        const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${accessToken}` },
-          body: form
-        });
-
-      if (!uploadRes.ok) {
-          const err = await uploadRes.text();
-          throw new Error('Error al subir a Drive: ' + err);
-        }
-
-        const fileData = await uploadRes.json();
-        const fileId = fileData.id;
-
-        await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ role: 'reader', type: 'anyone' })
-        });
-
-        const url = `https://lh3.googleusercontent.com/d/${fileId}`;
-
-        await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            bot_id: userData.bot_id, 
-            config: {...userData.config, avatar: url }
-          })
-        });
-
-        if (!userData.config) userData.config = {};
-        userData.config.avatar = url;
-
-        showLoading(false);
-        return url;
-      } catch (e) {
-        showLoading(false);
-        throw e;
-      }
-    }
-
-    function cerrarEditorWidget() {
-      document.getElementById('editor-widget').classList.remove('active');
-    }
-
-    async function guardarConfigWidgetModal() {
-      const config = {
-        color: document.getElementById('colorWidgetEdit').value,
-        theme: document.getElementById('themeWidgetEdit').value,
-        pos: document.getElementById('posWidgetEdit').value,
-        saludo: document.getElementById('saludoWidgetEdit').value,
-        nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
-        avatar: document.getElementById('avatarWidgetEdit').value
+    showLoading(true);
+    try {
+      const metadata = {
+        name: `wasa_avatar_${currentUser.email}_${Date.now()}.${file.name.split('.').pop()}`,
+        mimeType: file.type
       };
 
-      showLoading(true);
-      try {
-        await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, config })
-        });
-        userData.config = config;
-        document.getElementById('colorWidget').value = config.color;
-        document.getElementById('posWidget').value = config.pos;
-        document.getElementById('saludoWidget').value = config.saludo;
-        actualizarPreviewMini();
-        showLoading(false);
-        showToast('✅ Widget actualizado');
-        cerrarEditorWidget();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
+      const form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+      form.append('file', file);
+
+      const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accessToken}` },
+        body: form
+      });
+
+      if (!uploadRes.ok) {
+        const err = await uploadRes.text();
+        throw new Error('Error al subir a Drive: ' + err);
+      }
+
+      const fileData = await uploadRes.json();
+      const fileId = fileData.id;
+
+      await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: 'reader', type: 'anyone' })
+      });
+
+      const url = `https://lh3.googleusercontent.com/d/${fileId}`;
+
+      await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bot_id: BOT_ID,
+          config: {...userData.config, avatar: url }
+        })
+      });
+
+      if (!userData.config) userData.config = {};
+      userData.config.avatar = url;
+
+      showLoading(false);
+      return url;
+    } catch (e) {
+      showLoading(false);
+      throw e;
+    }
+  }
+
+  async function handleAvatarUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('avatarPreview').innerHTML =
+        `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+    };
+    reader.readAsDataURL(file);
+
+    try {
+      const url = await subirAvatarADrive(file);
+      document.getElementById('avatarWidgetEdit').value = url;
+      renderizarPreviewWidget();
+      actualizarPreviewMini();
+      showToast('✅ Avatar subido y guardado');
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error');
+      document.getElementById('avatarPreview').innerHTML = '💬';
+      console.error(err);
+    }
+  }
+
+  async function guardarConfigWidgetModal() {
+    const config = {
+      color: document.getElementById('colorWidgetEdit').value,
+      theme: document.getElementById('themeWidgetEdit').value,
+      pos: document.getElementById('posWidgetEdit').value,
+      saludo: document.getElementById('saludoWidgetEdit').value,
+      nombre: document.getElementById('nombreWidgetEdit').value || 'WasaChat',
+      avatar: document.getElementById('avatarWidgetEdit').value
+    };
+
+    showLoading(true);
+    try {
+      await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: BOT_ID, config })
+      });
+      userData.config = config;
+      document.getElementById('colorWidget').value = config.color;
+      document.getElementById('posWidget').value = config.pos;
+      document.getElementById('saludoWidget').value = config.saludo;
+      actualizarPreviewMini();
+      showLoading(false);
+      showToast('✅ Widget actualizado');
+      cerrarEditorWidget();
+    } catch (e) {
+      showLoading(false);
+      alert('Error: ' + e.message);
+    }
+  }
+
+  function copiarCodigoModal() {
+    const textarea = document.getElementById('codigoWidgetModal');
+    textarea.select();
+    document.execCommand('copy');
+    showToast('📋 Código copiado');
+  }
+
+  function actualizarPreviewMini() {
+    const cfg = userData.config || {};
+    const color = cfg.color || '#25D366';
+    const nombre = cfg.nombre || 'WasaChat';
+    const saludo = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+
+    const previewMini = document.getElementById('widget-preview-mini');
+    if (previewMini) {
+      previewMini.style.background = color;
+      if (cfg.avatar) {
+        previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+      } else {
+        previewMini.innerHTML = '💬';
       }
     }
 
-    function copiarCodigoModal() {
-      const textarea = document.getElementById('codigoWidgetModal');
-      textarea.select();
-      document.execCommand('copy');
-      showToast('📋 Código copiado');
-    }
+    document.getElementById('widget-nombre-preview').textContent = nombre;
+    document.getElementById('widget-saludo-preview').textContent = saludo;
+  }
 
-    function actualizarPreviewMini() {
-      const cfg = userData.config || {};
-      const color = cfg.color || '#25D366';
-      const nombre = cfg.nombre || 'WasaChat';
-      const saludo = cfg.saludo || 'Hola 👋 ¿En qué te ayudo?';
+  function renderizarPreviewWidget() {
+    const color = document.getElementById('colorWidgetEdit').value;
+    const theme = document.getElementById('themeWidgetEdit').value;
+    const pos = document.getElementById('posWidgetEdit').value;
+    const saludo = document.getElementById('saludoWidgetEdit').value;
+    const nombre = document.getElementById('nombreWidgetEdit').value || 'WasaChat';
+    const avatar = document.getElementById('avatarWidgetEdit').value;
 
-      const previewMini = document.getElementById('widget-preview-mini');
-      if (previewMini) {
-        previewMini.style.background = color;
-        if (cfg.avatar) {
-          previewMini.innerHTML = `<img src="${cfg.avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-        } else {
-          previewMini.innerHTML = '💬';
-        }
-      }
+    const container = document.getElementById('preview-container-widget');
+    const btnContent = avatar
+     ? `<img src="${avatar}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+      : '💬';
 
-      if (document.getElementById('widget-nombre-preview')) {
-        document.getElementById('widget-nombre-preview').textContent = nombre;
-      }
-      if (document.getElementById('widget-saludo-preview')) {
-        document.getElementById('widget-saludo-preview').textContent = saludo;
-      }
-    }
+    const avatarHeader = avatar
+     ? `<img src="${avatar}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+      : '💬';
 
-    function renderizarPreviewWidget() {
-      const color = document.getElementById('colorWidgetEdit').value;
-      const theme = document.getElementById('themeWidgetEdit').value;
-      const pos = document.getElementById('posWidgetEdit').value;
-      const saludo = document.getElementById('saludoWidgetEdit').value;
-      const nombre = document.getElementById('nombreWidgetEdit').value || 'WasaChat';
-      const avatar = document.getElementById('avatarWidgetEdit').value;
+    const bgChat = theme === 'dark'? '#1e293b' : '#fff';
+    const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f7f8';
+    const textMain = theme === 'dark'? '#e2e8f0' : '#1e293b';
 
-      const container = document.getElementById('preview-container-widget');
-      const avatarUrl = avatar || '';
-
-      const btnContent = avatarUrl
-  ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
-        : '💬';
-
-      const avatarHeader = avatarUrl
-  ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
-        : '💬';
-
-      const bgChat = theme === 'dark'? '#1e293b' : '#fff';
-      const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f7f8';
-      const textMain = theme === 'dark'? '#e2e8f0' : '#1e293b';
-
-      container.innerHTML = `
-        <style>
-          #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-    .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-    .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-    .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-    .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-    .wasa-btn:hover { transform: scale(1.1); }
-    .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-    .wasa-ventana.activo { display: flex; }
-    .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-    .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
-    .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-    .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-        </style>
- <div class="wasa-demo-page">
-          <div>
-            <h2>Tu Sitio Web</h2>
-            <p>Así se verá el widget en tu página</p>
-          </div>
+    container.innerHTML = `
+      <style>
+        #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+       .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+       .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+       .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+       .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+       .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+       .wasa-btn:hover { transform: scale(1.1); }
+       .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+       .wasa-ventana.activo { display: flex; }
+       .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+       .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
+       .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+       .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+      </style>
+      <div class="wasa-demo-page">
+        <div>
+          <h2>Tu Sitio Web</h2>
+          <p>Así se verá el widget en tu página</p>
+        </div>
         <div class="wasa-widget">
           <div class="wasa-ventana" id="wasa-ventana-preview">
             <div class="wasa-header">
@@ -1119,384 +1216,580 @@ nav {
           </div>
           <button class="wasa-btn" onclick="document.getElementById('wasa-ventana-preview').classList.toggle('activo')">${btnContent}</button>
         </div>
-      `;
-    }
+      </div>
+    `;
+  }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const fileInput = document.getElementById('avatarWidgetFile');
-      if (fileInput) {
-        fileInput.addEventListener('change', async (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
+  // ===== FUNCIONES DE TABLAS =====
 
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            document.getElementById('avatarPreview').innerHTML =
-              `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
-          };
-          reader.readAsDataURL(file);
+  function limpiarFormProductos() {
+    document.getElementById('inputProducto').value = '';
+    document.getElementById('inputPrecio').value = '';
+    document.getElementById('inputUrlProd').value = '';
+    document.getElementById('inputFoto').value = '';
+    document.getElementById('inputDesc').value = '';
+    document.getElementById('inputKeywords').value = '';
+    document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
+    document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
+    document.getElementById('modoEdicionProd').classList.add('hidden');
+    document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
+    document.getElementById('btnBorrar').disabled = true;
+  }
 
-          try {
-            const url = await subirAvatarADrive(file);
-            document.getElementById('avatarWidgetEdit').value = url;
-            renderizarPreviewWidget();
-            actualizarPreviewMini();
-            showToast('✅ Avatar subido y guardado');
-          } catch (err) {
-            showToast('Error: ' + err.message, 'error');
-            document.getElementById('avatarPreview').innerHTML = '💬';
-            console.error(err);
-          }
-        });
-      }
+  function limpiarFormConfig() {
+    document.getElementById('inputPregunta').value = '';
+    document.getElementById('inputRespuesta').value = '';
+    document.getElementById('inputClaves').value = '';
+    document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
+    document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
+    document.getElementById('modoEdicionConfig').classList.add('hidden');
+    document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
+    document.getElementById('btnBorrarConfig').disabled = true;
+  }
+
+  function renderTablaProductos() {
+    const tbody = document.querySelector('#miTabla tbody');
+    tbody.innerHTML = '';
+    datosProductos.forEach((row, i) => {
+      const tr = tbody.insertRow();
+      const keywordsStr = Array.isArray(row.keywords)? row.keywords.join(', ') : (row.keywords || '');
+      tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.url||''}</td><td>${row.foto||''}</td><td>${row.desc||''}</td><td>${keywordsStr}</td>`;
+      tr.onclick = () => seleccionarFila(tr, i, 'productos');
     });
+  }
 
-    function marcarCambiosPendientes() {
-      cambiosPendientes = true;
-      document.getElementById('cambiosPendientes').style.display = 'block';
+  function renderTablaConfig() {
+    const tbody = document.querySelector('#miTablaConfig tbody');
+    tbody.innerHTML = '';
+    datosConfig.forEach((row, i) => {
+      const tr = tbody.insertRow();
+      tr.innerHTML = `<td>${row.pregunta||''}</td><td>${row.respuesta||''}</td><td>${row.keywords||''}</td>`;
+      tr.onclick = () => seleccionarFila(tr, i, 'config');
+    });
+  }
+
+  function seleccionarFila(row, index, tipo) {
+    document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
+    row.classList.add('seleccionada');
+    filaSeleccionada = {index, tipo};
+    modoEdicion = true;
+    indiceEdicion = index;
+
+    if (tipo === 'productos') {
+      const datos = datosProductos[index];
+      document.getElementById('inputProducto').value = datos.nombre || '';
+      document.getElementById('inputPrecio').value = datos.precio || '';
+      document.getElementById('inputUrlProd').value = datos.url || '';
+      document.getElementById('inputFoto').value = datos.foto || '';
+      document.getElementById('inputDesc').value = datos.desc || '';
+      document.getElementById('inputKeywords').value = Array.isArray(datos.keywords)? datos.keywords.join(', ') : (datos.keywords || '');
+      document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
+      document.getElementById('tituloFormProd').textContent = 'Editar Producto';
+      document.getElementById('modoEdicionProd').classList.remove('hidden');
+      document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
+      document.getElementById('btnBorrar').disabled = false;
+    } else {
+      const datos = datosConfig[index];
+      document.getElementById('inputPregunta').value = datos.pregunta || '';
+      document.getElementById('inputRespuesta').value = datos.respuesta || '';
+      document.getElementById('inputClaves').value = datos.keywords || '';
+      document.getElementById('btnGuardarConfig').textContent = '✏ Actualizar Pregunta';
+      document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
+      document.getElementById('modoEdicionConfig').classList.remove('hidden');
+      document.getElementById('btnCancelarEdicionConfig').classList.remove('hidden');
+      document.getElementById('btnBorrarConfig').disabled = false;
+    }
+  }
+
+  async function guardarProducto() {
+    const prod = document.getElementById('inputProducto').value.trim();
+    const precio = document.getElementById('inputPrecio').value.trim();
+    const urlProd = document.getElementById('inputUrlProd').value.trim();
+    const foto = document.getElementById('inputFoto').value.trim();
+    const desc = document.getElementById('inputDesc').value.trim();
+    const keywordsInput = document.getElementById('inputKeywords').value.trim();
+    let keywords = keywordsInput? keywordsInput.split(',').map(k => k.trim()).filter(k => k) : [];
+
+    if(!prod ||!precio ||!urlProd) return alert("Completá nombre, precio y URL producto");
+
+    const btnGuardar = document.getElementById('btnGuardar');
+    const textoOriginal = btnGuardar.textContent;
+    btnGuardar.textContent = 'Generando keywords...';
+    btnGuardar.disabled = true;
+
+    try {
+      const res = await fetch(API_URL + '/enrich-keywords', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ nombre: prod, descripcion: desc })
+      });
+      const data = await res.json();
+      if (data.keywords_auto && Array.isArray(data.keywords_auto)) {
+        keywords = [...new Set([...keywords,...data.keywords_auto])];
+      }
+    } catch (e) {
+      console.log('Error enriqueciendo keywords', e);
     }
 
-    async function abrirEditor(tab) {
-      currentTab = tab;
+    btnGuardar.textContent = textoOriginal;
+    btnGuardar.disabled = false;
+
+    const nuevoProd = {nombre: prod, precio, url: urlProd, foto, desc, keywords};
+
+    if (modoEdicion && indiceEdicion!== null) {
+      datosProductos[indiceEdicion] = nuevoProd;
       modoEdicion = false;
       indiceEdicion = null;
+      limpiarFormProductos();
+    } else {
+      datosProductos.push(nuevoProd);
+      limpiarFormProductos();
+    }
+
+    renderTablaProductos();
+    marcarCambiosPendientes();
+  }
+
+  function cancelarEdicionProd() {
+    modoEdicion = false;
+    indiceEdicion = null;
+    filaSeleccionada = null;
+    limpiarFormProductos();
+    document.querySelectorAll('#miTabla tbody tr').forEach(r => r.classList.remove('seleccionada'));
+    document.getElementById('btnBorrar').disabled = true;
+  }
+
+  function guardarFaq() {
+    const pregunta = document.getElementById('inputPregunta').value;
+    const respuesta = document.getElementById('inputRespuesta').value;
+    const claves = document.getElementById('inputClaves').value;
+    if(!pregunta ||!respuesta ||!claves) return alert("Completá los 3 campos");
+
+    const nuevaFaq = {pregunta, respuesta, keywords: claves};
+
+    if (modoEdicion && indiceEdicion!== null) {
+      datosConfig[indiceEdicion] = nuevaFaq;
+      modoEdicion = false;
+      indiceEdicion = null;
+      limpiarFormConfig();
+    } else {
+      datosConfig.push(nuevaFaq);
+      limpiarFormConfig();
+    }
+
+    renderTablaConfig();
+    marcarCambiosPendientes();
+  }
+
+  function cancelarEdicionConfig() {
+    modoEdicion = false;
+    indiceEdicion = null;
+    filaSeleccionada = null;
+    limpiarFormConfig();
+    document.querySelectorAll('#miTablaConfig tbody tr').forEach(r => r.classList.remove('seleccionada'));
+    document.getElementById('btnBorrarConfig').disabled = true;
+  }
+
+  function confirmarBorrar() {
+    if (filaSeleccionada.tipo === 'productos') {
+      datosProductos.splice(filaSeleccionada.index, 1);
+      renderTablaProductos();
+      document.getElementById('btnBorrar').disabled = true;
+      limpiarFormProductos();
+    } else {
+      datosConfig.splice(filaSeleccionada.index, 1);
+      renderTablaConfig();
+      document.getElementById('btnBorrarConfig').disabled = true;
+      limpiarFormConfig();
+    }
+    cerrarModales();
+    filaSeleccionada = null;
+    modoEdicion = false;
+    indiceEdicion = null;
+    marcarCambiosPendientes();
+  }
+
+  async function subirProductos() {
+    showLoading(true);
+    try {
+      await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: BOT_ID, data: { productos: datosProductos } })
+      });
       cambiosPendientes = false;
       document.getElementById('cambiosPendientes').style.display = 'none';
-      document.getElementById('editor').classList.add('active');
-      document.getElementById('editor-titulo').textContent = tab === 'productos'? 'Editor de Productos' : 'Editor de FAQs';
-
-      if (tab === 'productos') {
-        document.getElementById('form-productos').classList.remove('hidden');
-        document.getElementById('form-config').classList.add('hidden');
-        document.getElementById('tabla-productos').classList.remove('hidden');
-        document.getElementById('tabla-config').classList.add('hidden');
-        limpiarFormProductos();
-      } else {
-        document.getElementById('form-productos').classList.add('hidden');
-        document.getElementById('form-config').classList.remove('hidden');
-        document.getElementById('tabla-productos').classList.add('hidden');
-        document.getElementById('tabla-config').classList.remove('hidden');
-        limpiarFormConfig();
-      }
+      showLoading(false);
+      showToast('✅ Productos guardados en servidor');
+    } catch(e) {
+      showLoading(false);
+      showToast('Error al guardar: ' + e.message, 'error');
     }
+  }
 
-    function cerrarEditor() {
-      if (cambiosPendientes) {
-        if (!confirm('Tenés cambios sin guardar. ¿Salir igual?')) return;
-      }
-      document.getElementById('editor').classList.remove('active');
-      filaSeleccionada = null;
-      modoEdicion = false;
-      indiceEdicion = null;
+  async function subirFaq() {
+    showLoading(true);
+    try {
+      await fetch('https://api.wasa.chat/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: BOT_ID, data: { faq: datosConfig } })
+      });
       cambiosPendientes = false;
-      limpiarFormProductos();
-      limpiarFormConfig();
+      document.getElementById('cambiosPendientes').style.display = 'none';
+      showLoading(false);
+      showToast('✅ FAQs guardados en servidor');
+    } catch(e) {
+      showLoading(false);
+      showToast('Error al guardar: ' + e.message, 'error');
     }
+  }
 
-    function limpiarFormProductos() {
-      document.getElementById('inputProducto').value = '';
-      document.getElementById('inputPrecio').value = '';
-      document.getElementById('inputStock').value = '';
-      document.getElementById('inputDesc').value = '';
-      document.getElementById('inputFoto').value = '';
-      document.getElementById('inputUrlProd').value = '';
-      document.getElementById('btnGuardar').textContent = '➕ Agregar a tabla';
-      document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
-      document.getElementById('modoEdicionProd').classList.add('hidden');
-      document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
-    }
+  async function cargarCsvProductos() {
+    const file = document.getElementById('csvProductos').files[0];
+    if (!file) return alert('Seleccioná un archivo CSV');
 
-    function limpiarFormConfig() {
-      document.getElementById('inputPregunta').value = '';
-      document.getElementById('inputRespuesta').value = '';
-      document.getElementById('inputClaves').value = '';
-      document.getElementById('btnGuardarConfig').textContent = '➕ Agregar a tabla';
-      document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
-      document.getElementById('modoEdicionConfig').classList.add('hidden');
-      document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
-    }
+    const text = await file.text();
+    const lines = text.split('\n').filter(l => l.trim());
 
-    function renderTablaProductos() {
-      const tbody = document.querySelector('#miTabla tbody');
-      tbody.innerHTML = '';
-      datosProductos.forEach((row, i) => {
-        const tr = tbody.insertRow();
-        tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.stock||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
-        tr.onclick = () => seleccionarFila(tr, i, 'productos');
-      });
-    }
+    if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
 
-    function renderTablaConfig() {
-      const tbody = document.querySelector('#miTablaConfig tbody');
-      tbody.innerHTML = '';
-      datosConfig.forEach((row, i) => {
-        const tr = tbody.insertRow();
-        tr.innerHTML = `<td>${row.pregunta||''}</td><td>${row.respuesta||''}</td><td>${row.keywords||''}</td>`;
-        tr.onclick = () => seleccionarFila(tr, i, 'config');
-      });
-    }
-
-    function seleccionarFila(row, index, tipo) {
-      document.querySelectorAll('tr').forEach(r => r.classList.remove('seleccionada'));
-      row.classList.add('seleccionada');
-      filaSeleccionada = {index, tipo};
-      modoEdicion = true;
-      indiceEdicion = index;
-
-      if (tipo === 'productos') {
-        const datos = datosProductos[index];
-        document.getElementById('inputProducto').value = datos.nombre || '';
-        document.getElementById('inputPrecio').value = datos.precio || '';
-        document.getElementById('inputStock').value = datos.stock || '';
-        document.getElementById('inputDesc').value = datos.desc || '';
-        document.getElementById('inputFoto').value = datos.foto || '';
-        document.getElementById('inputUrlProd').value = datos.url || '';
-        document.getElementById('btnGuardar').textContent = '✏ Actualizar Producto';
-        document.getElementById('tituloFormProd').textContent = 'Editar Producto';
-        document.getElementById('modoEdicionProd').classList.remove('hidden');
-        document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
-        document.getElementById('btnBorrar').disabled = false;
-      } else {
-        const datos = datosConfig[index]; // FIX: era datosConfig, no datosConfig[index]
-        document.getElementById('inputPregunta').value = datos.pregunta || '';
-        document.getElementById('inputRespuesta').value = datos.respuesta || '';
-        document.getElementById('inputClaves').value = datos.keywords || '';
-        document.getElementById('btnGuardarConfig').textContent = '✏ Actualizar Pregunta';
-        document.getElementById('tituloFormConfig').textContent = 'Editar Pregunta Frecuente';
-        document.getElementById('modoEdicionConfig').classList.remove('hidden');
-        document.getElementById('btnCancelarEdicionConfig').classList.remove('hidden');
-        document.getElementById('btnBorrarConfig').disabled = false;
-      }
-    }
-
-    document.getElementById('btnGuardar').addEventListener('click', () => {
-      const prod = document.getElementById('inputProducto').value;
-      const precio = document.getElementById('inputPrecio').value;
-      const stock = document.getElementById('inputStock').value;
-      const desc = document.getElementById('inputDesc').value;
-      const foto = document.getElementById('inputFoto').value;
-      const urlProd = document.getElementById('inputUrlProd').value;
-      if(!prod ||!precio ||!stock) return alert("Completá nombre, precio y stock");
-
-      const nuevoProd = {nombre: prod, precio, stock, desc, foto, url: urlProd};
-
-      if (modoEdicion && indiceEdicion!== null) {
-        datosProductos[indiceEdicion] = nuevoProd;
-        modoEdicion = false;
-        indiceEdicion = null;
-        limpiarFormProductos();
-      } else {
-        datosProductos.push(nuevoProd);
-        limpiarFormProductos();
-      }
-
-      renderTablaProductos();
-      marcarCambiosPendientes();
+    datosProductos = lines.slice(1).map(line => {
+      const vals = line.split(',');
+      return {
+        nombre: vals[0]||'',
+        precio: vals[1]||'',
+        url: vals[2]||'',
+        foto: vals[3]||'',
+        desc: vals[4]||'',
+        keywords: vals[5]? vals[5].split(',').map(k => k.trim()).filter(k => k) : []
+      };
     });
 
-    document.getElementById('btnCancelarEdicionProd').addEventListener('click', () => {
-      modoEdicion = false;
-      indiceEdicion = null;
-      filaSeleccionada = null;
-      limpiarFormProductos();
-      document.querySelectorAll('#miTabla tbody tr').forEach(r => r.classList.remove('seleccionada'));
-      document.getElementById('btnBorrar').disabled = true;
+    renderTablaProductos();
+    marcarCambiosPendientes();
+    document.getElementById('csvProductos').value = '';
+  }
+
+  async function cargarCsvConfig() {
+    const file = document.getElementById('csvConfig').files[0];
+    if (!file) return alert('Seleccioná un archivo CSV');
+
+    const text = await file.text();
+    const lines = text.split('\n').filter(l => l.trim());
+
+    if (!confirm(`¿Reemplazar todas las preguntas con ${lines.length-1} filas del CSV?`)) return;
+
+    datosConfig = lines.slice(1).map(line => {
+      const vals = line.split(',');
+      return {
+        pregunta: vals[0]||'',
+        respuesta: vals[1]||'',
+        keywords: vals[2]||''
+      };
     });
 
-    document.getElementById('btnGuardarConfig').addEventListener('click', () => {
-      const pregunta = document.getElementById('inputPregunta').value;
-      const respuesta = document.getElementById('inputRespuesta').value;
-      const claves = document.getElementById('inputClaves').value;
-      if(!pregunta ||!respuesta ||!claves) return alert("Completá los 3 campos");
+    renderTablaConfig();
+    marcarCambiosPendientes();
+    document.getElementById('csvConfig').value = '';
+  }
 
-      const nuevaFaq = {pregunta, respuesta, keywords: claves};
+  function marcarCambiosPendientes() {
+    cambiosPendientes = true;
+    document.getElementById('cambiosPendientes').style.display = 'block';
+  }
 
-      if (modoEdicion && indiceEdicion!== null) {
-        datosConfig[indiceEdicion] = nuevaFaq;
-        modoEdicion = false;
-        indiceEdicion = null;
-        limpiarFormConfig();
-      } else {
-        datosConfig.push(nuevaFaq);
-        limpiarFormConfig();
-      }
+  function cerrarModales() {
+    document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none');
+  }
 
-      renderTablaConfig();
-      marcarCambiosPendientes();
-    });
+  function showLoading(show) {
+    document.getElementById('loading').style.display = show? 'flex' : 'none';
+  }
 
-    document.getElementById('btnCancelarEdicionConfig').addEventListener('click', () => {
-      modoEdicion = false;
-      indiceEdicion = null;
-      filaSeleccionada = null;
-      limpiarFormConfig();
-      document.querySelectorAll('#miTablaConfig tbody tr').forEach(r => r.classList.remove('seleccionada'));
-      document.getElementById('btnBorrarConfig').disabled = true;
-    });
+  function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = type === 'error'? '#dc3545' : '#28a745';
+    toast.style.display = 'block';
+    setTimeout(() => toast.style.display = 'none', 3000);
+  }
 
-    document.getElementById('btnBorrar').addEventListener('click', () => {
-      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
-    });
-    document.getElementById('btnBorrarConfig').addEventListener('click', () => {
-      if(filaSeleccionada) document.getElementById('modal-borrar').style.display = 'block';
-    });
+  function logout() {
+    localStorage.removeItem('bot_id');
+    localStorage.removeItem('user_email');
+    window.location.href = 'index.html';
+  }
 
-    document.getElementById('confirmar-si').addEventListener('click', () => {
-      if (filaSeleccionada.tipo === 'productos') {
-        datosProductos.splice(filaSeleccionada.index, 1);
-        renderTablaProductos();
-        document.getElementById('btnBorrar').disabled = true;
-        limpiarFormProductos();
-      } else {
-        datosConfig.splice(filaSeleccionada.index, 1);
-        renderTablaConfig();
-        document.getElementById('btnBorrarConfig').disabled = true;
-        limpiarFormConfig();
-      }
-      cerrarModales();
-      filaSeleccionada = null;
-      modoEdicion = false;
-      indiceEdicion = null;
-      marcarCambiosPendientes();
-    });
+  document.getElementById('logoutBtn').addEventListener('click', logout);
 
-    document.getElementById('btnSubirProductos').addEventListener('click', async () => {
-      showLoading(true);
-      try {
-        await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
-        });
-        cambiosPendientes = false;
-        document.getElementById('cambiosPendientes').style.display = 'none';
-        showLoading(false);
-        showToast('✅ Productos guardados en servidor');
-      } catch(e) {
-        showLoading(false);
-        showToast('Error al guardar: ' + e.message, 'error');
-      }
-    });
-
-    document.getElementById('btnSubirFaq').addEventListener('click', async () => {
-      showLoading(true);
-      try {
-        await fetch('https://api.wasa.chat/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
-        });
-        cambiosPendientes = false;
-        document.getElementById('cambiosPendientes').style.display = 'none';
-        showLoading(false);
-        showToast('✅ FAQs guardados en servidor');
-      } catch(e) {
-        showLoading(false);
-        showToast('Error al guardar: ' + e.message, 'error');
-      }
-    });
-
-    document.getElementById('btnCargarCsvProd').addEventListener('click', async () => {
-      const file = document.getElementById('csvProductos').files[0];
-      if (!file) return alert('Seleccioná un archivo CSV');
-
-      const text = await file.text();
-      const lines = text.split('\n').filter(l => l.trim());
-
-      if (!confirm(`¿Reemplazar todos los productos con ${lines.length-1} filas del CSV?`)) return;
-
-      datosProductos = lines.slice(1).map(line => {
-        const vals = line.split(',');
-        return {
-          nombre: vals[0]||'',
-          precio: vals[1]||'',
-          stock: vals[2]||'',
-          desc: vals[3]||'',
-          foto: vals[4]||'',
-          url: vals[5]||''
-        };
-      });
-
-      renderTablaProductos();
-      marcarCambiosPendientes();
-      document.getElementById('csvProductos').value = '';
-    });
-
-    document.getElementById('btnCargarCsvConfig').addEventListener('click', async () => {
-      const file = document.getElementById('csvConfig').files[0];
-      if (!file) return alert('Seleccioná un archivo CSV');
-
-      const text = await file.text();
-      const lines = text.split('\n').filter(l => l.trim());
-
-      if (!confirm(`¿Reemplazar todas las preguntas con ${lines.length-1} filas del CSV?`)) return;
-
-      datosConfig = lines.slice(1).map(line => {
-        const vals = line.split(',');
-        return {
-          pregunta: vals[0]||'',
-          respuesta: vals[1]||'',
-          keywords: vals[2]||''
-        };
-      });
-
-      renderTablaConfig();
-      marcarCambiosPendientes();
-      document.getElementById('csvConfig').value = '';
-    });
-
-    function cerrarModales() {
-      document.querySelectorAll('.modal-fondo').forEach(m => m.style.display = 'none');
-    }
-
-    function showLoading(show) {
-      document.getElementById('loading').style.display = show? 'flex' : 'none';
-    }
-
-    function showToast(msg, type = 'success') {
-      const toast = document.getElementById('toast');
-      toast.textContent = msg;
-      toast.style.background = type === 'error'? '#dc3545' : '#28a745';
-      toast.style.display = 'block';
-      setTimeout(() => toast.style.display = 'none', 3000);
-    }
-
-    function logout() {
-      localStorage.removeItem('bot_id');
-      localStorage.removeItem('user_email');
-      window.location.href = 'index.html';
-    }
-
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-
-    const resizer = document.getElementById('editor-resizer');
-    const leftSide = document.getElementById('editor-form');
+  function setupResizer(resizerId, formId) {
+    const resizer = document.getElementById(resizerId);
+    const leftSide = document.getElementById(formId);
     if (resizer && leftSide) {
       resizer.addEventListener('mousedown', (e) => {
+        const resize = (e) => {
+          const newWidth = e.clientX;
+          if (newWidth > 250 && newWidth < 600) {
+            leftSide.style.width = newWidth + 'px';
+          }
+        };
         document.addEventListener('mousemove', resize);
         document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resize));
       });
     }
-    function resize(e) {
-      if (leftSide) leftSide.style.width = e.clientX + 'px';
-    }
+  }
 
-    const resizerWidget = document.getElementById('editor-widget-resizer');
-    const leftSideWidget = document.getElementById('editor-widget-form');
-    if (resizerWidget && leftSideWidget) {
-      resizerWidget.addEventListener('mousedown', (e) => {
-        document.addEventListener('mousemove', resizeWidget);
-        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', resizeWidget));
+  function generarCodigoWidget() {
+    const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+    const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
+    document.getElementById('codigoWidget').value = codigo;
+    if (document.getElementById('codigoWidgetModal')) {
+      document.getElementById('codigoWidgetModal').value = codigo;
+    }
+  }
+
+  // ===== NAVEGACIÓN DE SOLAPAS =====
+  document.querySelectorAll('.sidebar-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const section = e.target.dataset.section;
+      showSection(section);
+    });
+  });
+
+  function showSection(section) {
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+    if (section === 'configuracion') {
+      document.getElementById('section-configuracion').classList.remove('hidden');
+      document.getElementById('section-analytics').classList.add('hidden');
+    } else if (section === 'analytics') {
+      document.getElementById('section-configuracion').classList.add('hidden');
+      document.getElementById('section-analytics').classList.remove('hidden');
+      cargarAnalytics();
+    }
+  }
+
+  function cargarAnalytics() {
+    if (!userData || !userData.stats) return;
+    const stats = userData.stats;
+    document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
+    document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
+    document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
+    document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
+    document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
+     ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
+      : '-';
+  }
+
+  // ===== INICIALIZACIÓN DE BOTONES DE EDITOR =====
+  // IMPORTANTE: Estos event listeners son los que faltaban
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔵 Inicializando botones de editor...');
+    
+    // Buscar botones por ID o clase
+    const btnProductos = document.querySelector('[onclick*="abrirEditor(\'productos\')"]');
+    const btnConfig = document.querySelector('[onclick*="abrirEditor(\'config\')"]');
+    
+    console.log('Botón productos encontrado:', !!btnProductos);
+    console.log('Botón config encontrado:', !!btnConfig);
+    
+    // Si no se encontraron por onclick, buscarlos por texto
+    if (!btnProductos) {
+      const allButtons = document.querySelectorAll('button');
+      allButtons.forEach(btn => {
+        if (btn.textContent.includes('Editar Tabla de Productos')) {
+          console.log('✅ Botón productos encontrado por texto');
+          btn.onclick = function() { abrirEditor('productos'); };
+        }
+        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
+          console.log('✅ Botón config encontrado por texto');
+          btn.onclick = function() { abrirEditor('config'); };
+        }
       });
     }
-    function resizeWidget(e) {
-      if (leftSideWidget) {
-        const newWidth = e.clientX;
-        if (newWidth > 250 && newWidth < 600) {
-          leftSideWidget.style.width = newWidth + 'px';
+  });
+
+  // ASIGNAR FUNCIONES AL SCOPE GLOBAL PARA QUE LOS onclicks FUNCIONEN
+  window.abrirEditor = abrirEditor;
+  window.cerrarEditor = cerrarEditor;
+  window.abrirEditorWidget = abrirEditorWidget;
+  window.cerrarEditorWidget = cerrarEditorWidget;
+  window.guardarProducto = guardarProducto;
+  window.guardarFaq = guardarFaq;
+  window.cancelarEdicionProd = cancelarEdicionProd;
+  window.cancelarEdicionConfig = cancelarEdicionConfig;
+  window.confirmarBorrar = confirmarBorrar;
+  window.subirProductos = subirProductos;
+  window.subirFaq = subirFaq;
+  window.cargarCsvProductos = cargarCsvProductos;
+  window.cargarCsvConfig = cargarCsvConfig;
+  window.mostrarCambiarDominio = mostrarCambiarDominio;
+  window.cambiarDominio = cambiarDominio;
+  window.cerrarModales = cerrarModales;
+  window.copiarCodigo = copiarCodigo;
+  window.copiarCodigoModal = copiarCodigoModal;
+  window.guardarConfigWidgetModal = guardarConfigWidgetModal;
+  window.handleAvatarUpload = handleAvatarUpload;
+  window.irAComprar = irAComprar;
+  window.logout = logout;
+
+  console.log('✅ Todas las funciones asignadas al window global');
+  console.log('✅ Script cargado correctamente');
+
+  // ===== SOLUCIÓN DEFINITIVA PARA LOS BOTONES =====
+// Forzar que los botones tengan los onclick correctos
+(function() {
+    console.log('🔧 Aplicando fix definitivo para botones...');
+    
+    // Buscar todos los botones
+    const allButtons = document.querySelectorAll('button');
+    
+    allButtons.forEach(btn => {
+        // Buscar botón de productos
+        if (btn.textContent.includes('Editar Tabla de Productos')) {
+            console.log('✅ Fix aplicado a botón de productos');
+            // Remover cualquier onclick existente y asignar el nuestro
+            btn.removeAttribute('onclick');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🟢 Click en Editar Productos');
+                abrirEditor('productos');
+            };
         }
-      }
-    }
+        
+        // Buscar botón de preguntas
+        if (btn.textContent.includes('Editar Preguntas y Respuestas')) {
+            console.log('✅ Fix aplicado a botón de preguntas');
+            btn.removeAttribute('onclick');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🟢 Click en Editar Preguntas');
+                abrirEditor('config');
+            };
+        }
+        
+        // Buscar botón de personalizar widget
+        if (btn.textContent.includes('Personalizar apariencia')) {
+            console.log('✅ Fix aplicado a botón de widget');
+            btn.removeAttribute('onclick');
+            btn.onclick = function(e) {
+                e.preventDefault();
+                console.log('🟢 Click en Personalizar Widget');
+                abrirEditorWidget();
+            };
+        }
+    });
+    
+    // También buscar por los onclick en el HTML y reemplazarlos
+    document.querySelectorAll('[onclick*="abrirEditor"]').forEach(el => {
+        const onclickAttr = el.getAttribute('onclick');
+        if (onclickAttr.includes("'productos'")) {
+            console.log('✅ Reemplazando onclick de productos');
+            el.removeAttribute('onclick');
+            el.onclick = function(e) {
+                e.preventDefault();
+                abrirEditor('productos');
+            };
+        } else if (onclickAttr.includes("'config'")) {
+            console.log('✅ Reemplazando onclick de config');
+            el.removeAttribute('onclick');
+            el.onclick = function(e) {
+                e.preventDefault();
+                abrirEditor('config');
+            };
+        }
+    });
+    
+    console.log('✅ Fix de botones aplicado correctamente');
+})();
+
+// También asegurar que las funciones estén en window (por si acaso)
+window.abrirEditor = abrirEditor;
+window.cerrarEditor = cerrarEditor;
+window.abrirEditorWidget = abrirEditorWidget;
+window.cerrarEditorWidget = cerrarEditorWidget;
+
+console.log('✅ Todo listo - Los botones deberían funcionar ahora');
+
+  // ===== FIX ULTRA DEFINITIVO =====
+// Esto fuerza la apertura del editor directamente
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Aplicando fix ultra definitivo...');
+    
+    // Buscar todos los botones y reemplazar sus onclick
+    document.querySelectorAll('button').forEach(btn => {
+        const texto = btn.textContent.trim();
+        
+        if (texto.includes('Editar Tabla de Productos')) {
+            btn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🟢 Click en productos - FORZANDO apertura');
+                
+                // FORZAR apertura directa
+                const editor = document.getElementById('editor');
+                if (editor) {
+                    editor.style.display = 'flex';
+                    editor.style.position = 'fixed';
+                    editor.style.top = '0';
+                    editor.style.left = '0';
+                    editor.style.width = '100%';
+                    editor.style.height = '100%';
+                    editor.style.zIndex = '99999';
+                    editor.style.background = 'white';
+                    editor.style.visibility = 'visible';
+                    
+                    // Mostrar contenido
+                    document.getElementById('form-productos').classList.remove('hidden');
+                    document.getElementById('form-config').classList.add('hidden');
+                    document.getElementById('tabla-productos').classList.remove('hidden');
+                    document.getElementById('tabla-config').classList.add('hidden');
+                    document.getElementById('editor-titulo').textContent = 'Editor de Productos';
+                    
+                    console.log('✅ Editor de productos FORZADO');
+                } else {
+                    alert('ERROR: No se encontró el editor');
+                }
+            };
+        }
+        
+        if (texto.includes('Editar Preguntas y Respuestas')) {
+            btn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🟢 Click en preguntas - FORZANDO apertura');
+                
+                const editor = document.getElementById('editor');
+                if (editor) {
+                    editor.style.display = 'flex';
+                    editor.style.position = 'fixed';
+                    editor.style.top = '0';
+                    editor.style.left = '0';
+                    editor.style.width = '100%';
+                    editor.style.height = '100%';
+                    editor.style.zIndex = '99999';
+                    editor.style.background = 'white';
+                    editor.style.visibility = 'visible';
+                    
+                    document.getElementById('form-productos').classList.add('hidden');
+                    document.getElementById('form-config').classList.remove('hidden');
+                    document.getElementById('tabla-productos').classList.add('hidden');
+                    document.getElementById('tabla-config').classList.remove('hidden');
+                    document.getElementById('editor-titulo').textContent = 'Editor de FAQs';
+                    
+                    console.log('✅ Editor de preguntas FORZADO');
+                } else {
+                    alert('ERROR: No se encontró el editor');
+                }
+            };
+        }
+    });
+    
+    console.log('✅ Fix ultra definitivo aplicado');
+});
+  
 </script>
 </body>
 </html>
