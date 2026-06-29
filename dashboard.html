@@ -1476,9 +1476,17 @@ function showSection(section) {
   if (section === 'configuracion') {
     document.getElementById('section-configuracion').classList.remove('hidden');
     document.getElementById('section-analytics').classList.add('hidden');
+	document.getElementById('section-referidos').classList.add('hidden');
   } else if (section === 'analytics') {
     document.getElementById('section-configuracion').classList.add('hidden');
     document.getElementById('section-analytics').classList.remove('hidden');
+	document.getElementById('section-referidos').classList.add('hidden');
+    cargarAnalytics();
+  }
+	else if (section === 'referidos') {
+    document.getElementById('section-configuracion').classList.add('hidden');
+    document.getElementById('section-analytics').classList.add('hidden');
+	document.getElementById('section-referidos').classList.remove('hidden');
     cargarAnalytics();
   }
 }
