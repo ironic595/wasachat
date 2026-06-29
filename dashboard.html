@@ -310,7 +310,6 @@ nav {
     text-align: left;
     border-bottom: 1px solid #222;
   }
-  
   /* Cambiamos la línea decorativa de abajo hacia el costado izquierdo en monitores */
   #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
   #tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
@@ -318,28 +317,23 @@ nav {
     border-left: 4px solid #4285f4;
   }
 }
-
       /* Ocultamos los selectores radio del flujo visual */
 .radio-tab {
   display: none !important;
 }
-
 /* Ocultamos ambas pantallas del Dashboard por defecto */
 .seccion-config,
 .seccion-stats {
   display: none;
 }
-
 /* Si se selecciona Configuración, se activa su bloque */
 #tab-config:checked ~ .allcont .seccion-config {
   display: block;
 }
-
 /* Si se selecciona Estadísticas, se activa su bloque */
 #tab-stats:checked ~ .allcont .seccion-stats {
   display: block;
 }
-
 /* Convierte los labels del menú en botones interactivos */
 .menu-btn {
   display: block;
@@ -352,11 +346,9 @@ nav {
   text-align: center;
   transition: background 0.2s, color 0.2s;
 }
-
 .menu-btn:hover {
   background: #333;
 }
-
 /* Resalta visualmente el botón que está activo */
 #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
 #tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
@@ -364,7 +356,6 @@ nav {
   color: #4285f4;
   border-bottom: 2px solid #4285f4;
 }
-
 @media (min-width: 992px) {
   .menu-btn {
     padding: 15px 20px;
@@ -377,8 +368,6 @@ nav {
     border-left: 4px solid #4285f4;
   }
 }
-
-    
     .card { background: white; padding: 30px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     h1 { text-align: center; color: #333; }
     h2 { color: #4285f4; border-bottom: 2px solid #4285f4; padding-bottom: 10px; }
@@ -726,7 +715,9 @@ nav {
       window.location.href = 'index.html';
     } else {
       currentUser = { email: userEmail };
-      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
+      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button class="danger" id="btnLogout" style="padding: 8px 16px; font-size: 14px; margin: 0; border-radius: 4px; cursor: pointer;">
+      Cerrar Sesión
+    </button>`;
       cargarBot();
     }
 
