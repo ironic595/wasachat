@@ -1497,6 +1497,48 @@ nav {
         }
       }
     }
+
+  // === NAVEGACIÓN DE SOLAPAS ===
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    const section = e.target.dataset.section;
+    showSection(section);
+  });
+});
+
+function showSection(section) {
+  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+  document.querySelector(`[data-section="${section}"]`).classList.add('active');
+
+  if (section === 'configuracion') {
+    document.getElementById('section-configuracion').classList.remove('hidden');
+    document.getElementById('section-analytics').classList.add('hidden');
+  } else if (section === 'analytics') {
+    document.getElementById('section-configuracion').classList.add('hidden');
+    document.getElementById('section-analytics').classList.remove('hidden');
+    cargarAnalytics();
+  }
+}
+
+function cargarAnalytics() {
+  if (!userData || !userData.stats) {
+    document.getElementById('statSesiones').textContent = '0';
+    document.getElementById('statMensajes').textContent = '0';
+    document.getElementById('statExitosas').textContent = '0';
+    document.getElementById('statFallidas').textContent = '0';
+    document.getElementById('statUltimaActividad').textContent = '-';
+    return;
+  }
+  
+  const stats = userData.stats;
+  document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
+  document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
+  document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
+  document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
+  document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
+   ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
+    : '-';
+}
 </script>
 </body>
 </html>
