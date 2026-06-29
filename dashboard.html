@@ -688,8 +688,9 @@ nav {
   </div>
 
 <script>
-const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev'; // CAMBIA ESTO por tu URL real de Cloudflare
+  const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev'; // CAMBIA ESTO por tu URL real de Cloudflare
   const BOT_ID = localStorage.getItem('bot_id');
+  const botId = BOT_ID;
 
 // Si no hay bot_id, lo rajamos al login
 if (!BOT_ID) {
@@ -721,7 +722,7 @@ if (!BOT_ID) {
 
     const userEmail = localStorage.getItem('user_email');
 
-    if (!BOT_ID ||!userEmail) {
+    if (!botId ||!userEmail) {
       window.location.href = 'index.html';
     } else {
       currentUser = { email: userEmail };
@@ -734,7 +735,7 @@ if (!BOT_ID) {
         const res = await fetch('https://api.wasa.chat/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: BOT_ID })
+          body: JSON.stringify({ bot_id: botId })
         });
         const data = await res.json();
         
@@ -748,7 +749,7 @@ if (!BOT_ID) {
         
         userData = {
           email: userEmail,
-          bot_id: BOT_ID,
+          bot_id: botId,
           estado: data.estado,
           domain: data.domain,
           config: data.config,
@@ -864,8 +865,8 @@ if (!BOT_ID) {
     }
 
     function generarCodigoWidget() {
-      const BOT_IDFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${BOT_IDFinal}"><\/script>`;
+      const botIdFinal = BOT_ID || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
+      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
       if (document.getElementById('codigoWidgetModal')) {
         document.getElementById('codigoWidgetModal').value = codigo;
@@ -1531,54 +1532,6 @@ if (!BOT_ID) {
         }
       }
     }
-  
-// === TODO TU JAVASCRIPT ORIGINAL VA ACÁ SIN CAMBIOS ===
-// Solo agregá estas 2 funciones nuevas al final:
-
-function showSection(section) {
-  document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
-  event.target.classList.add('active');
-  
-  if (section === 'configuracion') {
-    document.getElementById('section-configuracion').classList.remove('hidden');
-    document.getElementById('section-analytics').classList.add('hidden');
-  } else if (section === 'analytics') {
-    document.getElementById('section-configuracion').classList.add('hidden');
-    document.getElementById('section-analytics').classList.remove('hidden');
-    cargarAnalytics();
-  }
-}
-
-function cargarAnalytics() {
-  if (!userData || !userData.stats) return;
-  const stats = userData.stats;
-  document.getElementById('statSesiones').textContent = stats.sesiones_totales || '0';
-  document.getElementById('statMensajes').textContent = stats.mensajes_totales || '0';
-  document.getElementById('statExitosas').textContent = stats.respuestas_exitosas || '0';
-  document.getElementById('statFallidas').textContent = stats.respuestas_fallidas || '0';
-  document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad 
-    ? new Date(stats.ultima_actividad).toLocaleString('es-AR') 
-    : '-';
-}
-
-// Modificá esta línea en cargarBot() para que actualice el email del sidebar:
-document.getElementById('sidebarEmail').textContent = userEmail;
-
-// === PEGÁ TODO TU JAVASCRIPT ORIGINAL DESDE API_URL HASTA EL FINAL ACÁ ===
-const API_URL = 'https://wasa-api-proxy.javimsites.workers.dev';
-const BOT_ID = localStorage.getItem('bot_id');
-
-if (!BOT_ID || !userEmail) {
-  window.location.href = 'index.html';
-} else {
-  currentUser = { email: userEmail };
-  document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong>`;
-  document.getElementById('sidebarEmail').textContent = userEmail;
-  cargarBot();
-}
-
-// ... TODO EL RESTO DE TU CÓDIGO ORIGINAL SIN CAMBIOS ...
-// [COPIÁ TODO EL SCRIPT QUE TENÍAS DESDE CLIENT_ID HASTA EL FINAL]
 </script>
 </body>
 </html>
