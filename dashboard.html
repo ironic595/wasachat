@@ -1509,6 +1509,9 @@ function cargarAnalytics() {
    ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
     : '-';
 }
+	const miCodigo = userData.codigo_propio;
+const link = `https://wasa.chat/signup?ref=${miCodigo}`;
+document.getElementById('linkReferido').value = link;
 </script>
 </body>
 </html>
