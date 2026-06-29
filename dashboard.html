@@ -257,7 +257,8 @@ nav {
 
 /* 2. Por defecto, ocultamos ambas secciones */
 .seccion-config,
-.seccion-stats {
+.seccion-stats,
+.seccion-refs{
   display: none;
 }
 
@@ -269,6 +270,10 @@ nav {
 #tab-stats:checked ~ .allcont .seccion-stats {
   display: block;
 }
+
+#tab-refs:checked ~ .allcont .seccion-refs {
+  display: block;
+}      
 
 /* 4. Labels del menubar como botones clickeables */
 .menu-btn {
@@ -289,7 +294,8 @@ nav {
 
 /* 5. EFECTO VISUAL DE PESTAÑA ACTIVA */
 #tab-config:checked ~ .allcont .menu-btn[for="tab-config"],
-#tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"] {
+#tab-stats:checked ~ .allcont .menu-btn[for="tab-stats"],
+#tab-refs:checked ~ .allcont .menu-btn[for="tab-refs"]{
   background: #222;
   color: #4285f4;
   border-bottom: 2px solid #4285f4;
@@ -436,6 +442,30 @@ nav {
             <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #dc3545;">
               <div style="font-size: 32px; font-weight: 700; color: #dc3545;" id="statFallidas">0</div>
               <div style="font-size: 14px; color: #666; margin-top: 4px;">Sin respuesta</div>
+            </div>
+          </div>
+
+          <div style="background: #fff3cd; padding: 16px; border-radius: 8px; border-left: 4px solid #ff9500;">
+            <strong>Última actividad:</strong> <span id="statUltimaActividad">-</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+	<div class="seccion-refs">
+      <div id="section-referidos">
+        <div class="content-card">
+          <h2>Referidos</h2>
+          <p style="color: #666; margin-bottom: 24px;">Métricas de referidos</p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #00d4aa;">
+              <div style="font-size: 32px; font-weight: 700; color: #00d4aa;" id="statSesiones">0</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Referidos totales</div>
+            </div>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #4285f4;">
+              <div style="font-size: 32px; font-weight: 700; color: #4285f4;" id="statMensajes">0</div>
+              <div style="font-size: 14px; color: #666; margin-top: 4px;">Recompensas totales</div>
             </div>
           </div>
 
