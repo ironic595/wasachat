@@ -730,6 +730,33 @@ nav {
         cargarConfigWidget();
         cargarDatosTablas();
         cargarAnalytics(); 
+
+// === PEGAR ACÁ ===
+const codigoPropio = data.codigo_propio || '';
+const linkCompleto = `https://wasa.chat/signup?ref=${codigoPropio}`;
+const inputLink = document.getElementById('linkReferido');
+if (inputLink) {
+  inputLink.value = linkCompleto;
+}
+
+// Llenar métricas de referidos
+if (document.getElementById('referidosTotales')) {
+  document.getElementById('referidosTotales').textContent = data.total_referidos || 0;
+}
+if (document.getElementById('recompensasGanadas')) {
+  document.getElementById('recompensasGanadas').textContent = '$' + (data.recompensas_referidos || 0).toFixed(2);
+}
+
+// Botón copiar
+const btnCopiar = document.getElementById('btnCopiarLink');
+if (btnCopiar) {
+  btnCopiar.onclick = () => {
+    navigator.clipboard.writeText(linkCompleto);
+    btnCopiar.textContent = 'Copiado!';
+    setTimeout(() => { btnCopiar.textContent = 'Copiar'; }, 2000);
+  };
+}
+		  
       } catch(e) {
         document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
         console.error('Error:', e);
@@ -1509,9 +1536,7 @@ function cargarAnalytics() {
    ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
     : '-';
 }
-	const miCodigo = userData.codigo_propio;
-const link = `https://wasa.chat/signup?ref=${miCodigo}`;
-document.getElementById('linkReferido').value = link;
+	
 </script>
 </body>
 </html>
