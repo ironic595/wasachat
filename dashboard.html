@@ -790,17 +790,17 @@ if (btnCopiar) {
       }
     }
 
-   function irAComprar() {
+	window.irAComprar = function() {
   document.getElementById('modalPlanes').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
 
-function cerrarModalPlanes() {
+window.cerrarModalPlanes = function() {
   document.getElementById('modalPlanes').style.display = 'none';
   document.body.style.overflow = 'auto';
 }
 
-async function pagar(plan) {
+window.pagar = async function(plan) {
   const btn = event.target;
   const textoOriginal = btn.textContent;
   btn.textContent = 'Redirigiendo a Stripe...';
