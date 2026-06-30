@@ -790,9 +790,45 @@ if (btnCopiar) {
       }
     }
 
-    function irAComprar() {
-      window.location.href = 'index.html#precios';
+    function iracomprar() {
+  document.getElementById('modalPlanes').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalPlanes() {
+  document.getElementById('modalPlanes').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+async function pagar(plan) {
+  const btn = event.target;
+  btn.textContent = 'Redirigiendo a Stripe...';
+  btn.disabled = true;
+  
+  try {
+    const user = firebase.auth().currentUser;
+    const idToken = await user.getIdToken();
+    
+    const res = await fetch('https://api.wasa.chat/crear-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan, idToken })
+    });
+    
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url; // Te manda directo a Stripe
+    } else {
+      alert('Error: ' + data.error);
+      btn.textContent = 'Activar ' + plan;
+      btn.disabled = false;
     }
+  } catch(e) {
+    alert('Error de conexión');
+    btn.textContent = 'Activar ' + plan;
+    btn.disabled = false;
+  }
+}
 
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
       let dominio = document.getElementById('dominioInput').value.trim();
@@ -1538,29 +1574,37 @@ function cargarAnalytics() {
 }
 	
 </script>
-	<!-- MODAL DE PLANES -->
-<div id="modalPlanes" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;overflow-y:auto;">
-  <div style="background:white;max-width:1000px;margin:40px auto;padding:40px;border-radius:20px;position:relative;">
-    <button onclick="cerrarModalPlanes()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:28px;cursor:pointer;color:#94a3b8;">×</button>
+<!-- MODAL DE PLANES -->
+<div id="modalPlanes" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;overflow-y:auto;">
+  <div style="background:white;max-width:950px;margin:50px auto;padding:40px;border-radius:20px;position:relative;">
+    <button onclick="cerrarModalPlanes()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:32px;cursor:pointer;color:#94a3b8;line-height:1;">×</button>
     
     <h2 style="text-align:center;font-size:28px;font-weight:800;margin-bottom:8px;">Activá tu bot</h2>
-    <p style="text-align:center;color:#64748b;margin-bottom:40px;">Elegí el plan que mejor se adapte. Se renueva automático cada mes.</p>
+    <p style="text-align:center;color:#64748b;margin-bottom:40px;">Elegí un plan. Se cobra mensual y renovás automático.</p>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;">
       <!-- STARTED -->
       <div style="border:2px solid #e2e8f0;border-radius:16px;padding:24px;">
         <h3 style="color:#3B5BFF;font-size:18px;margin-bottom:8px;">Started</h3>
         <div style="font-size:36px;font-weight:800;margin:12px 0;">$19<span style="font-size:14px;color:#64748b;">/mes</span></div>
-        <p style="color:#64748b;font-size:13px;margin-bottom:20px;">~5,000 mensajes/mes</p>
+        <p style="color:#64748b;font-size:13px;margin-bottom:20px;"><strong>5,000 mensajes</strong> incluidos</p>
+        <ul style="text-align:left;list-style:none;margin-bottom:24px;font-size:14px;">
+          <li style="margin:6px 0;">✓ Bot Llama 3</li>
+          <li style="margin:6px 0;">✓ Soporte email</li>
+        </ul>
         <button onclick="pagar('started')" style="width:100%;padding:12px;background:#3B5BFF;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Activar Started</button>
       </div>
 
       <!-- PRO -->
-      <div style="border:3px solid #3B5BFF;border-radius:16px;padding:24px;position:relative;">
-        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#3B5BFF;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">RECOMENDADO</div>
+      <div style="border:3px solid #3B5BFF;border-radius:16px;padding:24px;position:relative;transform:scale(1.05);">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#3B5BFF;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">MÁS POPULAR</div>
         <h3 style="color:#3B5BFF;font-size:18px;margin-bottom:8px;">Pro</h3>
         <div style="font-size:36px;font-weight:800;margin:12px 0;">$49<span style="font-size:14px;color:#64748b;">/mes</span></div>
-        <p style="color:#64748b;font-size:13px;margin-bottom:20px;">~20,000 mensajes/mes</p>
+        <p style="color:#64748b;font-size:13px;margin-bottom:20px;"><strong>20,000 mensajes</strong> incluidos</p>
+        <ul style="text-align:left;list-style:none;margin-bottom:24px;font-size:14px;">
+          <li style="margin:6px 0;">✓ Bot Llama 3</li>
+          <li style="margin:6px 0;">✓ Soporte prioritario</li>
+        </ul>
         <button onclick="pagar('pro')" style="width:100%;padding:12px;background:#3B5BFF;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Activar Pro</button>
       </div>
 
@@ -1568,48 +1612,20 @@ function cargarAnalytics() {
       <div style="border:2px solid #e2e8f0;border-radius:16px;padding:24px;">
         <h3 style="color:#3B5BFF;font-size:18px;margin-bottom:8px;">Enterprise</h3>
         <div style="font-size:36px;font-weight:800;margin:12px 0;">$199<span style="font-size:14px;color:#64748b;">/mes</span></div>
-        <p style="color:#64748b;font-size:13px;margin-bottom:20px;">~100,000 mensajes/mes</p>
+        <p style="color:#64748b;font-size:13px;margin-bottom:20px;"><strong>100,000 mensajes</strong> incluidos</p>
+        <ul style="text-align:left;list-style:none;margin-bottom:24px;font-size:14px;">
+          <li style="margin:6px 0;">✓ Bot Llama 3</li>
+          <li style="margin:6px 0;">✓ Soporte 24/7</li>
+        </ul>
         <button onclick="pagar('enterprise')" style="width:100%;padding:12px;background:#3B5BFF;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Activar Enterprise</button>
       </div>
     </div>
 
     <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:32px;">
-      Los mensajes no usados no se acumulan. Se renueva cada 30 días. Cancelás cuando quieras.
+      Los mensajes se reinician cada 30 días. Si te pasás del límite, el bot se pausa hasta renovar o hacer upgrade.
     </p>
   </div>
 </div>
 
-<script>
-function mostrarModalPlanes() {
-  document.getElementById('modalPlanes').style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-function cerrarModalPlanes() {
-  document.getElementById('modalPlanes').style.display = 'none';
-  document.body.style.overflow = 'auto';
-}
-
-async function pagar(plan) {
-  const user = firebase.auth().currentUser;
-  const idToken = await user.getIdToken();
-  
-  // Mostrar loading
-  event.target.textContent = 'Redirigiendo...';
-  event.target.disabled = true;
-  
-  const res = await fetch('https://api.wasa.chat/crear-checkout', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan, idToken })
-  });
-  const data = await res.json();
-  if (data.url) window.location.href = data.url;
-  else {
-    alert('Error: ' + data.error);
-    event.target.textContent = 'Activar ' + plan;
-    event.target.disabled = false;
-  }
-}
-</script>
 </body>
 </html>
