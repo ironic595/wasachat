@@ -790,7 +790,7 @@ if (btnCopiar) {
       }
     }
 
-    function iracomprar() {
+   function irAComprar() {
   document.getElementById('modalPlanes').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
@@ -802,11 +802,14 @@ function cerrarModalPlanes() {
 
 async function pagar(plan) {
   const btn = event.target;
+  const textoOriginal = btn.textContent;
   btn.textContent = 'Redirigiendo a Stripe...';
   btn.disabled = true;
   
   try {
     const user = firebase.auth().currentUser;
+    if (!user) throw new Error('Sesión expirada');
+    
     const idToken = await user.getIdToken();
     
     const res = await fetch('https://api.wasa.chat/crear-checkout', {
@@ -817,15 +820,13 @@ async function pagar(plan) {
     
     const data = await res.json();
     if (data.url) {
-      window.location.href = data.url; // Te manda directo a Stripe
+      window.location.href = data.url;
     } else {
-      alert('Error: ' + data.error);
-      btn.textContent = 'Activar ' + plan;
-      btn.disabled = false;
+      throw new Error(data.error || 'Error desconocido');
     }
   } catch(e) {
-    alert('Error de conexión');
-    btn.textContent = 'Activar ' + plan;
+    alert('Error: ' + e.message);
+    btn.textContent = textoOriginal;
     btn.disabled = false;
   }
 }
