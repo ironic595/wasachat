@@ -718,6 +718,7 @@ footer {
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+
 <script>
   const WORKER_URL = 'https://api.wasa.chat';
   const GOOGLE_CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
@@ -741,12 +742,19 @@ footer {
     document.body.style.overflow = 'auto';
   }
 
-// Leer ?ref=WASA-XXX de la URL
-const urlParams = new URLSearchParams(window.location.search);
-const codigoRef = urlParams.get('ref') || '';
-if (codigoRef) {
-  localStorage.setItem('codigo_referido', codigoRef.toUpperCase());
-}
+  // === LEER ?ref= UNA SOLA VEZ ===
+  const urlParams = new URLSearchParams(window.location.search);
+  const codigoRef = urlParams.get('ref') || '';
+  if (codigoRef) {
+    localStorage.setItem('codigo_referido', codigoRef.toUpperCase());
+    // Solo mostrar si existe el elemento
+    const msgEl = document.getElementById('codigo-ref-msg');
+    const textEl = document.getElementById('codigo-ref-text');
+    if (msgEl && textEl) {
+      msgEl.style.display = 'block';
+      textEl.textContent = codigoRef.toUpperCase();
+    }
+  }
     
   window.onload = function () {
     google.accounts.id.initialize({
@@ -760,43 +768,34 @@ if (codigoRef) {
   };
 
   async function handleCredentialResponse(response) {
-  const idToken = response.credential;
-  const codigo_referido = localStorage.getItem('codigo_referido') || ''; // <- NUEVO
+    const idToken = response.credential;
+    const codigo_referido = localStorage.getItem('codigo_referido') || '';
 
-  try {
-    const res = await fetch(`${WORKER_URL}/auth`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken, codigo_referido }) // <- MANDÁS EL CÓDIGO
-    });
+    try {
+      const res = await fetch(`${WORKER_URL}/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken, codigo_referido })
+      });
 
-    const data = await res.json();
-    
-    if (res.ok && data.bot_id && data.email) {
-      localStorage.setItem('bot_id', data.bot_id);
-      localStorage.setItem('user_email', data.email);
-      localStorage.removeItem('codigo_referido'); // <- LIMPIAR DESPUÉS DE USAR
-      cerrarModal();
-      btnLogin.textContent = "Mi Dashboard";
-      btnLogin.onclick = () => window.location.href = "dashboard.html";
-      window.location.href = "dashboard.html";
-    } else {
-      alert("Error al iniciar sesión: " + (data.error || 'desconocido'));
+      const data = await res.json();
+      
+      if (res.ok && data.bot_id && data.email) {
+        localStorage.setItem('bot_id', data.bot_id);
+        localStorage.setItem('user_email', data.email);
+        localStorage.removeItem('codigo_referido');
+        cerrarModal();
+        btnLogin.textContent = "Mi Dashboard";
+        btnLogin.onclick = () => window.location.href = "dashboard.html";
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Error al iniciar sesión: " + (data.error || 'desconocido'));
+      }
+    } catch (e) {
+      alert("Error de conexión: " + e.message);
     }
-  } catch (e) {
-    alert("Error de conexión: " + e.message);
   }
-}
 
-const urlParams = new URLSearchParams(window.location.search);
-const codigoRef = urlParams.get('ref') || '';
-if (codigoRef) {
-  localStorage.setItem('codigo_referido', codigoRef.toUpperCase());
-  // Mostrar en el modal
-  document.getElementById('codigo-ref-msg').style.display = 'block';
-  document.getElementById('codigo-ref-text').textContent = codigoRef.toUpperCase();
-}
-    
   function elegirPlan(tipo, precio) {
     localStorage.setItem('planElegido', JSON.stringify({
       tipo: tipo,
