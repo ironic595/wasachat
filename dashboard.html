@@ -420,6 +420,15 @@ nav {
     <div id="userInfo"></div>
     <div id="debug">Cargando datos del Worker...</div>
 
+	<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">
+  <h3 style="margin: 0 0 10px 0; font-size: 16px; opacity: 0.9;">Créditos de IA disponibles</h3>
+  <div style="font-size: 42px; font-weight: 800; margin: 10px 0;" id="creditosIA">0</div>
+  <div style="font-size: 13px; opacity: 0.8; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 12px;">
+    Último mensaje: <span id="ultimoCosto">0</span> créditos<br>
+    Enriquecer producto: <span id="costoEnrichment">2</span> créditos aprox
+  </div>
+</div>
+
     <div class="card">
      <div class="seccion-stats">
       <div id="section-analytics">
@@ -726,6 +735,18 @@ nav {
           stats: data.stats,
           data: data.data
         };
+
+// ACTUALIZAR CRÉDITOS
+if (data.saldo_creditos_ia !== undefined) {
+  document.getElementById('creditosIA').textContent = data.saldo_creditos_ia.toLocaleString('es-AR');
+}
+if (data.ultimo_costo_mensaje !== undefined) {
+  document.getElementById('ultimoCosto').textContent = data.ultimo_costo_mensaje || '2';
+}
+if (data.costo_enrichment !== undefined) {
+  document.getElementById('costoEnrichment').textContent = data.costo_enrichment;
+}
+		  
         mostrarPanelCorrecto();
         cargarConfigWidget();
         cargarDatosTablas();
@@ -788,6 +809,9 @@ if (btnCopiar) {
           btnComprar.classList.remove('hidden');
         }
       }
+		if (userData.saldo_creditos_ia !== undefined) {
+    document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
+  }
     }
 
 	window.irAComprar = function() {
