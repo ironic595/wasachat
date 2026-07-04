@@ -1635,7 +1635,8 @@ function cargarAnalytics() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
       idToken: idTokenGlobal,
-      codigo_verificacion: codigo 
+      codigo_verificacion: codigo,
+	  email: userEmail
     })
   });
   
