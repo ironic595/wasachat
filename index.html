@@ -779,6 +779,7 @@ footer {
     });
 
     const data = await res.json();
+      console.log('[AUTH RESPONSE]', data);
     
     // Si hay error explícito, cortar
     if (data.error) {
