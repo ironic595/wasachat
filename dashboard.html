@@ -678,10 +678,15 @@ nav {
   </div>
 
 <script>
+	
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
 
     let currentUser = null;
     let userData = null;
+
+	let idTokenGlobal = '';
+    let emailPendienteVerificacion = '';
+	
     let tokenClient;
     let accessToken = null;
     let currentTab = 'productos';
@@ -1652,6 +1657,43 @@ function cargarAnalytics() {
     <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:32px;">
       Los mensajes se reinician cada 30 días. Si te pasás del límite, el bot se pausa hasta renovar o hacer upgrade.
     </p>
+  </div>
+</div>
+
+	<!-- Modal Verificación Email -->
+<div id="modalVerificacion" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:32px;max-width:400px;width:90%;text-align:center;">
+    <h2 style="color:#25D366;margin:0 0 8px;font-size:24px;">Verificá tu email</h2>
+    <p style="color:#aaa;margin:0 0 24px;font-size:14px;">
+      Te enviamos un código de 6 dígitos a <br><b id="emailVerificacion" style="color:#fff"></b>
+    </p>
+    
+    <input 
+      type="text" 
+      id="inputCodigoVerificacion" 
+      placeholder="000000" 
+      maxlength="6"
+      style="width:100%;padding:16px;text-align:center;font-size:32px;letter-spacing:8px;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;outline:none;margin-bottom:16px;"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+    >
+    
+    <div id="errorVerificacion" style="color:#ff4444;font-size:13px;min-height:20px;margin-bottom:16px;"></div>
+    
+    <button 
+      id="btnVerificarCodigo" 
+      onclick="verificarCodigo()"
+      style="width:100%;padding:14px;background:#25D366;border:none;border-radius:8px;color:#000;font-weight:600;font-size:16px;cursor:pointer;"
+    >
+      Verificar cuenta
+    </button>
+    
+    <button 
+      onclick="reenviarCodigo()" 
+      id="btnReenviar"
+      style="width:100%;padding:12px;background:transparent;border:none;color:#666;font-size:13px;cursor:pointer;margin-top:8px;"
+    >
+      Reenviar código
+    </button>
   </div>
 </div>
 
