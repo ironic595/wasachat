@@ -767,7 +767,7 @@ footer {
     );
   };
 
- async function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
   const idToken = response.credential;
   const codigo_referido = localStorage.getItem('codigo_referido') || '';
 
@@ -779,20 +779,22 @@ footer {
     });
 
     const data = await res.json();
-      console.log('[AUTH RESPONSE]', data);
+    console.log('[AUTH RESPONSE]', data); // Para debug
     
-    // Si hay error explícito, cortar
+    // Si hay error explícito del Worker
     if (data.error) {
       alert("Error al iniciar sesión: " + data.error);
       return;
     }
 
-    // Caso 1: Ya verificado → entrar directo
-    if (data.verificado === true && data.bot_id && data.email) {
+    // Guardar siempre el idToken y email si vienen
+    if (data.email) localStorage.setItem('user_email', data.email);
+    if (idToken) localStorage.setItem('idToken', idToken);
+    localStorage.removeItem('codigo_referido');
+
+    // Si está verificado y tiene bot_id → entrar
+    if (data.verificado === true && data.bot_id) {
       localStorage.setItem('bot_id', data.bot_id);
-      localStorage.setItem('user_email', data.email);
-      localStorage.setItem('idToken', idToken);
-      localStorage.removeItem('codigo_referido');
       cerrarModal();
       btnLogin.textContent = "Mi Dashboard";
       btnLogin.onclick = () => window.location.href = "dashboard.html";
@@ -800,19 +802,16 @@ footer {
       return;
     }
 
-    // Caso 2: No verificado → igual lo mando al dashboard para que vea el modal
-    if (data.requiere_verificacion === true && data.email) {
-      localStorage.setItem('user_email', data.email);
-      localStorage.setItem('idToken', idToken);
-      localStorage.removeItem('codigo_referido');
+    // Si requiere verificación O si solo vino email → igual mandarlo al dashboard
+    if (data.requiere_verificacion === true || data.email) {
       cerrarModal();
       window.location.href = "dashboard.html";
       return;
     }
 
-    // Si llega acá, algo raro pasó
-    alert("Error al iniciar sesión: respuesta inválida del servidor");
-    console.error('Respuesta /auth:', data);
+    // Si no entró en ningún caso
+    alert("Error al iniciar sesión: respuesta inesperada");
+    console.error('Respuesta inesperada:', data);
 
   } catch (e) {
     alert("Error de conexión: " + e.message);
