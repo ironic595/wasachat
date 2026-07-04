@@ -804,6 +804,7 @@ async function handleCredentialResponse(response) {
 
     // Si requiere verificación O si solo vino email → igual mandarlo al dashboard
     if (data.requiere_verificacion === true || data.email) {
+      localStorage.setItem('bot_id', 'pending');
       cerrarModal();
       window.location.href = "dashboard.html";
       return;
