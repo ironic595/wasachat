@@ -732,14 +732,23 @@ nav {
         }
         
         userData = {
-          email: userEmail,
-          bot_id: botId,
-          estado: data.estado,
-          domain: data.domain,
-          config: data.config,
-          stats: data.stats,
-          data: data.data
-        };
+  email: userEmail,
+  bot_id: botId,
+  estado: data.estado,
+  domain: data.domain,
+  config: data.config,
+  stats: data.stats,
+  data: data.data,
+  verificado: data.verificado || false
+};
+
+// Si no está verificado, mostrar modal y cortar
+if (!userData.verificado) {
+  document.getElementById('emailVerificacion').textContent = userEmail;
+  document.getElementById('modalVerificacion').style.display = 'flex';
+  document.getElementById('inputCodigoVerificacion').focus();
+  return; // No ejecuta mostrarPanelCorrecto()
+}
 
 // ACTUALIZAR CRÉDITOS
 if (data.saldo_creditos_ia !== undefined) {
@@ -1605,6 +1614,79 @@ function cargarAnalytics() {
    ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
     : '-';
 }
+
+	async function verificarCodigo() {
+  const codigo = document.getElementById('inputCodigoVerificacion').value;
+  const btnVerificar = document.getElementById('btnVerificarCodigo');
+  const errorDiv = document.getElementById('errorVerificacion');
+  
+  if (codigo.length !== 6) {
+    errorDiv.textContent = 'El código debe tener 6 dígitos';
+    return;
+  }
+  
+  btnVerificar.disabled = true;
+  btnVerificar.textContent = 'Verificando...';
+  errorDiv.textContent = '';
+  
+  const res = await fetch('https://api.wasa.chat/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      idToken: idTokenGlobal,
+      codigo_verificacion: codigo 
+    })
+  });
+  
+  const data = await res.json();
+  
+  if (data.verificado) {
+    localStorage.setItem('bot_id', data.bot_id);
+    localStorage.setItem('user_email', data.email);
+    document.getElementById('modalVerificacion').style.display = 'none';
+    location.reload();
+    return;
+  }
+  
+  btnVerificar.disabled = false;
+  btnVerificar.textContent = 'Verificar cuenta';
+  
+  if (data.error === 'codigo_incorrecto') {
+    errorDiv.textContent = 'Código incorrecto. Intentá de nuevo.';
+  } else if (data.error === 'codigo_expirado') {
+    errorDiv.textContent = 'El código expiró. Pedí uno nuevo.';
+  } else {
+    errorDiv.textContent = 'Error al verificar.';
+  }
+  
+  document.getElementById('inputCodigoVerificacion').value = '';
+  document.getElementById('inputCodigoVerificacion').focus();
+}
+
+async function reenviarCodigo() {
+  const btnReenviar = document.getElementById('btnReenviar');
+  btnReenviar.disabled = true;
+  btnReenviar.textContent = 'Enviando...';
+  
+  await fetch('https://api.wasa.chat/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken: idTokenGlobal })
+  });
+  
+  btnReenviar.textContent = 'Código reenviado ✓';
+  setTimeout(() => {
+    btnReenviar.disabled = false;
+    btnReenviar.textContent = 'Reenviar código';
+  }, 3000);
+  
+  document.getElementById('errorVerificacion').textContent = '';
+  document.getElementById('inputCodigoVerificacion').focus();
+}
+
+document.getElementById('inputCodigoVerificacion')?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') verificarCodigo();
+});
 	
 </script>
 <!-- MODAL DE PLANES -->
