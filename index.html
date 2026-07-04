@@ -783,6 +783,7 @@ footer {
       if (res.ok && data.bot_id && data.email) {
         localStorage.setItem('bot_id', data.bot_id);
         localStorage.setItem('user_email', data.email);
+        localStorage.setItem('idToken', idToken);  
         localStorage.removeItem('codigo_referido');
         cerrarModal();
         btnLogin.textContent = "Mi Dashboard";
