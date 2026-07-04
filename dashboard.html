@@ -717,7 +717,7 @@ if (!userEmail ||!idToken) {
 
     async function cargarBot() {
       try {
-        const res = await fetch('https://api.wasa.chat/config', {
+        const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_id: botId })
@@ -854,7 +854,7 @@ window.pagar = async function(plan) {
     
     const idToken = await user.getIdToken();
     
-    const res = await fetch('https://api.wasa.chat/crear-checkout', {
+    const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/crear-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan, idToken })
@@ -880,7 +880,7 @@ window.pagar = async function(plan) {
 
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
@@ -907,7 +907,7 @@ window.pagar = async function(plan) {
 
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
@@ -944,7 +944,7 @@ window.pagar = async function(plan) {
 
     function generarCodigoWidget() {
       const botIdFinal = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
+      const codigo = `<script src="https://wasa-api-proxy.javimsites.workers.dev/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
       if (document.getElementById('codigoWidgetModal')) {
         document.getElementById('codigoWidgetModal').value = codigo;
@@ -1052,7 +1052,7 @@ window.pagar = async function(plan) {
 
         const url = `https://lh3.googleusercontent.com/d/${fileId}`;
 
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -1088,7 +1088,7 @@ window.pagar = async function(plan) {
 
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_id: userData.bot_id, config })
@@ -1439,7 +1439,7 @@ window.pagar = async function(plan) {
     document.getElementById('btnSubirProductos').addEventListener('click', async () => {
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
@@ -1457,7 +1457,7 @@ window.pagar = async function(plan) {
     document.getElementById('btnSubirFaq').addEventListener('click', async () => {
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
@@ -1630,7 +1630,7 @@ function cargarAnalytics() {
   btnVerificar.textContent = 'Verificando...';
   errorDiv.textContent = '';
   
-  const res = await fetch('https://api.wasa.chat/auth', {
+  const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
@@ -1670,7 +1670,7 @@ async function reenviarCodigo() {
   btnReenviar.disabled = true;
   btnReenviar.textContent = 'Enviando...';
   
-  await fetch('https://api.wasa.chat/auth', {
+  await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ idToken: idTokenGlobal })
