@@ -720,7 +720,7 @@ if (!userEmail ||!idToken) {
         const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: botId })
+          body: JSON.stringify({ bot_id: botId, email: userEmail })
         });
         const data = await res.json();
         
@@ -883,7 +883,7 @@ window.pagar = async function(plan) {
         await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
         });
         userData.domain = dominio;
         showLoading(false);
@@ -910,7 +910,7 @@ window.pagar = async function(plan) {
         await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo, email: userEmail })
         });
         userData.domain = nuevo;
         document.getElementById('dominioActual').textContent = nuevo;
@@ -1056,7 +1056,8 @@ window.pagar = async function(plan) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            bot_id: userData.bot_id, 
+            bot_id: userData.bot_id,
+			email: userEmail,  
             config: {...userData.config, avatar: url }
           })
         });
@@ -1091,7 +1092,7 @@ window.pagar = async function(plan) {
         await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, config })
+          body: JSON.stringify({ bot_id: userData.bot_id, email: userEmail, config })
         });
         userData.config = config;
         document.getElementById('colorWidget').value = config.color;
@@ -1442,7 +1443,7 @@ window.pagar = async function(plan) {
         await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
+          body: JSON.stringify({ bot_id: userData.bot_id, email: userEmail, data: { productos: datosProductos } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -1460,7 +1461,7 @@ window.pagar = async function(plan) {
         await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
+          body: JSON.stringify({ bot_id: userData.bot_id, email: userEmail, data: { faq: datosConfig } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -1636,7 +1637,8 @@ function cargarAnalytics() {
     body: JSON.stringify({ 
       idToken: idTokenGlobal,
       codigo_verificacion: codigo,
-	  email: userEmail
+	  email: userEmail,
+	  	
     })
   });
   
