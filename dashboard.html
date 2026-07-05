@@ -1622,6 +1622,12 @@ function cargarAnalytics() {
 }
 
 	async function verificarCodigo() {
+  const idToken = localStorage.getItem('idToken'); // <-- AGREGÁ ESTA LÍNEA
+  if (!idToken) {
+    alert('Sesión expirada. Refrescá la página.');
+    return;
+  }
+		
   const codigo = document.getElementById('inputCodigoVerificacion').value;
   const btnVerificar = document.getElementById('btnVerificarCodigo');
   const errorDiv = document.getElementById('errorVerificacion');
