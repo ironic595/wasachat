@@ -1639,7 +1639,7 @@ function cargarAnalytics() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
-      idToken: idTokenGlobal,
+      idToken: localStorage.getItem('idToken'),
       codigo_verificacion: codigo,
 	  email: userEmail,
 	  	
@@ -1679,7 +1679,7 @@ async function reenviarCodigo() {
   await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken: idTokenGlobal })
+    body: JSON.stringify({ idToken: localStorage.getItem('idToken'), })
   });
   
   btnReenviar.textContent = 'Código reenviado ✓';
