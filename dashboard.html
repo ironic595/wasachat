@@ -804,34 +804,43 @@ if (btnCopiar) {
     }
 
     function mostrarPanelCorrecto() {
-      const stepDominio = document.getElementById('stepDominio');
-      const panelPrincipal = document.getElementById('panelPrincipal');
+  const stepDominio = document.getElementById('stepDominio');
+  const panelPrincipal = document.getElementById('panelPrincipal');
 
-      if (!userData.domain || userData.domain === null || userData.domain === '') {
-        stepDominio.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-      } else {
-        stepDominio.classList.add('hidden');
-        panelPrincipal.classList.remove('hidden');
-        document.getElementById('dominioActual').textContent = userData.domain;
+  // Si no está verificado, ni mostramos el dashboard
+  if (!userData.verificado) {
+    stepDominio.classList.add('hidden');
+    panelPrincipal.classList.add('hidden');
+    return;
+  }
+
+  // Si no hay dominio guardado → mostrar solo el step de dominio
+  if (!userData.domain || userData.domain === null || userData.domain.trim() === '') {
+    stepDominio.classList.remove('hidden');
+    panelPrincipal.classList.add('hidden');
+  } else {
+    // Si ya hay dominio → ocultar step y mostrar panel principal directo
+    stepDominio.classList.add('hidden');
+    panelPrincipal.classList.remove('hidden');
+    document.getElementById('dominioActual').textContent = userData.domain;
 
         const estadoBotSpan = document.getElementById('estadoBot');
         const btnComprar = document.getElementById('btnComprarPlan');
 
         if (userData.estado === 'activo' || userData.estado === 'pago') {
-          estadoBotSpan.textContent = '✅ Activo';
-          estadoBotSpan.className = 'estado-activo';
-          btnComprar.classList.add('hidden');
-        } else {
-          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-          estadoBotSpan.className = 'estado-inactivo';
-          btnComprar.classList.remove('hidden');
-        }
-      }
-		if (userData.saldo_creditos_ia !== undefined) {
+      estadoBotSpan.textContent = '✅ Activo';
+      estadoBotSpan.className = 'estado-activo';
+      btnComprar.classList.add('hidden');
+    } else {
+      estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+      estadoBotSpan.className = 'estado-inactivo';
+      btnComprar.classList.remove('hidden');
+    }
+  }
+	if (userData.saldo_creditos_ia!== undefined) {
     document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
   }
-    }
+}
 
 	window.irAComprar = function() {
   const modal = document.getElementById('modalPlanes');
@@ -878,26 +887,27 @@ window.pagar = async function(plan) {
 }
 
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
-      let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
-      if (!dominio) return alert("Ingresá un dominio válido");
+  let dominio = document.getElementById('dominioInput').value.trim();
+  dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
+  if (!dominio) return alert("Ingresá un dominio válido");
 
       showLoading(true);
-      try {
-        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
-        });
-        userData.domain = dominio;
-        showLoading(false);
-        showToast('✅ Dominio guardado');
-        mostrarPanelCorrecto();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
+  try {
+    await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
     });
+         // Clave: actualizamos el objeto local antes de refrescar UI
+    userData.domain = dominio;
+    showLoading(false);
+    showToast('✅ Dominio guardado');
+    mostrarPanelCorrecto(); // Esto oculta stepDominio y muestra panelPrincipal
+  } catch (e) {
+    showLoading(false);
+    alert('Error: ' + e.message);
+  }
+});
 
     function mostrarCambiarDominio() {
       document.getElementById('nuevoDominioInput').value = userData.domain;
