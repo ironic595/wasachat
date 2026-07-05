@@ -430,6 +430,46 @@ nav {
 </div>
 
     <div class="card">
+<div class="panelInicio">
+<div id="panelPrincipal">
+	 <div class="content-card">
+      <h2>✅ Todo configurado</h2>
+      <div class="info-row">
+        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
+        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
+      </div>
+      <div class="info-row">
+        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
+        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
+      </div>
+      <div class="card" style="margin-top:30px;">
+        <h3 class="card-title">🎨 Configuración del Widget</h3>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
+            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+        </div>
+        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+        <input type="hidden" id="colorWidget">
+        <input type="hidden" id="posWidget">
+        <input type="hidden" id="saludoWidget">
+      </div>
+      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
+      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
+      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
+    </div>
+    </div>
+	</div>
+	</div>
+
      <div class="seccion-stats">
       <div id="section-analytics">
         <div class="content-card">
@@ -461,6 +501,9 @@ nav {
         </div>
       </div>
     </div>
+
+
+		
 	<div class="seccion-config">
     <div id="stepDominio">
 		 <div class="content-card">
@@ -502,47 +545,6 @@ nav {
       </div>
     </div>
     </div>
-
-
-    <div class="card hidden" id="panelPrincipal">
-      <h2>✅ Todo configurado</h2>
-
-      <div class="info-row">
-        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
-        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
-      </div>
-
-      <div class="info-row">
-        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
-        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
-      </div>
-
-      <div class="card" style="margin-top:30px;">
-        <h3 class="card-title">🎨 Configuración del Widget</h3>
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
-          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
-          <div style="flex:1;">
-            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
-            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
-          </div>
-        </div>
-        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
-          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-        </div>
-        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
-        <input type="hidden" id="colorWidget">
-        <input type="hidden" id="posWidget">
-        <input type="hidden" id="saludoWidget">
-      </div>
-
-      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
-      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
-      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
-    </div>
-  </div>
 </div>
   
   </div>
