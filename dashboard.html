@@ -724,7 +724,7 @@ if (!userEmail || userEmail === 'null' || userEmail === '' || !idToken) {
         const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: botId, email: userEmail })
+          body: JSON.stringify({ email: userEmail })
         });
         const data = await res.json();
         
