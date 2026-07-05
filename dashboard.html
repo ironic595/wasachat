@@ -685,6 +685,7 @@ nav {
     let userData = null;
 
 	let idTokenGlobal = '';
+	let idTokenGlobal = localStorage.getItem('idToken') || '';
     let emailPendienteVerificacion = '';
 	
     let tokenClient;
