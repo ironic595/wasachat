@@ -807,35 +807,53 @@ if (btnCopiar) {
       }
     }
 
-    function mostrarPanelCorrecto() {
-      const stepDominio = document.getElementById('stepDominio');
-      const panelPrincipal = document.getElementById('panelPrincipal');
+   function mostrarPanelCorrecto() {
+  const radioConfig = document.getElementById('tab-config');
+  const radioStats = document.getElementById('tab-stats');
+  const radioRefs = document.getElementById('tab-refs');
+  
+  const panelInicio = document.querySelector('.panelInicio');
+  const seccionConfig = document.querySelector('.seccion-config');
+  const seccionStats = document.querySelector('.seccion-stats');
+  const seccionRefs = document.querySelector('.seccion-refs');
 
-      if (!userData.domain || userData.domain === null || userData.domain === '') {
-        stepDominio.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-      } else {
-        stepDominio.classList.add('hidden');
-        panelPrincipal.classList.remove('hidden');
-        document.getElementById('dominioActual').textContent = userData.domain;
+  if (!userData.verificado) return; // El modal se encarga
 
-        const estadoBotSpan = document.getElementById('estadoBot');
-        const btnComprar = document.getElementById('btnComprarPlan');
+  // Si NO hay dominio → mostrar solo seccion-config con el form de dominio
+  if (!userData.domain || userData.domain.trim() === '') {
+    radioConfig.checked = true; // Forzar tab config
+    seccionConfig.style.display = 'block';
+    panelInicio.classList.add('hidden');
+    seccionStats.style.display = 'none';
+    seccionRefs.style.display = 'none';
+  } else {
+    // Si YA hay dominio → mostrar panelInicio por defecto
+    radioConfig.checked = true; // Forzar tab config
+    panelInicio.classList.remove('hidden');
+    seccionConfig.style.display = 'none'; // Ocultar el step de dominio
+    seccionStats.style.display = 'none';
+    seccionRefs.style.display = 'none';
+    
+    // Cargar datos del panel
+    document.getElementById('dominioActual').textContent = userData.domain;
+    const estadoBotSpan = document.getElementById('estadoBot');
+    const btnComprar = document.getElementById('btnComprarPlan');
 
-        if (userData.estado === 'activo' || userData.estado === 'pago') {
-          estadoBotSpan.textContent = '✅ Activo';
-          estadoBotSpan.className = 'estado-activo';
-          btnComprar.classList.add('hidden');
-        } else {
-          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-          estadoBotSpan.className = 'estado-inactivo';
-          btnComprar.classList.remove('hidden');
-        }
-      }
-		if (userData.saldo_creditos_ia !== undefined) {
+    if (userData.estado === 'activo' || userData.estado === 'pago') {
+      estadoBotSpan.textContent = '✅ Activo';
+      estadoBotSpan.className = 'estado-activo';
+      btnComprar.classList.add('hidden');
+    } else {
+      estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+      estadoBotSpan.className = 'estado-inactivo';
+      btnComprar.classList.remove('hidden');
+    }
+  }
+
+  if (userData.saldo_creditos_ia !== undefined) {
     document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
   }
-    }
+}
 
 	window.irAComprar = function() {
   const modal = document.getElementById('modalPlanes');
