@@ -803,31 +803,48 @@ if (btnCopiar) {
       }
     }
 
-    function mostrarPanelCorrecto() {
+   function mostrarPanelCorrecto() {
+  // Estos son los bloques que hay que alternar
   const stepDominio = document.getElementById('stepDominio');
+  const userInfo = document.getElementById('userInfo');
+  const cardCreditos = document.querySelector('.card[style*="linear-gradient"]'); // La card morada
   const panelPrincipal = document.getElementById('panelPrincipal');
+  const seccionStats = document.querySelector('.seccion-stats');
+  const seccionRefs = document.querySelector('.seccion-refs');
 
-  // Si no está verificado, ni mostramos el dashboard
+  // Si no está verificado, el modal se encarga. Acá no mostramos nada.
   if (!userData.verificado) {
     stepDominio.classList.add('hidden');
+    userInfo.style.display = 'none';
+    cardCreditos.style.display = 'none';
     panelPrincipal.classList.add('hidden');
     return;
   }
 
-  // Si no hay dominio guardado → mostrar solo el step de dominio
-  if (!userData.domain || userData.domain === null || userData.domain.trim() === '') {
+  // CASO 1: NO HAY DOMINIO → Mostrar SOLO el step de dominio
+  if (!userData.domain || userData.domain.trim() === '') {
     stepDominio.classList.remove('hidden');
+    userInfo.style.display = 'none';
+    cardCreditos.style.display = 'none';
     panelPrincipal.classList.add('hidden');
+    seccionStats.style.display = 'none';
+    seccionRefs.style.display = 'none';
+
   } else {
-    // Si ya hay dominio → ocultar step y mostrar panel principal directo
+    // CASO 2: YA HAY DOMINIO → Mostrar dashboard completo
     stepDominio.classList.add('hidden');
+    userInfo.style.display = 'block';
+    cardCreditos.style.display = 'block';
     panelPrincipal.classList.remove('hidden');
+    seccionStats.style.display = 'block';
+    seccionRefs.style.display = 'block';
+
     document.getElementById('dominioActual').textContent = userData.domain;
 
-        const estadoBotSpan = document.getElementById('estadoBot');
-        const btnComprar = document.getElementById('btnComprarPlan');
+    const estadoBotSpan = document.getElementById('estadoBot');
+    const btnComprar = document.getElementById('btnComprarPlan');
 
-        if (userData.estado === 'activo' || userData.estado === 'pago') {
+    if (userData.estado === 'activo' || userData.estado === 'pago') {
       estadoBotSpan.textContent = '✅ Activo';
       estadoBotSpan.className = 'estado-activo';
       btnComprar.classList.add('hidden');
@@ -837,7 +854,9 @@ if (btnCopiar) {
       btnComprar.classList.remove('hidden');
     }
   }
-	if (userData.saldo_creditos_ia!== undefined) {
+
+  // Créditos IA
+  if (userData.saldo_creditos_ia!== undefined) {
     document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
   }
 }
@@ -891,18 +910,18 @@ window.pagar = async function(plan) {
   dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
   if (!dominio) return alert("Ingresá un dominio válido");
 
-      showLoading(true);
+  showLoading(true);
   try {
     await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
     });
-         // Clave: actualizamos el objeto local antes de refrescar UI
-    userData.domain = dominio;
+
+    userData.domain = dominio; // Clave: actualizar el objeto local
     showLoading(false);
     showToast('✅ Dominio guardado');
-    mostrarPanelCorrecto(); // Esto oculta stepDominio y muestra panelPrincipal
+    mostrarPanelCorrecto(); // Esto oculta el form y muestra todo el dashboard
   } catch (e) {
     showLoading(false);
     alert('Error: ' + e.message);
