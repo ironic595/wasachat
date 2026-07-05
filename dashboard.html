@@ -703,11 +703,15 @@ nav {
       callback: '',
     });
 
-    const botId = localStorage.getItem('bot_id');
+const botId = localStorage.getItem('bot_id');
 const userEmail = localStorage.getItem('user_email');
 const idToken = localStorage.getItem('idToken');
 
-if (!userEmail ||!idToken) {
+console.log('[DASHBOARD] localStorage:', { botId, userEmail, idToken });
+
+if (!userEmail || userEmail === 'null' || userEmail === '' || !idToken) {
+  console.error('[DASHBOARD] Sesión inválida, redirigiendo...');
+  localStorage.clear();
   window.location.href = 'index.html';
 } else {
   currentUser = { email: userEmail };
