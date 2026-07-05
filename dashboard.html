@@ -809,32 +809,23 @@ if (btnCopiar) {
 
    function mostrarPanelCorrecto() {
   const radioConfig = document.getElementById('tab-config');
-  const radioStats = document.getElementById('tab-stats');
-  const radioRefs = document.getElementById('tab-refs');
-  
   const panelInicio = document.querySelector('.panelInicio');
-  const seccionConfig = document.querySelector('.seccion-config');
-  const seccionStats = document.querySelector('.seccion-stats');
-  const seccionRefs = document.querySelector('.seccion-refs');
+  const stepDominio = document.getElementById('stepDominio');
 
-  if (!userData.verificado) return; // El modal se encarga
+  if (!userData.verificado) return;
 
-  // Si NO hay dominio → mostrar solo seccion-config con el form de dominio
+  // Forzar que esté en tab Configuración
+  radioConfig.checked = true;
+
+  // Si NO hay dominio → mostrar stepDominio, ocultar panelInicio
   if (!userData.domain || userData.domain.trim() === '') {
-    radioConfig.checked = true; // Forzar tab config
-    seccionConfig.style.display = 'block';
+    stepDominio.classList.remove('hidden');
     panelInicio.classList.add('hidden');
-    seccionStats.style.display = 'none';
-    seccionRefs.style.display = 'none';
   } else {
-    // Si YA hay dominio → mostrar panelInicio por defecto
-    radioConfig.checked = true; // Forzar tab config
+    // Si YA hay dominio → mostrar panelInicio, ocultar stepDominio
+    stepDominio.classList.add('hidden');
     panelInicio.classList.remove('hidden');
-    seccionConfig.style.display = 'none'; // Ocultar el step de dominio
-    seccionStats.style.display = 'none';
-    seccionRefs.style.display = 'none';
     
-    // Cargar datos del panel
     document.getElementById('dominioActual').textContent = userData.domain;
     const estadoBotSpan = document.getElementById('estadoBot');
     const btnComprar = document.getElementById('btnComprarPlan');
