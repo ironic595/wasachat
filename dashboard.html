@@ -807,25 +807,26 @@ if (btnCopiar) {
       }
     }
 
-   function mostrarPanelCorrecto() {
+  function mostrarPanelCorrecto() {
   const radioConfig = document.getElementById('tab-config');
   const panelInicio = document.querySelector('.panelInicio');
   const stepDominio = document.getElementById('stepDominio');
 
   if (!userData.verificado) return;
 
-  // Forzar que esté en tab Configuración
+  // Siempre arrancamos en tab Configuración
   radioConfig.checked = true;
 
-  // Si NO hay dominio → mostrar stepDominio, ocultar panelInicio
   if (!userData.domain || userData.domain.trim() === '') {
+    // SIN DOMINIO: mostrar stepDominio, ocultar panelInicio
     stepDominio.classList.remove('hidden');
     panelInicio.classList.add('hidden');
   } else {
-    // Si YA hay dominio → mostrar panelInicio, ocultar stepDominio
+    // CON DOMINIO: mostrar panelInicio, ocultar stepDominio
     stepDominio.classList.add('hidden');
     panelInicio.classList.remove('hidden');
     
+    // Cargar datos
     document.getElementById('dominioActual').textContent = userData.domain;
     const estadoBotSpan = document.getElementById('estadoBot');
     const btnComprar = document.getElementById('btnComprarPlan');
