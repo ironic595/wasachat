@@ -430,46 +430,6 @@ nav {
 </div>
 
     <div class="card">
-<div class="panelInicio">
-<div id="panelPrincipal">
-	 <div class="content-card">
-      <h2>✅ Todo configurado</h2>
-      <div class="info-row">
-        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
-        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
-      </div>
-      <div class="info-row">
-        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
-        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
-      </div>
-      <div class="card" style="margin-top:30px;">
-        <h3 class="card-title">🎨 Configuración del Widget</h3>
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
-          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
-          <div style="flex:1;">
-            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
-            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
-          </div>
-        </div>
-        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
-          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-        </div>
-        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
-        <input type="hidden" id="colorWidget">
-        <input type="hidden" id="posWidget">
-        <input type="hidden" id="saludoWidget">
-      </div>
-      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
-      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
-      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
-    </div>
-    </div>
-	</div>
-	</div>
-
      <div class="seccion-stats">
       <div id="section-analytics">
         <div class="content-card">
@@ -501,19 +461,6 @@ nav {
         </div>
       </div>
     </div>
-
-
-		
-	<div class="seccion-config">
-    <div id="stepDominio">
-		 <div class="content-card">
-      <h2>1. Registrá tu dominio</h2>
-      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
-      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
-      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
-      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
-      <div id="dominioStatus"></div>
-		 </div></div></div>	
 	<div class="seccion-refs">
       <div id="section-referidos">
         <div class="content-card">
@@ -545,6 +492,55 @@ nav {
       </div>
     </div>
     </div>
+<div class="seccion-config">
+    <div class="card" id="stepDominio">
+      <h2>1. Registrá tu dominio</h2>
+      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
+      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
+      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
+      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
+      <div id="dominioStatus"></div>
+    </div>
+
+    <div class="card hidden" id="panelPrincipal">
+      <h2>✅ Todo configurado</h2>
+
+      <div class="info-row">
+        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
+        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
+      </div>
+
+      <div class="info-row">
+        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
+        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
+      </div>
+
+      <div class="card" style="margin-top:30px;">
+        <h3 class="card-title">🎨 Configuración del Widget</h3>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
+            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+        </div>
+        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+        <input type="hidden" id="colorWidget">
+        <input type="hidden" id="posWidget">
+        <input type="hidden" id="saludoWidget">
+      </div>
+
+      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
+      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
+      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
+    </div>
+  </div>
 </div>
   
   </div>
@@ -807,35 +803,63 @@ if (btnCopiar) {
       }
     }
 
-    function mostrarPanelCorrecto() {
-      const stepDominio = document.getElementById('stepDominio');
-      const panelPrincipal = document.getElementById('panelPrincipal');
+   function mostrarPanelCorrecto() {
+  // Estos son los bloques que hay que alternar
+  const stepDominio = document.getElementById('stepDominio');
+  const userInfo = document.getElementById('userInfo');
+  const cardCreditos = document.querySelector('.card[style*="linear-gradient"]'); // La card morada
+  const panelPrincipal = document.getElementById('panelPrincipal');
+  const seccionStats = document.querySelector('.seccion-stats');
+  const seccionRefs = document.querySelector('.seccion-refs');
 
-      if (!userData.domain || userData.domain === null || userData.domain === '') {
-        stepDominio.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-      } else {
-        stepDominio.classList.add('hidden');
-        panelPrincipal.classList.remove('hidden');
-        document.getElementById('dominioActual').textContent = userData.domain;
+  // Si no está verificado, el modal se encarga. Acá no mostramos nada.
+  if (!userData.verificado) {
+    stepDominio.classList.add('hidden');
+    userInfo.style.display = 'none';
+    cardCreditos.style.display = 'none';
+    panelPrincipal.classList.add('hidden');
+    return;
+  }
 
-        const estadoBotSpan = document.getElementById('estadoBot');
-        const btnComprar = document.getElementById('btnComprarPlan');
+  // CASO 1: NO HAY DOMINIO → Mostrar SOLO el step de dominio
+  if (!userData.domain || userData.domain.trim() === '') {
+    stepDominio.classList.remove('hidden');
+    userInfo.style.display = 'none';
+    cardCreditos.style.display = 'none';
+    panelPrincipal.classList.add('hidden');
+    seccionStats.style.display = 'none';
+    seccionRefs.style.display = 'none';
 
-        if (userData.estado === 'activo' || userData.estado === 'pago') {
-          estadoBotSpan.textContent = '✅ Activo';
-          estadoBotSpan.className = 'estado-activo';
-          btnComprar.classList.add('hidden');
-        } else {
-          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-          estadoBotSpan.className = 'estado-inactivo';
-          btnComprar.classList.remove('hidden');
-        }
-      }
-		if (userData.saldo_creditos_ia !== undefined) {
+  } else {
+    // CASO 2: YA HAY DOMINIO → Mostrar dashboard completo
+    stepDominio.classList.add('hidden');
+    userInfo.style.display = 'block';
+    cardCreditos.style.display = 'block';
+    panelPrincipal.classList.remove('hidden');
+    seccionStats.style.display = 'block';
+    seccionRefs.style.display = 'block';
+
+    document.getElementById('dominioActual').textContent = userData.domain;
+
+    const estadoBotSpan = document.getElementById('estadoBot');
+    const btnComprar = document.getElementById('btnComprarPlan');
+
+    if (userData.estado === 'activo' || userData.estado === 'pago') {
+      estadoBotSpan.textContent = '✅ Activo';
+      estadoBotSpan.className = 'estado-activo';
+      btnComprar.classList.add('hidden');
+    } else {
+      estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+      estadoBotSpan.className = 'estado-inactivo';
+      btnComprar.classList.remove('hidden');
+    }
+  }
+
+  // Créditos IA
+  if (userData.saldo_creditos_ia!== undefined) {
     document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
   }
-    }
+}
 
 	window.irAComprar = function() {
   const modal = document.getElementById('modalPlanes');
@@ -882,26 +906,27 @@ window.pagar = async function(plan) {
 }
 
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
-      let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
-      if (!dominio) return alert("Ingresá un dominio válido");
+  let dominio = document.getElementById('dominioInput').value.trim();
+  dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
+  if (!dominio) return alert("Ingresá un dominio válido");
 
-      showLoading(true);
-      try {
-        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
-        });
-        userData.domain = dominio;
-        showLoading(false);
-        showToast('✅ Dominio guardado');
-        mostrarPanelCorrecto();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
+  showLoading(true);
+  try {
+    await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
     });
+
+    userData.domain = dominio; // Clave: actualizar el objeto local
+    showLoading(false);
+    showToast('✅ Dominio guardado');
+    mostrarPanelCorrecto(); // Esto oculta el form y muestra todo el dashboard
+  } catch (e) {
+    showLoading(false);
+    alert('Error: ' + e.message);
+  }
+});
 
     function mostrarCambiarDominio() {
       document.getElementById('nuevoDominioInput').value = userData.domain;
