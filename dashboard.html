@@ -649,7 +649,7 @@ nav {
       <div id="editor-tabla">
         <div id="tabla-productos" class="hidden">
           <h3>Productos Cargados</h3>
-          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
+          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
         </div>
         <div id="tabla-config" class="hidden">
           <h3>Base de Conocimiento del Bot</h3>
@@ -790,9 +790,49 @@ if (btnCopiar) {
       }
     }
 
-    function irAComprar() {
-      window.location.href = 'index.html#precios';
+	window.irAComprar = function() {
+  const modal = document.getElementById('modalPlanes');
+  modal.style.display = 'flex'; // Acá lo activás
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  document.body.style.overflow = 'hidden';
+}
+
+window.cerrarModalPlanes = function() {
+  document.getElementById('modalPlanes').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+window.pagar = async function(plan) {
+  const btn = event.target;
+  const textoOriginal = btn.textContent;
+  btn.textContent = 'Redirigiendo a Stripe...';
+  btn.disabled = true;
+  
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) throw new Error('Sesión expirada');
+    
+    const idToken = await user.getIdToken();
+    
+    const res = await fetch('https://api.wasa.chat/crear-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan, idToken })
+    });
+    
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Error desconocido');
     }
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.textContent = textoOriginal;
+    btn.disabled = false;
+  }
+}
 
     document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
       let dominio = document.getElementById('dominioInput').value.trim();
@@ -1538,5 +1578,58 @@ function cargarAnalytics() {
 }
 	
 </script>
+<!-- MODAL DE PLANES -->
+<div id="modalPlanes" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;overflow-y:auto;padding:20px;box-sizing:border-box;">
+  <div style="background:white;max-width:1000px;width:100%;padding:40px;border-radius:20px;position:relative;max-height:90vh;overflow-y:auto;">
+    <button onclick="cerrarModalPlanes()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:32px;cursor:pointer;color:#94a3b8;line-height:1;">×</button>
+    
+    <h2 style="text-align:center;font-size:28px;font-weight:800;margin-bottom:8px;">Activá tu bot</h2>
+    <p style="text-align:center;color:#64748b;margin-bottom:40px;">Elegí un plan. Se cobra mensual y renovás automático.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;">
+      <!-- STARTED -->
+      <div style="border:2px solid #e2e8f0;border-radius:16px;padding:24px;">
+        <h3 style="color:#3B5BFF;font-size:18px;margin-bottom:8px;">Started</h3>
+        <div style="font-size:36px;font-weight:800;margin:12px 0;">$19<span style="font-size:14px;color:#64748b;">/mes</span></div>
+        <p style="color:#64748b;font-size:13px;margin-bottom:20px;"><strong>5,000 mensajes</strong> incluidos</p>
+        <ul style="text-align:left;list-style:none;margin-bottom:24px;font-size:14px;">
+          <li style="margin:6px 0;">✓ Bot Llama 3</li>
+          <li style="margin:6px 0;">✓ Soporte email</li>
+        </ul>
+        <button onclick="pagar('started')" style="width:100%;padding:12px;background:#3B5BFF;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Activar Started</button>
+      </div>
+
+      <!-- PRO -->
+      <div style="border:3px solid #3B5BFF;border-radius:16px;padding:24px;position:relative;transform:scale(1.05);">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#3B5BFF;color:white;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;">MÁS POPULAR</div>
+        <h3 style="color:#3B5BFF;font-size:18px;margin-bottom:8px;">Pro</h3>
+        <div style="font-size:36px;font-weight:800;margin:12px 0;">$49<span style="font-size:14px;color:#64748b;">/mes</span></div>
+        <p style="color:#64748b;font-size:13px;margin-bottom:20px;"><strong>20,000 mensajes</strong> incluidos</p>
+        <ul style="text-align:left;list-style:none;margin-bottom:24px;font-size:14px;">
+          <li style="margin:6px 0;">✓ Bot Llama 3</li>
+          <li style="margin:6px 0;">✓ Soporte prioritario</li>
+        </ul>
+        <button onclick="pagar('pro')" style="width:100%;padding:12px;background:#3B5BFF;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Activar Pro</button>
+      </div>
+
+      <!-- ENTERPRISE -->
+      <div style="border:2px solid #e2e8f0;border-radius:16px;padding:24px;">
+        <h3 style="color:#3B5BFF;font-size:18px;margin-bottom:8px;">Enterprise</h3>
+        <div style="font-size:36px;font-weight:800;margin:12px 0;">$199<span style="font-size:14px;color:#64748b;">/mes</span></div>
+        <p style="color:#64748b;font-size:13px;margin-bottom:20px;"><strong>100,000 mensajes</strong> incluidos</p>
+        <ul style="text-align:left;list-style:none;margin-bottom:24px;font-size:14px;">
+          <li style="margin:6px 0;">✓ Bot Llama 3</li>
+          <li style="margin:6px 0;">✓ Soporte 24/7</li>
+        </ul>
+        <button onclick="pagar('enterprise')" style="width:100%;padding:12px;background:#3B5BFF;color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;">Activar Enterprise</button>
+      </div>
+    </div>
+
+    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:32px;">
+      Los mensajes se reinician cada 30 días. Si te pasás del límite, el bot se pausa hasta renovar o hacer upgrade.
+    </p>
+  </div>
+</div>
+
 </body>
 </html>
