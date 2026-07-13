@@ -777,7 +777,7 @@ if (!userEmail || userEmail === 'null' || userEmail === '' ||!idToken) {
   window.location.href = 'index.html';
 } else {
   currentUser = { email: userEmail };
-  // FIX 1: Setear email directo sin innerHTML para no romper el onclick del logout
+  // FIX 1: No usar innerHTML para no borrar el onclick del botón
   document.getElementById('userEmailText').textContent = userEmail;
   cargarBot();
 }
@@ -862,7 +862,7 @@ if (!userEmail || userEmail === 'null' || userEmail === '' ||!idToken) {
       }
     }
 
-  // FIX 2: Eliminé toda referencia a stepDominio porque ya no existe en el HTML
+  // FIX 2: Eliminé toda referencia a stepDominio porque ya no existe
   function mostrarPanelCorrecto() {
     const radioConfig = document.getElementById('tab-config');
     if (!userData.verificado) return;
@@ -970,12 +970,12 @@ window.pagar = async function(plan) {
       actualizarPreviewMini();
     }
 
-    // FIX 3: Asegurarse que los datos existan antes de renderizar
+    // FIX 3: Console.log para debuggear si llegan los datos
     function cargarDatosTablas() {
       datosProductos = userData.data?.productos || [];
       datosConfig = userData.data?.faq || [];
-      console.log('[DEBUG] Productos cargados:', datosProductos.length);
-      console.log('[DEBUG] FAQs cargadas:', datosConfig.length);
+      console.log('[DEBUG] Productos cargados:', datosProductos.length, datosProductos);
+      console.log('[DEBUG] FAQs cargadas:', datosConfig.length, datosConfig);
       renderTablaProductos();
       renderTablaConfig();
       cambiosPendientes = false;
@@ -1191,11 +1191,11 @@ window.pagar = async function(plan) {
       const avatarUrl = avatar || '';
 
       const btnContent = avatarUrl
- ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : '💬';
 
       const avatarHeader = avatarUrl
- ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
         : '💬';
 
       const bgChat = theme === 'dark'? '#1e293b' : '#fff';
@@ -1205,18 +1205,18 @@ window.pagar = async function(plan) {
       container.innerHTML = `
         <style>
           #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-   .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-   .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-   .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-   .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-   .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-   .wasa-btn:hover { transform: scale(1.1); }
-   .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-   .wasa-ventana.activo { display: flex; }
-   .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-   .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
-   .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-   .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+  .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+  .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+  .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+  .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+  .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+  .wasa-btn:hover { transform: scale(1.1); }
+  .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+  .wasa-ventana.activo { display: flex; }
+  .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+  .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
+  .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+  .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
  <div class="wasa-demo-page">
           <div>
@@ -1251,7 +1251,7 @@ reader.onload = (e) => {
             document.getElementById('avatarPreview').innerHTML =
               `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
           };
-          reader.readAsDataURL(file);
+         reader.readAsDataURL(file);
 
           try {
             const url = await subirAvatarADrive(file);
@@ -1654,7 +1654,7 @@ function cargarAnalytics() {
   document.getElementById('statExitosas').textContent = stats.respuestas_exitosas?? '0';
   document.getElementById('statFallidas').textContent = stats.respuestas_fallidas?? '0';
   document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
- ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
+? new Date(stats.ultima_actividad).toLocaleString('es-AR')
     : '-';
 }
 
