@@ -420,57 +420,68 @@ nav {
     <div id="userInfo"></div>
     <div id="debug">Cargando datos del Worker...</div>
 
-	<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">
-  <h3 style="margin: 0 0 10px 0; font-size: 16px; opacity: 0.9;">Créditos de IA disponibles</h3>
-  <div style="font-size: 42px; font-weight: 800; margin: 10px 0;" id="creditosIA">0</div>
-  <div style="font-size: 13px; opacity: 0.8; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 12px;">
-    Último mensaje: <span id="ultimoCosto">0</span> créditos<br>
-    Enriquecer producto: <span id="costoEnrichment">2</span> créditos aprox
-  </div>
-</div>
-
-    <div class="card">
-<div class="panelInicio">
-<div id="panelPrincipal">
-	 <div class="content-card">
-      <h2>✅ Todo configurado</h2>
-      <div class="info-row">
-        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
-        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
-      </div>
-      <div class="info-row">
-        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
-        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
-      </div>
-      <div class="card" style="margin-top:30px;">
-        <h3 class="card-title">🎨 Configuración del Widget</h3>
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
-          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
-          <div style="flex:1;">
-            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
-            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+    <div class="seccion-config">
+      <div class="panelInicio">
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">
+          <h3 style="margin: 0 0 10px 0; font-size: 16px; opacity: 0.9;">Créditos de IA disponibles</h3>
+          <div style="font-size: 42px; font-weight: 800; margin: 10px 0;" id="creditosIA">0</div>
+          <div style="font-size: 13px; opacity: 0.8; line-height: 1.6; border-top: 1px solid rgba(255,255,0.2); padding-top: 12px; margin-top: 12px;">
+            Último mensaje: <span id="ultimoCosto">0</span> créditos<br>
+            Enriquecer producto: <span id="costoEnrichment">2</span> créditos aprox
           </div>
         </div>
-        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
-          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-        </div>
-        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
-        <input type="hidden" id="colorWidget">
-        <input type="hidden" id="posWidget">
-        <input type="hidden" id="saludoWidget">
-      </div>
-      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
-      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
-      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
-    </div>
-    </div>
-	</div>
-	</div>
 
-     <div class="seccion-stats">
+        <div id="panelPrincipal">
+          <div class="content-card">
+            <h2>✅ Todo configurado</h2>
+            <div class="info-row">
+              <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
+              <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
+            </div>
+            <div class="info-row">
+              <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
+              <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
+            </div>
+            <div class="card" style="margin-top:30px;">
+              <h3 class="card-title">🎨 Configuración del Widget</h3>
+              <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+                <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
+                <div style="flex:1;">
+                  <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
+                  <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+                </div>
+              </div>
+              <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
+              <div class="form-group">
+                <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+                <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
+                <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+              </div>
+              <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+              <input type="hidden" id="colorWidget">
+              <input type="hidden" id="posWidget">
+              <input type="hidden" id="saludoWidget">
+            </div>
+            <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
+            <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
+            <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="stepDominio" class="hidden">
+        <div class="content-card">
+          <h2>1. Registrá tu dominio</h2>
+          <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
+          <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
+          <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
+          <button id="guardarDominioBtn" class="success">Guardar dominio</button>
+          <div id="dominioStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="seccion-stats">
       <div id="section-analytics">
         <div class="content-card">
           <h2>📊 Analytics</h2>
@@ -502,19 +513,7 @@ nav {
       </div>
     </div>
 
-
-		
-	<div class="seccion-config">
-    <div id="stepDominio">
-		 <div class="content-card">
-      <h2>1. Registrá tu dominio</h2>
-      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
-      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
-      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
-      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
-      <div id="dominioStatus"></div>
-		 </div></div></div>	
-	<div class="seccion-refs">
+    <div class="seccion-refs">
       <div id="section-referidos">
         <div class="content-card">
           <h2>🎁 Referidos</h2>
@@ -544,142 +543,141 @@ nav {
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </div>
-  
-  </div>
-  <div id="modal-cambiar-dominio" class="modal-fondo">
-    <div class="modal-box">
-      <h3>Cambiar dominio</h3>
-      <input type="text" id="nuevoDominioInput" placeholder="Ej: negocio.com">
-      <div class="help-text">El chat dejará de funcionar en el dominio anterior</div>
-      <button onclick="cambiarDominio()" class="success" style="margin: 10px;">Guardar</button>
-      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
-    </div>
-  </div>
 
-  <div id="editor-widget">
-    <div id="editor-widget-header">
-      <h2>🎨 Personalizar Widget</h2>
-      <button onclick="cerrarEditorWidget()" style="background:#dc3545;">✕ Cerrar</button>
-    </div>
-    <div id="editor-widget-body">
-      <div id="editor-widget-form">
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
-          <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
-        </div>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Tema</label>
-          <select id="themeWidgetEdit" class="input-field"><option value="light">Light</option><option value="dark">Dark</option></select>
-        </div>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
-          <select id="posWidgetEdit" class="input-field"><option value="right">Abajo derecha</option><option value="left">Abajo izquierda</option></select>
-        </div>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
-          <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
-        </div>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
-          <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
-        </div>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar del bot</label>
-          <input type="file" id="avatarWidgetFile" accept="image/*" style="margin-bottom:8px;">
-          <input type="hidden" id="avatarWidgetEdit">
-          <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">💬</div>
-          <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
-        </div>
-        <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">💾 Guardar cambios</button>
-        <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-          <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
-          <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-        </div>
-      </div>
-      <div id="editor-widget-resizer"></div>
-      <div id="editor-widget-preview">
-        <div class="preview-bar">Vista previa en tiempo real</div>
-        <div id="preview-container-widget" style="flex:1; position:relative; background:white;"></div>
-      </div>
-    </div>
+<div id="modal-cambiar-dominio" class="modal-fondo">
+  <div class="modal-box">
+    <h3>Cambiar dominio</h3>
+    <input type="text" id="nuevoDominioInput" placeholder="Ej: negocio.com">
+    <div class="help-text">El chat dejará de funcionar en el dominio anterior</div>
+    <button onclick="cambiarDominio()" class="success" style="margin: 10px;">Guardar</button>
+    <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
   </div>
+</div>
 
-  <div id="editor">
-    <div id="editor-header">
-      <h2 id="editor-titulo">Editor</h2>
-      <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
+<div id="editor-widget">
+  <div id="editor-widget-header">
+    <h2>🎨 Personalizar Widget</h2>
+    <button onclick="cerrarEditorWidget()" style="background:#dc3545;">✕ Cerrar</button>
+  </div>
+  <div id="editor-widget-body">
+    <div id="editor-widget-form">
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Color principal</label>
+        <input type="color" id="colorWidgetEdit" style="width:100%; height:50px; border-radius:8px; cursor:pointer;">
+      </div>
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Tema</label>
+        <select id="themeWidgetEdit" class="input-field"><option value="light">Light</option><option value="dark">Dark</option></select>
+      </div>
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Posición</label>
+        <select id="posWidgetEdit" class="input-field"><option value="right">Abajo derecha</option><option value="left">Abajo izquierda</option></select>
+      </div>
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Nombre del bot</label>
+        <input type="text" id="nombreWidgetEdit" class="input-field" placeholder="WasaChat">
+      </div>
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Mensaje de bienvenida</label>
+        <textarea id="saludoWidgetEdit" class="input-field" rows="3" placeholder="Hola 👋 ¿En qué te ayudo?"></textarea>
+      </div>
+      <div class="form-group">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Avatar del bot</label>
+        <input type="file" id="avatarWidgetFile" accept="image/*" style="margin-bottom:8px;">
+        <input type="hidden" id="avatarWidgetEdit">
+        <div id="avatarPreview" style="width:60px; height:60px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; overflow:hidden;">💬</div>
+        <div class="help-text">Se guarda en tu Google Drive. Máx 2MB.</div>
+      </div>
+      <button class="btn success" onclick="guardarConfigWidgetModal()" style="width:100%; margin-top:16px;">💾 Guardar cambios</button>
+      <div style="margin-top:32px; padding-top:24px; border-top:1px solid #ddd;">
+        <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+        <textarea id="codigoWidgetModal" readonly class="input-field" rows="3" style="font-size:11px; font-family:monospace; background:#f5f5f5;"></textarea>
+        <button class="btn-secondary" onclick="copiarCodigoModal()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+      </div>
     </div>
-    <div id="editor-body">
-      <div id="editor-form">
-        <div id="cambiosPendientes" class="cambios-pendientes">
-          📝 Tenés cambios sin guardar. Apretá "SUBIR CAMBIOS" para enviar al servidor.
-        </div>
-        <div id="form-productos" class="hidden">
-          <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
-          <h3 id="tituloFormProd">Agregar Producto</h3>
-          <input type="text" id="inputProducto" placeholder="Nombre del producto *">
-          <input type="number" id="inputPrecio" placeholder="Precio *">
-          <input type="number" id="inputStock" placeholder="Stock *">
-          <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
-          <input type="text" id="inputFoto" placeholder="URL de foto">
-          <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
-          <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
-          <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-          <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-          <hr style="margin: 20px 0;">
-          <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
-          <hr style="margin: 20px 0;">
-          <h4>Cargar desde CSV</h4>
-          <input type="file" id="csvProductos" accept=".csv">
-          <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
-          <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
-        </div>
-        <div id="form-config" class="hidden">
-          <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
-          <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
-          <input type="text" id="inputPregunta" placeholder="Pregunta *">
-          <div class="help-text">Ej: ¿Cuáles son los horarios de atención?</div>
-          <textarea id="inputRespuesta" placeholder="Respuesta *" rows="4"></textarea>
-          <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs</div>
-          <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
-          <div class="help-text">Ej: horario, abierto, atender, hora</div>
-          <button id="btnGuardarConfig" class="btn success">➕ Agregar a tabla</button>
-          <button id="btnCancelarEdicionConfig" class="btn hidden" style="background:#6c757d;">Cancelar</button>
-          <button id="btnBorrarConfig" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
-          <hr style="margin: 20px 0;">
-          <button id="btnSubirFaq" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
-          <hr style="margin: 20px 0;">
-          <h4>Cargar desde CSV</h4>
-          <input type="file" id="csvConfig" accept=".csv">
-          <button id="btnCargarCsvConfig" class="btn">📁 Cargar CSV</button>
-          <div class="help-text">Formato: pregunta,respuesta,palabras_clave</div>
-        </div>
-      </div>
-      <div id="editor-resizer"></div>
-      <div id="editor-tabla">
-        <div id="tabla-productos" class="hidden">
-          <h3>Productos Cargados</h3>
-          <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
-        </div>
-        <div id="tabla-config" class="hidden">
-          <h3>Base de Conocimiento del Bot</h3>
-          <table id="miTablaConfig"><thead><tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
+    <div id="editor-widget-resizer"></div>
+    <div id="editor-widget-preview">
+      <div class="preview-bar">Vista previa en tiempo real</div>
+      <div id="preview-container-widget" style="flex:1; position:relative; background:white;"></div>
     </div>
   </div>
+</div>
 
-  <div id="modal-borrar" class="modal-fondo">
-    <div class="modal-box">
-      <h3>¿Borrar fila seleccionada?</h3>
-      <p>Se eliminará de la tabla local. Recordá apretar "SUBIR CAMBIOS" para guardar en el servidor.</p>
-      <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
-      <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
+<div id="editor">
+  <div id="editor-header">
+    <h2 id="editor-titulo">Editor</h2>
+    <button onclick="cerrarEditor()" style="background:#dc3545;">✕ Cerrar</button>
+  </div>
+  <div id="editor-body">
+    <div id="editor-form">
+      <div id="cambiosPendientes" class="cambios-pendientes">
+        📝 Tenés cambios sin guardar. Apretá "SUBIR CAMBIOS" para enviar al servidor.
+      </div>
+      <div id="form-productos" class="hidden">
+        <div id="modoEdicionProd" class="modo-edicion hidden">✏ Editando producto seleccionado</div>
+        <h3 id="tituloFormProd">Agregar Producto</h3>
+        <input type="text" id="inputProducto" placeholder="Nombre del producto *">
+        <input type="number" id="inputPrecio" placeholder="Precio *">
+        <input type="number" id="inputStock" placeholder="Stock *">
+        <textarea id="inputDesc" placeholder="Descripción" rows="3"></textarea>
+        <input type="text" id="inputFoto" placeholder="URL de foto">
+        <input type="text" id="inputUrlProd" placeholder="URL del producto en tu web">
+        <button id="btnGuardar" class="btn success">➕ Agregar a tabla</button>
+        <button id="btnCancelarEdicionProd" class="btn hidden" style="background:#6c757d;">Cancelar</button>
+        <button id="btnBorrar" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+        <hr style="margin: 20px 0;">
+        <button id="btnSubirProductos" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
+        <hr style="margin: 20px 0;">
+        <h4>Cargar desde CSV</h4>
+        <input type="file" id="csvProductos" accept=".csv">
+        <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
+        <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
+      </div>
+      <div id="form-config" class="hidden">
+        <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
+        <h3 id="tituloFormConfig">Agregar Pregunta Frecuente</h3>
+        <input type="text" id="inputPregunta" placeholder="Pregunta *">
+        <div class="help-text">Ej: ¿Cuáles son los horarios de atención?</div>
+        <textarea id="inputRespuesta" placeholder="Respuesta *" rows="4"></textarea>
+        <div class="help-text">Ej: Lunes a Viernes de 9 a 18hs</div>
+        <input type="text" id="inputClaves" placeholder="Palabras clave separadas por coma *">
+        <div class="help-text">Ej: horario, abierto, atender, hora</div>
+        <button id="btnGuardarConfig" class="btn success">➕ Agregar a tabla</button>
+        <button id="btnCancelarEdicionConfig" class="btn hidden" style="background:#6c757d;">Cancelar</button>
+        <button id="btnBorrarConfig" class="btn danger" disabled>🗑 Borrar Seleccionado</button>
+        <hr style="margin: 20px 0;">
+        <button id="btnSubirFaq" class="btn success">💾 SUBIR CAMBIOS AL SERVIDOR</button>
+        <hr style="margin: 20px 0;">
+        <h4>Cargar desde CSV</h4>
+        <input type="file" id="csvConfig" accept=".csv">
+        <button id="btnCargarCsvConfig" class="btn">📁 Cargar CSV</button>
+        <div class="help-text">Formato: pregunta,respuesta,palabras_clave</div>
+      </div>
+    </div>
+    <div id="editor-resizer"></div>
+    <div id="editor-tabla">
+      <div id="tabla-productos" class="hidden">
+        <h3>Productos Cargados</h3>
+        <table id="miTabla"><thead><tr><th>Producto</th><th>Precio</th><th>Descripción</th><th>URL</th></tr></thead><tbody></tbody></table>
+      </div>
+      <div id="tabla-config" class="hidden">
+        <h3>Base de Conocimiento del Bot</h3>
+        <table id="miTablaConfig"><thead><tr><th>Pregunta</th><th>Respuesta</th><th>Palabras Clave</th></tr></thead><tbody></tbody></table>
+      </div>
     </div>
   </div>
+</div>
+
+<div id="modal-borrar" class="modal-fondo">
+  <div class="modal-box">
+    <h3>¿Borrar fila seleccionada?</h3>
+    <p>Se eliminará de la tabla local. Recordá apretar "SUBIR CAMBIOS" para guardar en el servidor.</p>
+    <button id="confirmar-si" style="background:#dc3545; color:white; padding:10px 20px; border:none; cursor:pointer;">Borrar</button>
+    <button onclick="cerrarModales()" style="background:#6c757d; color:white; padding:10px 20px; border:none; cursor:pointer;">Cancelar</button>
+  </div>
+</div>
 
 <script>
 	
