@@ -739,7 +739,6 @@ nav {
   </div>
 </div>
 
-
 <script>
 	
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
@@ -772,13 +771,14 @@ const idToken = localStorage.getItem('idToken');
 
 console.log('[DASHBOARD] localStorage:', { botId, userEmail, idToken });
 
-if (!userEmail || userEmail === 'null' || userEmail === '' || !idToken) {
+if (!userEmail || userEmail === 'null' || userEmail === '' ||!idToken) {
   console.error('[DASHBOARD] Sesión inválida, redirigiendo...');
   localStorage.clear();
   window.location.href = 'index.html';
 } else {
   currentUser = { email: userEmail };
-  document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button id="logoutBtn" class="danger" style="margin:20px;">Cerrar sesión</button>`;
+  // FIX 1: Setear email directo sin innerHTML para no romper el onclick del logout
+  document.getElementById('userEmailText').textContent = userEmail;
   cargarBot();
 }
 
@@ -790,103 +790,88 @@ if (!userEmail || userEmail === 'null' || userEmail === '' || !idToken) {
           body: JSON.stringify({ email: userEmail })
         });
         const data = await res.json();
-        
+
         document.getElementById('debug').innerHTML = `<strong>Respuesta del Worker:</strong><br>${JSON.stringify(data, null, 2)}`;
         console.log('[DEBUG] Worker response:', data);
-        
+
         if (data.error === 'Bot no encontrado') {
           alert('Error: Bot no encontrado');
           return;
         }
-        
+
         userData = {
-  email: userEmail,
-  bot_id: botId,
-  estado: data.estado,
-  domain: data.domain,
-  config: data.config,
-  stats: data.stats,
-  data: data.data,
-  verificado: data.verificado || false
-};
+          email: userEmail,
+          bot_id: botId,
+          estado: data.estado,
+          domain: data.domain,
+          config: data.config,
+          stats: data.stats,
+          data: data.data,
+          verificado: data.verificado || false
+        };
 
-// Si no está verificado, mostrar modal y cortar
-if (!userData.verificado) {
-  document.getElementById('emailVerificacion').textContent = userEmail;
-  document.getElementById('modalVerificacion').style.display = 'flex';
-  document.getElementById('inputCodigoVerificacion').focus();
-  return; // No ejecuta mostrarPanelCorrecto()
-}
+        // Si no está verificado, mostrar modal y cortar
+        if (!userData.verificado) {
+          document.getElementById('emailVerificacion').textContent = userEmail;
+          document.getElementById('modalVerificacion').style.display = 'flex';
+          document.getElementById('inputCodigoVerificacion').focus();
+          return;
+        }
 
-// ACTUALIZAR CRÉDITOS
-if (data.saldo_creditos_ia !== undefined) {
-  document.getElementById('creditosIA').textContent = data.saldo_creditos_ia.toLocaleString('es-AR');
-}
-if (data.ultimo_costo_mensaje !== undefined) {
-  document.getElementById('ultimoCosto').textContent = data.ultimo_costo_mensaje || '2';
-}
-if (data.costo_enrichment !== undefined) {
-  document.getElementById('costoEnrichment').textContent = data.costo_enrichment;
-}
-		  
+        // ACTUALIZAR CRÉDITOS
+        if (data.saldo_creditos_ia!== undefined) {
+          document.getElementById('creditosIA').textContent = data.saldo_creditos_ia.toLocaleString('es-AR');
+        }
+        if (data.ultimo_costo_mensaje!== undefined) {
+          document.getElementById('ultimoCosto').textContent = data.ultimo_costo_mensaje || '2';
+        }
+        if (data.costo_enrichment!== undefined) {
+          document.getElementById('costoEnrichment').textContent = data.costo_enrichment;
+        }
+		
         mostrarPanelCorrecto();
         cargarConfigWidget();
         cargarDatosTablas();
-        cargarAnalytics(); 
+        cargarAnalytics();
 
-// === PEGAR ACÁ ===
-const codigoPropio = data.codigo_propio || '';
-const linkCompleto = `https://wasa.chat/signup?ref=${codigoPropio}`;
-const inputLink = document.getElementById('linkReferido');
-if (inputLink) {
-  inputLink.value = linkCompleto;
-}
+        // Link de referidos
+        const codigoPropio = data.codigo_propio || '';
+        const linkCompleto = `https://wasa.chat/signup?ref=${codigoPropio}`;
+        const inputLink = document.getElementById('linkReferido');
+        if (inputLink) {
+          inputLink.value = linkCompleto;
+        }
 
-// Llenar métricas de referidos
-if (document.getElementById('referidosTotales')) {
-  document.getElementById('referidosTotales').textContent = data.total_referidos || 0;
-}
-if (document.getElementById('recompensasGanadas')) {
-  document.getElementById('recompensasGanadas').textContent = '$' + (data.recompensas_referidos || 0).toFixed(2);
-}
+        // Llenar métricas de referidos
+        document.getElementById('statReferidosTotal').textContent = data.total_referidos || 0;
+        document.getElementById('statRecompensasTotal').textContent = '$' + (data.recompensas_referidos || 0).toFixed(2);
 
-// Botón copiar
-const btnCopiar = document.getElementById('btnCopiarLink');
-if (btnCopiar) {
-  btnCopiar.onclick = () => {
-    navigator.clipboard.writeText(linkCompleto);
-    btnCopiar.textContent = 'Copiado!';
-    setTimeout(() => { btnCopiar.textContent = 'Copiar'; }, 2000);
-  };
-}
-		  
+        // Botón copiar
+        const btnCopiar = document.getElementById('btnCopiarLink');
+        if (btnCopiar) {
+          btnCopiar.onclick = () => {
+            navigator.clipboard.writeText(linkCompleto);
+            btnCopiar.textContent = 'Copiado!';
+            setTimeout(() => { btnCopiar.textContent = 'Copiar'; }, 2000);
+          };
+        }
+		
       } catch(e) {
         document.getElementById('debug').innerHTML = `<strong>ERROR:</strong> ${e.message}`;
         console.error('Error:', e);
       }
     }
 
+  // FIX 2: Eliminé toda referencia a stepDominio porque ya no existe en el HTML
   function mostrarPanelCorrecto() {
-  const radioConfig = document.getElementById('tab-config');
-  const panelInicio = document.querySelector('.panelInicio');
-  const stepDominio = document.getElementById('stepDominio');
+    const radioConfig = document.getElementById('tab-config');
+    if (!userData.verificado) return;
 
-  if (!userData.verificado) return;
+    // Siempre arrancamos en tab Configuración
+    radioConfig.checked = true;
 
-  // Siempre arrancamos en tab Configuración
-  radioConfig.checked = true;
-
-  if (!userData.domain || userData.domain.trim() === '') {
-    // SIN DOMINIO: mostrar stepDominio, ocultar panelInicio
-    stepDominio.classList.remove('hidden');
-    panelInicio.classList.add('hidden');
-  } else {
-    // CON DOMINIO: mostrar panelInicio, ocultar stepDominio
-    stepDominio.classList.add('hidden');
-    panelInicio.classList.remove('hidden');
-    
-    // Cargar datos
-    document.getElementById('dominioActual').textContent = userData.domain;
+    // Cargar datos del dominio
+    document.getElementById('dominioActual').textContent = userData.domain || 'No configurado';
     const estadoBotSpan = document.getElementById('estadoBot');
     const btnComprar = document.getElementById('btnComprarPlan');
 
@@ -899,16 +884,15 @@ if (btnCopiar) {
       estadoBotSpan.className = 'estado-inactivo';
       btnComprar.classList.remove('hidden');
     }
-  }
 
-  if (userData.saldo_creditos_ia !== undefined) {
-    document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
+    if (userData.saldo_creditos_ia!== undefined) {
+      document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
+    }
   }
-}
 
 	window.irAComprar = function() {
   const modal = document.getElementById('modalPlanes');
-  modal.style.display = 'flex'; // Acá lo activás
+  modal.style.display = 'flex';
   modal.style.alignItems = 'center';
   modal.style.justifyContent = 'center';
   document.body.style.overflow = 'hidden';
@@ -924,19 +908,17 @@ window.pagar = async function(plan) {
   const textoOriginal = btn.textContent;
   btn.textContent = 'Redirigiendo a Stripe...';
   btn.disabled = true;
-  
+
   try {
-    const user = firebase.auth().currentUser;
-    if (!user) throw new Error('Sesión expirada');
-    
-    const idToken = await user.getIdToken();
-    
+    const idToken = localStorage.getItem('idToken');
+    if (!idToken) throw new Error('Sesión expirada');
+
     const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/crear-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan, idToken })
     });
-    
+
     const data = await res.json();
     if (data.url) {
       window.location.href = data.url;
@@ -950,30 +932,8 @@ window.pagar = async function(plan) {
   }
 }
 
-    document.getElementById('guardarDominioBtn').addEventListener('click', async () => {
-      let dominio = document.getElementById('dominioInput').value.trim();
-      dominio = dominio.replace(/https?:\/\//, '').replace(/\/$/, '').replace(/www\./, '').split('/')[0];
-      if (!dominio) return alert("Ingresá un dominio válido");
-
-      showLoading(true);
-      try {
-        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
-        });
-        userData.domain = dominio;
-        showLoading(false);
-        showToast('✅ Dominio guardado');
-        mostrarPanelCorrecto();
-      } catch (e) {
-        showLoading(false);
-        alert('Error: ' + e.message);
-      }
-    });
-
     function mostrarCambiarDominio() {
-      document.getElementById('nuevoDominioInput').value = userData.domain;
+      document.getElementById('nuevoDominioInput').value = userData.domain || '';
       document.getElementById('modal-cambiar-dominio').style.display = 'block';
     }
 
@@ -1010,9 +970,12 @@ window.pagar = async function(plan) {
       actualizarPreviewMini();
     }
 
+    // FIX 3: Asegurarse que los datos existan antes de renderizar
     function cargarDatosTablas() {
       datosProductos = userData.data?.productos || [];
       datosConfig = userData.data?.faq || [];
+      console.log('[DEBUG] Productos cargados:', datosProductos.length);
+      console.log('[DEBUG] FAQs cargadas:', datosConfig.length);
       renderTablaProductos();
       renderTablaConfig();
       cambiosPendientes = false;
@@ -1132,9 +1095,9 @@ window.pagar = async function(plan) {
         await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             bot_id: userData.bot_id,
-			email: userEmail,  
+			email: userEmail,
             config: {...userData.config, avatar: url }
           })
         });
@@ -1228,32 +1191,32 @@ window.pagar = async function(plan) {
       const avatarUrl = avatar || '';
 
       const btnContent = avatarUrl
-  ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
+ ? `<img src="${avatarUrl}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`
         : '💬';
 
       const avatarHeader = avatarUrl
-  ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
+ ? `<img src="${avatarUrl}" style="width:32px; height:32px; border-radius:50%; margin-right:10px; object-fit:cover;">`
         : '💬';
 
       const bgChat = theme === 'dark'? '#1e293b' : '#fff';
-      const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f7f8';
+      const bgMsgs = theme === 'dark'? '#0f172a' : '#f7f8';
       const textMain = theme === 'dark'? '#e2e8f0' : '#1e293b';
 
       container.innerHTML = `
         <style>
           #preview-container-widget { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
-    .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
-    .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
-    .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
-    .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
-    .wasa-btn:hover { transform: scale(1.1); }
-    .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
-    .wasa-ventana.activo { display: flex; }
-    .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
-    .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
-    .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
-    .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+   .wasa-demo-page { width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; text-align: center; padding: 40px; }
+   .wasa-demo-page h2 { font-size: 32px; margin-bottom: 12px; }
+   .wasa-demo-page p { font-size: 16px; opacity: 0.9; }
+   .wasa-widget { position: absolute; bottom: 20px; ${pos}: 20px; z-index: 9999; }
+   .wasa-btn { width: 60px; height: 60px; border-radius: 50%; background: ${color}; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; transition: transform 0.2s; overflow: hidden; padding: 0; }
+   .wasa-btn:hover { transform: scale(1.1); }
+   .wasa-ventana { position: absolute; bottom: 70px; ${pos}: 0; width: 350px; height: 500px; background: ${bgChat}; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0.2); display: none; flex-direction: column; overflow: hidden; }
+   .wasa-ventana.activo { display: flex; }
+   .wasa-header { background: ${color}; color: white; padding: 16px; font-weight: 600; display: flex; align-items: center; font-size: 15px; }
+   .wasa-body { flex: 1; padding: 16px; background: ${bgMsgs}; overflow-y: auto; }
+   .wasa-msg { background: ${theme === 'dark'? '#334155' : 'white'}; color:${textMain}; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 10px; max-width: 80%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.4; }
+   .wasa-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-left: auto; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
         </style>
  <div class="wasa-demo-page">
           <div>
@@ -1284,7 +1247,7 @@ window.pagar = async function(plan) {
           if (!file) return;
 
           const reader = new FileReader();
-          reader.onload = (e) => {
+reader.onload = (e) => {
             document.getElementById('avatarPreview').innerHTML =
               `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
           };
@@ -1358,6 +1321,7 @@ window.pagar = async function(plan) {
       document.getElementById('tituloFormProd').textContent = 'Agregar Producto';
       document.getElementById('modoEdicionProd').classList.add('hidden');
       document.getElementById('btnCancelarEdicionProd').classList.add('hidden');
+      document.getElementById('btnBorrar').disabled = true;
     }
 
     function limpiarFormConfig() {
@@ -1368,6 +1332,7 @@ window.pagar = async function(plan) {
       document.getElementById('tituloFormConfig').textContent = 'Agregar Pregunta Frecuente';
       document.getElementById('modoEdicionConfig').classList.add('hidden');
       document.getElementById('btnCancelarEdicionConfig').classList.add('hidden');
+      document.getElementById('btnBorrarConfig').disabled = true;
     }
 
     function renderTablaProductos() {
@@ -1411,7 +1376,7 @@ window.pagar = async function(plan) {
         document.getElementById('btnCancelarEdicionProd').classList.remove('hidden');
         document.getElementById('btnBorrar').disabled = false;
       } else {
-        const datos = datosConfig[index]; // FIX: era datosConfig, no datosConfig[index]
+        const datos = datosConfig[index];
         document.getElementById('inputPregunta').value = datos.pregunta || '';
         document.getElementById('inputRespuesta').value = datos.respuesta || '';
         document.getElementById('inputClaves').value = datos.keywords || '';
@@ -1618,10 +1583,9 @@ window.pagar = async function(plan) {
     function logout() {
       localStorage.removeItem('bot_id');
       localStorage.removeItem('user_email');
+      localStorage.removeItem('idToken');
       window.location.href = 'index.html';
     }
-
-    document.getElementById('logoutBtn').addEventListener('click', logout);
 
     const resizer = document.getElementById('editor-resizer');
     const leftSide = document.getElementById('editor-form');
@@ -1675,7 +1639,7 @@ function showSection(section) {
 }
 
 function cargarAnalytics() {
-  if (!userData || !userData.stats) {
+  if (!userData ||!userData.stats) {
     document.getElementById('statSesiones').textContent = '0';
     document.getElementById('statMensajes').textContent = '0';
     document.getElementById('statExitosas').textContent = '0';
@@ -1683,19 +1647,19 @@ function cargarAnalytics() {
     document.getElementById('statUltimaActividad').textContent = '-';
     return;
   }
-  
+
   const stats = userData.stats;
-  document.getElementById('statSesiones').textContent = stats.sesiones_totales ?? '0';
-  document.getElementById('statMensajes').textContent = stats.mensajes_totales ?? '0';
-  document.getElementById('statExitosas').textContent = stats.respuestas_exitosas ?? '0';
-  document.getElementById('statFallidas').textContent = stats.respuestas_fallidas ?? '0';
+  document.getElementById('statSesiones').textContent = stats.sesiones_totales?? '0';
+  document.getElementById('statMensajes').textContent = stats.mensajes_totales?? '0';
+  document.getElementById('statExitosas').textContent = stats.respuestas_exitosas?? '0';
+  document.getElementById('statFallidas').textContent = stats.respuestas_fallidas?? '0';
   document.getElementById('statUltimaActividad').textContent = stats.ultima_actividad
-   ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
+ ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
     : '-';
 }
 
 	async function verificarCodigo() {
-  const idToken = localStorage.getItem('idToken'); // <-- AGREGÁ ESTA LÍNEA
+  const idToken = localStorage.getItem('idToken');
   if (!idToken) {
     alert('Sesión expirada. Refrescá la página.');
     return;
@@ -1704,29 +1668,29 @@ function cargarAnalytics() {
   const codigo = document.getElementById('inputCodigoVerificacion').value;
   const btnVerificar = document.getElementById('btnVerificarCodigo');
   const errorDiv = document.getElementById('errorVerificacion');
-  
-  if (codigo.length !== 6) {
+
+  if (codigo.length!== 6) {
     errorDiv.textContent = 'El código debe tener 6 dígitos';
     return;
   }
-  
+
   btnVerificar.disabled = true;
   btnVerificar.textContent = 'Verificando...';
   errorDiv.textContent = '';
-  
+
   const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
+    body: JSON.stringify({
       idToken: idToken,
       codigo_verificacion: codigo,
 	  email: userEmail,
-	  	
+	
     })
   });
-  
+
   const data = await res.json();
-  
+
   if (data.verificado) {
     localStorage.setItem('bot_id', data.bot_id);
     localStorage.setItem('user_email', data.email);
@@ -1734,10 +1698,10 @@ function cargarAnalytics() {
     location.reload();
     return;
   }
-  
+
   btnVerificar.disabled = false;
   btnVerificar.textContent = 'Verificar cuenta';
-  
+
   if (data.error === 'codigo_incorrecto') {
     errorDiv.textContent = 'Código incorrecto. Intentá de nuevo.';
   } else if (data.error === 'codigo_expirado') {
@@ -1745,7 +1709,7 @@ function cargarAnalytics() {
   } else {
     errorDiv.textContent = 'Error al verificar.';
   }
-  
+
   document.getElementById('inputCodigoVerificacion').value = '';
   document.getElementById('inputCodigoVerificacion').focus();
 }
@@ -1754,19 +1718,19 @@ async function reenviarCodigo() {
   const btnReenviar = document.getElementById('btnReenviar');
   btnReenviar.disabled = true;
   btnReenviar.textContent = 'Enviando...';
-  
+
   await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ idToken: localStorage.getItem('idToken'), })
   });
-  
+
   btnReenviar.textContent = 'Código reenviado ✓';
   setTimeout(() => {
     btnReenviar.disabled = false;
     btnReenviar.textContent = 'Reenviar código';
   }, 3000);
-  
+
   document.getElementById('errorVerificacion').textContent = '';
   document.getElementById('inputCodigoVerificacion').focus();
 }
