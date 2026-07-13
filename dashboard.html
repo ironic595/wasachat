@@ -420,7 +420,56 @@ nav {
     <div id="userInfo"></div>
     <div id="debug">Cargando datos del Worker...</div>
 
+	<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-bottom: 20px;">
+  <h3 style="margin: 0 0 10px 0; font-size: 16px; opacity: 0.9;">Créditos de IA disponibles</h3>
+  <div style="font-size: 42px; font-weight: 800; margin: 10px 0;" id="creditosIA">0</div>
+  <div style="font-size: 13px; opacity: 0.8; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 12px;">
+    Último mensaje: <span id="ultimoCosto">0</span> créditos<br>
+    Enriquecer producto: <span id="costoEnrichment">2</span> créditos aprox
+  </div>
+</div>
+
     <div class="card">
+<div class="panelInicio">
+<div id="panelPrincipal">
+	 <div class="content-card">
+      <h2>✅ Todo configurado</h2>
+      <div class="info-row">
+        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
+        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
+      </div>
+      <div class="info-row">
+        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
+        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
+      </div>
+      <div class="card" style="margin-top:30px;">
+        <h3 class="card-title">🎨 Configuración del Widget</h3>
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
+          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
+            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
+        <div class="form-group">
+          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
+          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
+          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
+        </div>
+        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
+        <input type="hidden" id="colorWidget">
+        <input type="hidden" id="posWidget">
+        <input type="hidden" id="saludoWidget">
+      </div>
+      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
+      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
+      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
+    </div>
+    </div>
+	</div>
+	</div>
+
      <div class="seccion-stats">
       <div id="section-analytics">
         <div class="content-card">
@@ -452,6 +501,19 @@ nav {
         </div>
       </div>
     </div>
+
+
+		
+	<div class="seccion-config">
+    <div id="stepDominio">
+		 <div class="content-card">
+      <h2>1. Registrá tu dominio</h2>
+      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
+      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
+      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
+      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
+      <div id="dominioStatus"></div>
+		 </div></div></div>	
 	<div class="seccion-refs">
       <div id="section-referidos">
         <div class="content-card">
@@ -483,55 +545,6 @@ nav {
       </div>
     </div>
     </div>
-<div class="seccion-config">
-    <div class="card" id="stepDominio">
-      <h2>1. Registrá tu dominio</h2>
-      <p>El chat solo va a funcionar en este dominio. Podés cambiarlo después.</p>
-      <input type="text" id="dominioInput" placeholder="Ej: negocio.com">
-      <div class="help-text">Sin https:// ni www. Solo: negocio.com</div>
-      <button id="guardarDominioBtn" class="success">Guardar dominio</button>
-      <div id="dominioStatus"></div>
-    </div>
-
-    <div class="card hidden" id="panelPrincipal">
-      <h2>✅ Todo configurado</h2>
-
-      <div class="info-row">
-        <div><strong>Dominio:</strong> <span id="dominioActual"></span></div>
-        <button class="warning" onclick="mostrarCambiarDominio()">Cambiar dominio</button>
-      </div>
-
-      <div class="info-row">
-        <div><strong>Estado del Bot:</strong> <span id="estadoBot"></span></div>
-        <button id="btnComprarPlan" class="danger hidden" onclick="irAComprar()">Comprar Plan para Activar</button>
-      </div>
-
-      <div class="card" style="margin-top:30px;">
-        <h3 class="card-title">🎨 Configuración del Widget</h3>
-        <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px;">
-          <div id="widget-preview-mini" style="width:60px; height:60px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; font-size:28px; color:white; box-shadow:0 4px 12px rgba(0,0,0,0.2);">💬</div>
-          <div style="flex:1;">
-            <div style="font-weight:600; margin-bottom:4px;" id="widget-nombre-preview">WasaChat</div>
-            <div style="font-size:13px; color:#666;" id="widget-saludo-preview">Hola 👋 ¿En qué te ayudo?</div>
-          </div>
-        </div>
-        <button class="btn-primary" onclick="abrirEditorWidget()" style="width:100%; margin-bottom:16px;">✏ Personalizar apariencia</button>
-        <div class="form-group">
-          <label style="font-weight:600; margin-bottom:8px; display:block;">Código de instalación:</label>
-          <textarea id="codigoWidget" readonly class="input-field" rows="3" style="font-size:12px; font-family:monospace;"></textarea>
-          <button class="btn-secondary" onclick="copiarCodigo()" style="width:100%; margin-top:8px;">📋 Copiar código</button>
-        </div>
-        <div class="help-text">Pegá este código antes de &lt;/body&gt; en tu web</div>
-        <input type="hidden" id="colorWidget">
-        <input type="hidden" id="posWidget">
-        <input type="hidden" id="saludoWidget">
-      </div>
-
-      <h3 style="margin-top: 30px;">Gestioná tu contenido</h3>
-      <button class="big success" onclick="abrirEditor('productos')">📦 Editar Tabla de Productos</button>
-      <button class="big success" onclick="abrirEditor('config')">❓ Editar Preguntas y Respuestas</button>
-    </div>
-  </div>
 </div>
   
   </div>
@@ -669,10 +682,15 @@ nav {
   </div>
 
 <script>
+	
     const CLIENT_ID = '849916257157-o3f2cj1eampdldhap1hjv7u1aeiq559e.apps.googleusercontent.com';
 
     let currentUser = null;
     let userData = null;
+
+	let idTokenGlobal = '';
+    let emailPendienteVerificacion = '';
+	
     let tokenClient;
     let accessToken = null;
     let currentTab = 'productos';
@@ -689,23 +707,28 @@ nav {
       callback: '',
     });
 
-    const botId = localStorage.getItem('bot_id');
-    const userEmail = localStorage.getItem('user_email');
+const botId = localStorage.getItem('bot_id');
+const userEmail = localStorage.getItem('user_email');
+const idToken = localStorage.getItem('idToken');
 
-    if (!botId ||!userEmail) {
-      window.location.href = 'index.html';
-    } else {
-      currentUser = { email: userEmail };
-      document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button id="logoutBtn" class="danger" style="margin:20px;">Cerrar sesión</button>`;
-      cargarBot();
-    }
+console.log('[DASHBOARD] localStorage:', { botId, userEmail, idToken });
+
+if (!userEmail || userEmail === 'null' || userEmail === '' || !idToken) {
+  console.error('[DASHBOARD] Sesión inválida, redirigiendo...');
+  localStorage.clear();
+  window.location.href = 'index.html';
+} else {
+  currentUser = { email: userEmail };
+  document.getElementById('userInfo').innerHTML = `<strong>${userEmail}</strong><button id="logoutBtn" class="danger" style="margin:20px;">Cerrar sesión</button>`;
+  cargarBot();
+}
 
     async function cargarBot() {
       try {
-        const res = await fetch('https://api.wasa.chat/config', {
+        const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: botId })
+          body: JSON.stringify({ email: userEmail })
         });
         const data = await res.json();
         
@@ -718,14 +741,35 @@ nav {
         }
         
         userData = {
-          email: userEmail,
-          bot_id: botId,
-          estado: data.estado,
-          domain: data.domain,
-          config: data.config,
-          stats: data.stats,
-          data: data.data
-        };
+  email: userEmail,
+  bot_id: botId,
+  estado: data.estado,
+  domain: data.domain,
+  config: data.config,
+  stats: data.stats,
+  data: data.data,
+  verificado: data.verificado || false
+};
+
+// Si no está verificado, mostrar modal y cortar
+if (!userData.verificado) {
+  document.getElementById('emailVerificacion').textContent = userEmail;
+  document.getElementById('modalVerificacion').style.display = 'flex';
+  document.getElementById('inputCodigoVerificacion').focus();
+  return; // No ejecuta mostrarPanelCorrecto()
+}
+
+// ACTUALIZAR CRÉDITOS
+if (data.saldo_creditos_ia !== undefined) {
+  document.getElementById('creditosIA').textContent = data.saldo_creditos_ia.toLocaleString('es-AR');
+}
+if (data.ultimo_costo_mensaje !== undefined) {
+  document.getElementById('ultimoCosto').textContent = data.ultimo_costo_mensaje || '2';
+}
+if (data.costo_enrichment !== undefined) {
+  document.getElementById('costoEnrichment').textContent = data.costo_enrichment;
+}
+		  
         mostrarPanelCorrecto();
         cargarConfigWidget();
         cargarDatosTablas();
@@ -763,32 +807,45 @@ if (btnCopiar) {
       }
     }
 
-    function mostrarPanelCorrecto() {
-      const stepDominio = document.getElementById('stepDominio');
-      const panelPrincipal = document.getElementById('panelPrincipal');
+  function mostrarPanelCorrecto() {
+  const radioConfig = document.getElementById('tab-config');
+  const panelInicio = document.querySelector('.panelInicio');
+  const stepDominio = document.getElementById('stepDominio');
 
-      if (!userData.domain || userData.domain === null || userData.domain === '') {
-        stepDominio.classList.remove('hidden');
-        panelPrincipal.classList.add('hidden');
-      } else {
-        stepDominio.classList.add('hidden');
-        panelPrincipal.classList.remove('hidden');
-        document.getElementById('dominioActual').textContent = userData.domain;
+  if (!userData.verificado) return;
 
-        const estadoBotSpan = document.getElementById('estadoBot');
-        const btnComprar = document.getElementById('btnComprarPlan');
+  // Siempre arrancamos en tab Configuración
+  radioConfig.checked = true;
 
-        if (userData.estado === 'activo' || userData.estado === 'pago') {
-          estadoBotSpan.textContent = '✅ Activo';
-          estadoBotSpan.className = 'estado-activo';
-          btnComprar.classList.add('hidden');
-        } else {
-          estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
-          estadoBotSpan.className = 'estado-inactivo';
-          btnComprar.classList.remove('hidden');
-        }
-      }
+  if (!userData.domain || userData.domain.trim() === '') {
+    // SIN DOMINIO: mostrar stepDominio, ocultar panelInicio
+    stepDominio.classList.remove('hidden');
+    panelInicio.classList.add('hidden');
+  } else {
+    // CON DOMINIO: mostrar panelInicio, ocultar stepDominio
+    stepDominio.classList.add('hidden');
+    panelInicio.classList.remove('hidden');
+    
+    // Cargar datos
+    document.getElementById('dominioActual').textContent = userData.domain;
+    const estadoBotSpan = document.getElementById('estadoBot');
+    const btnComprar = document.getElementById('btnComprarPlan');
+
+    if (userData.estado === 'activo' || userData.estado === 'pago') {
+      estadoBotSpan.textContent = '✅ Activo';
+      estadoBotSpan.className = 'estado-activo';
+      btnComprar.classList.add('hidden');
+    } else {
+      estadoBotSpan.textContent = '⚠ Inactivo - Requiere suscripción';
+      estadoBotSpan.className = 'estado-inactivo';
+      btnComprar.classList.remove('hidden');
     }
+  }
+
+  if (userData.saldo_creditos_ia !== undefined) {
+    document.getElementById('creditosIA').textContent = userData.saldo_creditos_ia.toLocaleString('es-AR');
+  }
+}
 
 	window.irAComprar = function() {
   const modal = document.getElementById('modalPlanes');
@@ -815,7 +872,7 @@ window.pagar = async function(plan) {
     
     const idToken = await user.getIdToken();
     
-    const res = await fetch('https://api.wasa.chat/crear-checkout', {
+    const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/crear-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ plan, idToken })
@@ -841,10 +898,10 @@ window.pagar = async function(plan) {
 
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio })
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: dominio, email: userEmail })
         });
         userData.domain = dominio;
         showLoading(false);
@@ -868,10 +925,10 @@ window.pagar = async function(plan) {
 
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo })
+          body: JSON.stringify({ bot_id: userData.bot_id, domain: nuevo, email: userEmail })
         });
         userData.domain = nuevo;
         document.getElementById('dominioActual').textContent = nuevo;
@@ -905,7 +962,7 @@ window.pagar = async function(plan) {
 
     function generarCodigoWidget() {
       const botIdFinal = userData.bot_id || 'wasa_' + currentUser.email.replace(/[^a-z0-9]/gi, '');
-      const codigo = `<script src="https://api.wasa.chat/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
+      const codigo = `<script src="https://wasa-api-proxy.javimsites.workers.dev/widget.js" data-bot-id="${botIdFinal}"><\/script>`;
       document.getElementById('codigoWidget').value = codigo;
       if (document.getElementById('codigoWidgetModal')) {
         document.getElementById('codigoWidgetModal').value = codigo;
@@ -1013,11 +1070,12 @@ window.pagar = async function(plan) {
 
         const url = `https://lh3.googleusercontent.com/d/${fileId}`;
 
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            bot_id: userData.bot_id, 
+            bot_id: userData.bot_id,
+			email: userEmail,  
             config: {...userData.config, avatar: url }
           })
         });
@@ -1049,10 +1107,10 @@ window.pagar = async function(plan) {
 
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, config })
+          body: JSON.stringify({ bot_id: userData.bot_id, email: userEmail, config })
         });
         userData.config = config;
         document.getElementById('colorWidget').value = config.color;
@@ -1400,10 +1458,10 @@ window.pagar = async function(plan) {
     document.getElementById('btnSubirProductos').addEventListener('click', async () => {
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { productos: datosProductos } })
+          body: JSON.stringify({ bot_id: userData.bot_id, email: userEmail, data: { productos: datosProductos } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -1418,10 +1476,10 @@ window.pagar = async function(plan) {
     document.getElementById('btnSubirFaq').addEventListener('click', async () => {
       showLoading(true);
       try {
-        await fetch('https://api.wasa.chat/config', {
+        await fetch('https://wasa-api-proxy.javimsites.workers.dev/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bot_id: userData.bot_id, data: { faq: datosConfig } })
+          body: JSON.stringify({ bot_id: userData.bot_id, email: userEmail, data: { faq: datosConfig } })
         });
         cambiosPendientes = false;
         document.getElementById('cambiosPendientes').style.display = 'none';
@@ -1576,6 +1634,87 @@ function cargarAnalytics() {
    ? new Date(stats.ultima_actividad).toLocaleString('es-AR')
     : '-';
 }
+
+	async function verificarCodigo() {
+  const idToken = localStorage.getItem('idToken'); // <-- AGREGÁ ESTA LÍNEA
+  if (!idToken) {
+    alert('Sesión expirada. Refrescá la página.');
+    return;
+  }
+		
+  const codigo = document.getElementById('inputCodigoVerificacion').value;
+  const btnVerificar = document.getElementById('btnVerificarCodigo');
+  const errorDiv = document.getElementById('errorVerificacion');
+  
+  if (codigo.length !== 6) {
+    errorDiv.textContent = 'El código debe tener 6 dígitos';
+    return;
+  }
+  
+  btnVerificar.disabled = true;
+  btnVerificar.textContent = 'Verificando...';
+  errorDiv.textContent = '';
+  
+  const res = await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      idToken: idToken,
+      codigo_verificacion: codigo,
+	  email: userEmail,
+	  	
+    })
+  });
+  
+  const data = await res.json();
+  
+  if (data.verificado) {
+    localStorage.setItem('bot_id', data.bot_id);
+    localStorage.setItem('user_email', data.email);
+    document.getElementById('modalVerificacion').style.display = 'none';
+    location.reload();
+    return;
+  }
+  
+  btnVerificar.disabled = false;
+  btnVerificar.textContent = 'Verificar cuenta';
+  
+  if (data.error === 'codigo_incorrecto') {
+    errorDiv.textContent = 'Código incorrecto. Intentá de nuevo.';
+  } else if (data.error === 'codigo_expirado') {
+    errorDiv.textContent = 'El código expiró. Pedí uno nuevo.';
+  } else {
+    errorDiv.textContent = 'Error al verificar.';
+  }
+  
+  document.getElementById('inputCodigoVerificacion').value = '';
+  document.getElementById('inputCodigoVerificacion').focus();
+}
+
+async function reenviarCodigo() {
+  const btnReenviar = document.getElementById('btnReenviar');
+  btnReenviar.disabled = true;
+  btnReenviar.textContent = 'Enviando...';
+  
+  await fetch('https://wasa-api-proxy.javimsites.workers.dev/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken: localStorage.getItem('idToken'), })
+  });
+  
+  btnReenviar.textContent = 'Código reenviado ✓';
+  setTimeout(() => {
+    btnReenviar.disabled = false;
+    btnReenviar.textContent = 'Reenviar código';
+  }, 3000);
+  
+  document.getElementById('errorVerificacion').textContent = '';
+  document.getElementById('inputCodigoVerificacion').focus();
+}
+
+document.getElementById('inputCodigoVerificacion')?.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') verificarCodigo();
+});
 	
 </script>
 <!-- MODAL DE PLANES -->
@@ -1628,6 +1767,43 @@ function cargarAnalytics() {
     <p style="text-align:center;color:#94a3b8;font-size:12px;margin-top:32px;">
       Los mensajes se reinician cada 30 días. Si te pasás del límite, el bot se pausa hasta renovar o hacer upgrade.
     </p>
+  </div>
+</div>
+
+	<!-- Modal Verificación Email -->
+<div id="modalVerificacion" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:32px;max-width:400px;width:90%;text-align:center;">
+    <h2 style="color:#25D366;margin:0 0 8px;font-size:24px;">Verificá tu email</h2>
+    <p style="color:#aaa;margin:0 0 24px;font-size:14px;">
+      Te enviamos un código de 6 dígitos a <br><b id="emailVerificacion" style="color:#fff"></b>
+    </p>
+    
+    <input 
+      type="text" 
+      id="inputCodigoVerificacion" 
+      placeholder="000000" 
+      maxlength="6"
+      style="width:100%;padding:16px;text-align:center;font-size:32px;letter-spacing:8px;background:#0a0a0a;border:2px solid #333;border-radius:8px;color:#fff;outline:none;margin-bottom:16px;"
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+    >
+    
+    <div id="errorVerificacion" style="color:#ff4444;font-size:13px;min-height:20px;margin-bottom:16px;"></div>
+    
+    <button 
+      id="btnVerificarCodigo" 
+      onclick="verificarCodigo()"
+      style="width:100%;padding:14px;background:#25D366;border:none;border-radius:8px;color:#000;font-weight:600;font-size:16px;cursor:pointer;"
+    >
+      Verificar cuenta
+    </button>
+    
+    <button 
+      onclick="reenviarCodigo()" 
+      id="btnReenviar"
+      style="width:100%;padding:12px;background:transparent;border:none;color:#666;font-size:13px;cursor:pointer;margin-top:8px;"
+    >
+      Reenviar código
+    </button>
   </div>
 </div>
 
