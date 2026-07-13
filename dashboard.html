@@ -806,7 +806,10 @@ if (!userEmail || userEmail === 'null' || userEmail === '' ||!idToken) {
           config: data.config,
           stats: data.stats,
           data: data.data,
-          verificado: data.verificado || false
+          verificado: data.verificado || false,
+		  codigo_propio: data.codigo_propio || '', // <-- AGREGAR
+          total_referidos: data.total_referidos || 0, // <-- AGREGAR
+          recompensas_referidos: data.recompensas_referidos || 0
         };
 
         // Si no está verificado, mostrar modal y cortar
@@ -832,6 +835,7 @@ if (!userEmail || userEmail === 'null' || userEmail === '' ||!idToken) {
         cargarConfigWidget();
         cargarDatosTablas();
         cargarAnalytics();
+		 cargarReferidos();
 
         // Link de referidos
         const codigoPropio = data.codigo_propio || '';
@@ -1334,14 +1338,14 @@ reader.onload = (e) => {
     }
 
     function renderTablaProductos() {
-      const tbody = document.querySelector('#miTabla tbody');
-      tbody.innerHTML = '';
-      datosProductos.forEach((row, i) => {
-        const tr = tbody.insertRow();
-        tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
-        tr.onclick = () => seleccionarFila(tr, i, 'productos');
-      });
-    }
+  const tbody = document.querySelector('#miTabla tbody');
+  tbody.innerHTML = '';
+  datosProductos.forEach((row, i) => {
+    const tr = tbody.insertRow();
+    tr.innerHTML = `<td>${row.nombre||''}</td><td>${row.precio||''}</td><td>${row.desc||''}</td><td>${row.url||''}</td>`;
+    tr.onclick = () => seleccionarFila(tr, i, 'productos');
+  });
+}
 
     function renderTablaConfig() {
       const tbody = document.querySelector('#miTablaConfig tbody');
@@ -1633,6 +1637,27 @@ function showSection(section) {
   }
 }
 
+function cargarReferidos() {
+  const codigoPropio = userData.codigo_propio || '';
+  const linkCompleto = `https://wasa.chat/signup?ref=${codigoPropio}`;
+  const inputLink = document.getElementById('linkReferido');
+  if (inputLink) {
+    inputLink.value = linkCompleto;
+  }
+
+  document.getElementById('statReferidosTotal').textContent = userData.total_referidos || 0;
+  document.getElementById('statRecompensasTotal').textContent = '$' + (userData.recompensas_referidos || 0).toFixed(2);
+
+  const btnCopiar = document.getElementById('btnCopiarLink');
+  if (btnCopiar) {
+    btnCopiar.onclick = () => {
+      navigator.clipboard.writeText(linkCompleto);
+      btnCopiar.textContent = 'Copiado!';
+      setTimeout(() => { btnCopiar.textContent = 'Copiar'; }, 2000);
+    };
+  }
+}
+	
 function cargarAnalytics() {
   if (!userData ||!userData.stats) {
     document.getElementById('statSesiones').textContent = '0';
