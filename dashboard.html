@@ -616,7 +616,7 @@ nav {
         <h4>Cargar desde CSV</h4>
         <input type="file" id="csvProductos" accept=".csv">
         <button id="btnCargarCsvProd" class="btn">📁 Cargar CSV</button>
-        <div class="help-text">Formato: nombre,precio,stock,descripcion,foto_url,url_producto</div>
+        <div class="help-text">Formato: nombre,precio,descripcion,foto_url,url_producto</div>
       </div>
       <div id="form-config" class="hidden">
         <div id="modoEdicionConfig" class="modo-edicion hidden">✏ Editando pregunta seleccionada</div>
@@ -811,6 +811,7 @@ if (!userEmail || userEmail === 'null' || userEmail === '' ||!idToken) {
           total_referidos: data.total_referidos || 0, // <-- AGREGAR
           recompensas_referidos: data.recompensas_referidos || 0
         };
+
 
         // Si no está verificado, mostrar modal y cortar
         if (!userData.verificado) {
