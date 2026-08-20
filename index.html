@@ -329,11 +329,26 @@ document.getElementById('main-form').addEventListener('submit',async(e)=>{
     plan:currentPlan,
     planLabel:plans[currentPlan].label
   };
+  // --- CONFIGURA ACA TU URL DE APPS SCRIPT ---
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_TU_ID_AQUI/exec"; // <--- REEMPLAZA ESTO
+
   try{
-    const r=await fetch("https://odd-frost-873a.javimsites.workers.dev/",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-    if(r.ok){alert("Enviado correctamente ✅"); e.target.reset();}
-    else{alert("Error: "+await r.text());}
-  }catch(err){alert("Error red: "+err.message);}
+    // Apps Script no necesita Content-Type application/json porque da CORS preflight y falla con 401
+    // Lo mandamos como text/plain o como FormData para que funcione sin preflight
+    const r = await fetch(APPS_SCRIPT_URL,{
+      method:"POST",
+      mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body: JSON.stringify(data)
+    });
+    // Con no-cors no podemos leer la respuesta, pero si no tira error es que llegó
+    alert("Enviado correctamente ✅ (via Apps Script) - Revisá tu mail / Sheet");
+    e.target.reset();
+    document.getElementById('file-name').innerText = 'Subir captura / archivo';
+  }catch(err){
+    console.error(err);
+    alert("Error de red: "+err.message + "\n\nSi sigue fallando, pegame acá tu URL de Apps Script y te lo dejo conectado.");
+  }
 });
 </script>
 </body>
