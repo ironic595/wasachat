@@ -6,23 +6,250 @@
 <title>Checkout Cripto - wasa.chat</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
-<style>*{font-family:"Instrument Sans",system-ui,sans-serif}.display{font-family:"Syne",sans-serif}</style>
+<style>
+*{font-family:"Instrument Sans",system-ui,sans-serif}
+.display{font-family:"Syne",sans-serif}
+</style>
 </head>
 <body class="bg-[#eef7ff] min-h-screen">
-<div class="bg-[#0a1a3a] text-white"><div class="max-w-[1100px] mx-auto px-6 py-4 flex justify-between"><a href="index-nuevo.html" class="h-8 px-3.5 flex items-center rounded-lg border border-white/20 bg-white/10 text-[12px] font-bold">wasa.chat</a><a href="index-nuevo.html" class="h-8 px-4 rounded-full bg-white/10 border border-white/20 text-[12px] font-semibold flex items-center">Volver</a></div></div>
-<div class="max-w-[1100px] mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
-<div><div class="inline-flex px-3 py-1 rounded-full bg-[#0a1a3a] text-white text-[10px] font-bold">CHECKOUT CRIPTO - SOLO USDT</div><h1 class="display mt-4 text-[36px] font-extrabold">Finaliza tu pago</h1><p class="mt-3 text-[14px] text-zinc-500">Todo desconectado (mock) por ahora.</p><div class="mt-8 rounded-[20px] bg-white border p-6"><h3 class="font-bold text-[12px] text-zinc-400">PLAN</h3><div class="mt-4 flex gap-2"><button onclick="setPlan('basico')" id="btn-basico" class="plan-btn flex-1 h-11 rounded-full border-2 border-[#0a1a3a] bg-[#0a1a3a] text-white font-bold text-[12px]">Basico $150</button><button onclick="setPlan('intermedio')" id="btn-intermedio" class="plan-btn flex-1 h-11 rounded-full border bg-white font-bold text-[12px]">Inter $180</button><button onclick="setPlan('pro')" id="btn-pro" class="plan-btn flex-1 h-11 rounded-full border bg-white font-bold text-[12px]">Pro $600</button></div></div></div>
-<div class="rounded-[24px] bg-white border p-6"><label class="block text-[11px] font-bold text-zinc-400 mb-2">RED USDT</label><div class="grid grid-cols-2 gap-2"><button onclick="setNet('trc20')" id="net-trc20" class="net-btn h-11 rounded-full bg-[#0a1a3a] text-white text-[11px] font-bold">TRC20 barato</button><button onclick="setNet('bep20')" id="net-bep20" class="net-btn h-11 rounded-full bg-white border text-[11px] font-bold">BEP20</button><button onclick="setNet('erc20')" id="net-erc20" class="net-btn h-11 rounded-full bg-white border text-[11px] font-bold">ERC20</button><button onclick="setNet('arbitrum')" id="net-arbitrum" class="net-btn h-11 rounded-full bg-white border text-[11px] font-bold">Arbitrum</button></div><div class="mt-6 rounded-[16px] bg-[#eef7ff] border p-4"><p class="text-[11px] font-bold" id="chain-label">TRC20 (Tron)</p><p id="chain-addr" class="mt-2 font-mono text-[11px] break-all bg-white border rounded p-2">TQr4aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789</p><button onclick="navigator.clipboard.writeText(document.getElementById('chain-addr').innerText)" class="mt-2 h-8 px-3 rounded-full bg-white border text-[11px] font-bold">Copiar</button><p class="mt-2 text-[11px]">Monto: <span id="amount" class="font-bold">$150 USDT</span></p></div><div class="mt-6"><button id="btn-connect" onclick="connectW()" class="w-full h-12 rounded-full bg-[#0a1a3a] text-white font-bold text-[13px]">Conectar Billetera</button><div id="wallet-ok" class="hidden mt-3 bg-emerald-50 border border-emerald-200 p-3 rounded-[12px] flex justify-between"><span class="text-[11px] font-bold">0x1234...ABCD conectada</span><button onclick="payW()" class="h-8 px-4 rounded-full bg-emerald-600 text-white text-[11px] font-bold">Pagar</button></div><div id="wallet-pay" class="hidden mt-3 bg-blue-50 border p-3 rounded-[12px] text-[11px]">Enviando... Hash: 0xa1b2... Verificando...</div></div><div class="mt-6"><input id="tx-hash" placeholder="Pegar Tx Hash" class="w-full h-11 px-4 rounded-full border bg-zinc-50 text-[11px] font-mono"><button onclick="verify()" class="mt-2 w-full h-11 rounded-full border-2 border-[#0a1a3a] text-[#0a1a3a] font-bold text-[12px]">Verificar hash y activar</button><div id="verify-res" class="hidden mt-3 p-3 rounded-[12px] text-[11px]"></div></div></div>
+
+<!-- NAV -->
+<div class="bg-[#0a1a3a] text-white">
+  <div class="max-w-[1100px] mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="index-nuevo.html" class="h-8 px-3.5 flex items-center rounded-lg border border-white/20 bg-white/10 text-[12px] font-bold tracking-[0.12em]">wasa.chat</a>
+    <a href="index-nuevo.html" class="h-8 px-4 rounded-full bg-white/10 border border-white/20 text-[12px] font-semibold flex items-center">Volver</a>
+  </div>
 </div>
+
+<div class="max-w-[1100px] mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+  <!-- IZQUIERDA -->
+  <div>
+    <div class="inline-flex px-3 py-1 rounded-full bg-[#0a1a3a] text-white text-[10px] font-bold tracking-[0.14em]">CHECKOUT CRIPTO - SOLO USDT</div>
+    <h1 class="display mt-4 text-[36px] font-extrabold leading-[0.95]">Finaliza tu pago</h1>
+    <p class="mt-3 text-[14px] text-zinc-500">Todo desconectado (mock) por ahora. Vos reemplazás las imágenes después.</p>
+
+    <div class="mt-8 rounded-[20px] bg-white border p-6">
+      <h3 class="font-bold text-[11px] tracking-[0.12em] text-zinc-400">PLAN</h3>
+      <div class="mt-4 flex gap-2">
+        <button onclick="setPlan('basico')" id="btn-basico" class="plan-btn flex-1 h-11 rounded-full border-2 border-[#0a1a3a] bg-[#0a1a3a] text-white font-bold text-[12px]">Básico $150</button>
+        <button onclick="setPlan('intermedio')" id="btn-intermedio" class="plan-btn flex-1 h-11 rounded-full border bg-white font-bold text-[12px]">Inter $180</button>
+        <button onclick="setPlan('pro')" id="btn-pro" class="plan-btn flex-1 h-11 rounded-full border bg-white font-bold text-[12px]">Pro $600</button>
+      </div>
+    </div>
+
+    <!-- TARJETA CARACTERISTICAS - ZONA VERDE -->
+    <div id="plan-card" class="mt-6 rounded-[24px] bg-white border shadow-sm overflow-hidden">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <h3 id="plan-card-title" class="display text-[20px] font-extrabold">BÁSICO</h3>
+          <span id="plan-card-price" class="px-3 py-1 rounded-full bg-[#0a1a3a] text-white text-[11px] font-bold">$150 USDT/año</span>
+        </div>
+        <div class="mt-5 grid grid-cols-[120px_1fr] gap-5 items-start">
+          <div class="rounded-[12px] overflow-hidden border bg-zinc-50">
+            <img id="plan-card-img" src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=300&h=300&fit=crop" class="w-full aspect-square object-cover" alt="ejemplo">
+          </div>
+          <div>
+            <ul id="plan-card-features" class="space-y-2 text-[13px] text-zinc-700"></ul>
+            <p id="plan-card-desc" class="mt-4 text-[11px] text-zinc-400"></p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-[#eef7ff] px-6 py-3 flex justify-between items-center">
+        <span class="text-[11px] text-zinc-500">Ejemplo: <span id="plan-card-example">cafeteria-demo.com</span></span>
+        <button onclick="openPreview()" class="text-[11px] font-bold underline bg-white px-3 py-1 rounded-full border hover:bg-[#0a1a3a] hover:text-white transition">Ver demo en imagen →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DERECHA PAGO -->
+  <div class="rounded-[24px] bg-white border p-6 h-fit">
+    <label class="block text-[11px] font-bold tracking-[0.12em] text-zinc-400 mb-2">RED USDT</label>
+    <div class="grid grid-cols-2 gap-2">
+      <button onclick="setNet('trc20')" id="net-trc20" class="net-btn h-11 rounded-full bg-[#0a1a3a] text-white text-[11px] font-bold">TRC20 barato</button>
+      <button onclick="setNet('bep20')" id="net-bep20" class="net-btn h-11 rounded-full bg-white border text-[11px] font-bold">BEP20</button>
+      <button onclick="setNet('erc20')" id="net-erc20" class="net-btn h-11 rounded-full bg-white border text-[11px] font-bold">ERC20</button>
+      <button onclick="setNet('arbitrum')" id="net-arbitrum" class="net-btn h-11 rounded-full bg-white border text-[11px] font-bold">Arbitrum</button>
+    </div>
+
+    <div class="mt-6 rounded-[16px] bg-[#eef7ff] border p-4">
+      <p class="text-[11px] font-bold" id="chain-label">TRC20 (Tron)</p>
+      <p id="chain-addr" class="mt-2 font-mono text-[11px] break-all bg-white border rounded p-2">TQr4aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789</p>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('chain-addr').innerText)" class="mt-2 h-8 px-3 rounded-full bg-white border text-[11px] font-bold">Copiar</button>
+      <p class="mt-2 text-[11px]">Monto: <span id="amount" class="font-bold">$150 USDT</span></p>
+    </div>
+
+    <div class="mt-6">
+      <button id="btn-connect" onclick="connectW()" class="w-full h-12 rounded-full bg-[#0a1a3a] text-white font-bold text-[13px]">Conectar Billetera</button>
+      <div id="wallet-ok" class="hidden mt-3 bg-emerald-50 border border-emerald-200 p-3 rounded-[12px] flex justify-between items-center">
+        <span class="text-[11px] font-bold">0x1234...ABCD conectada</span>
+        <button onclick="payW()" class="h-8 px-4 rounded-full bg-emerald-600 text-white text-[11px] font-bold">Pagar</button>
+      </div>
+      <div id="wallet-pay" class="hidden mt-3 bg-blue-50 border p-3 rounded-[12px] text-[11px]">Enviando... Hash: 0xa1b2... Verificando...</div>
+    </div>
+
+    <div class="mt-6">
+      <input id="tx-hash" placeholder="Pegar Tx Hash" class="w-full h-11 px-4 rounded-full border bg-zinc-50 text-[11px] font-mono">
+      <button onclick="verify()" class="mt-2 w-full h-11 rounded-full border-2 border-[#0a1a3a] text-[#0a1a3a] font-bold text-[12px]">Verificar hash y activar</button>
+      <div id="verify-res" class="hidden mt-3 p-3 rounded-[12px] text-[11px]"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL IMAGEN SCROLLEABLE - 2 IMAGENES POR PLAN -->
+<div id="preview-modal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-[#0a1a3a]/90 backdrop-blur-md" onclick="closePreview()"></div>
+  <div class="relative z-10 h-screen flex flex-col">
+    <div class="flex justify-between items-center px-6 py-4 bg-[#0a1a3a] text-white shrink-0">
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="text-[12px] font-bold">Preview imagen</span>
+        <span id="preview-plan-badge" class="px-2 py-1 rounded-full bg-white/10 text-[10px]">BÁSICO</span>
+        <span class="px-2 py-1 rounded-full bg-[#BBF7D0] text-[#0a1a3a] text-[10px] font-bold">Solo imagen - No código</span>
+        <div class="flex bg-white/10 rounded-full p-1 ml-2">
+          <button id="btn-view-desktop" onclick="setPreviewView('desktop')" class="h-7 px-3 rounded-full bg-white text-[#0a1a3a] text-[11px] font-bold">Desktop</button>
+          <button id="btn-view-mobile" onclick="setPreviewView('mobile')" class="h-7 px-3 rounded-full text-white/70 text-[11px] font-bold">Mobile</button>
+        </div>
+      </div>
+      <button onclick="closePreview()" class="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">✕</button>
+    </div>
+    <div class="flex-1 overflow-hidden flex flex-col bg-[#eef7ff] p-3 md:p-6">
+      <div class="flex-1 overflow-auto rounded-[16px] bg-white shadow-2xl border max-w-[1200px] w-full mx-auto relative select-none" oncontextmenu="return false;" style="user-select:none;">
+        <div class="absolute inset-0 z-20 bg-transparent" style="pointer-events:auto;"></div>
+        <img id="preview-img-desktop" src="" class="w-full h-auto block" alt="desktop">
+        <img id="preview-img-mobile" src="" class="w-full max-w-[390px] mx-auto h-auto hidden" alt="mobile">
+      </div>
+      <p class="mt-3 text-center text-[11px] text-zinc-500">Scrolleá para ver el sitio completo · Cambiá entre Desktop/Mobile · Reemplazá las imágenes en planData.imgDesktop / imgMobile</p>
+    </div>
+  </div>
+</div>
+
 <script>
-let plan='basico', net='trc20';
-const addrs={trc20:"TQr4aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789 - TRC20", bep20:"0x1234...ABCD - BEP20", erc20:"0x5678...EFGH - ERC20", arbitrum:"0x9abc...IJKL - Arbitrum"};
+let plan='basico', net='trc20', previewView='desktop';
+
+// Lee ?plan= y ?from=
+const params = new URLSearchParams(window.location.search);
+const urlPlan = params.get('plan');
+if(urlPlan && ['basico','intermedio','pro'].includes(urlPlan)){ plan=urlPlan; }
+
+const addrs={
+  trc20:"TQr4aBcDeFgHiJkLmNoPqRsTuVwXyZ123456789 - TRC20",
+  bep20:"0x1234...ABCD - BEP20",
+  erc20:"0x5678...EFGH - ERC20",
+  arbitrum:"0x9abc...IJKL - Arbitrum"
+};
 const amts={basico:"$150 USDT", intermedio:"$180 USDT", pro:"$600 USDT"};
-function setPlan(p){plan=p; document.querySelectorAll('.plan-btn').forEach(b=>b.className='plan-btn flex-1 h-11 rounded-full border bg-white font-bold text-[12px]'); document.getElementById('btn-'+p).className='plan-btn flex-1 h-11 rounded-full border-2 border-[#0a1a3a] bg-[#0a1a3a] text-white font-bold text-[12px]'; document.getElementById('amount').innerText=amts[p];}
-function setNet(n){net=n; document.querySelectorAll('.net-btn').forEach(b=>b.className='net-btn h-11 rounded-full bg-white border text-[11px] font-bold'); document.getElementById('net-'+n).className='net-btn h-11 rounded-full bg-[#0a1a3a] text-white text-[11px] font-bold'; document.getElementById('chain-label').innerText=n.toUpperCase(); document.getElementById('chain-addr').innerText=addrs[n];}
-function connectW(){document.getElementById('btn-connect').innerText='Conectando...'; setTimeout(()=>{document.getElementById('btn-connect').classList.add('hidden'); document.getElementById('wallet-ok').classList.remove('hidden');},700);}
-function payW(){document.getElementById('wallet-ok').classList.add('hidden'); document.getElementById('wallet-pay').classList.remove('hidden'); setTimeout(()=>{document.getElementById('wallet-pay').innerHTML='✅ Verificado en '+net+'<br><a href="dashboard.html" class="underline font-bold">Ir al Dashboard</a>';},1500);}
-function verify(){const h=document.getElementById('tx-hash').value; const r=document.getElementById('verify-res'); r.classList.remove('hidden'); r.className='mt-3 p-3 rounded-[12px] text-[11px] bg-blue-50 border'; r.innerText='Verificando '+h.slice(0,15)+'...'; setTimeout(()=>{r.className='mt-3 p-3 rounded-[12px] text-[11px] bg-emerald-50 border border-emerald-200'; r.innerHTML='✅ Hash valido - Cuenta activada<br><a href="dashboard.html" class="inline-flex mt-2 h-8 px-4 rounded-full bg-emerald-600 text-white font-bold items-center">Dashboard</a>';},1200);}
+
+const planData={
+  basico:{
+    title:"BÁSICO",
+    price:"$150 USDT/año",
+    img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=300&h=300&fit=crop",
+    // REEMPLAZA ESTAS DOS POR TUS ARCHIVOS
+    imgDesktop:"./images/basico-desktop.jpg",
+    imgMobile:"./images/basico-mobile.jpg",
+    example:"cafeteria-demo.com",
+    desc:"Ideal para landing simple y presencia online rápida.",
+    features:["10 plantillas con estilos diferentes para elegir","1 página única","Hosting + dominio + DB 1 año","Entrega en 72hs","Editor con agregar/quitar secciones","Soporte por email"]
+  },
+  intermedio:{
+    title:"INTERMEDIO",
+    price:"$180 USDT/año",
+    img:"https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=300&fit=crop",
+    imgDesktop:"./images/intermedio-desktop.jpg",
+    imgMobile:"./images/intermedio-mobile.jpg",
+    example:"negocio-demo.com",
+    desc:"Más completo para mostrar servicios y captar leads.",
+    features:["15 plantillas con estilos diferentes para elegir","Hasta 5 páginas","Blog + gestión de artículos","Editor con agregar/quitar secciones y reordenar","Hosting + dominio + DB 1 año","Soporte prioritario"]
+  },
+  pro:{
+    title:"PRO",
+    price:"Desde $600 USDT/año",
+    img:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&h=300&fit=crop",
+    imgDesktop:"./images/pro-desktop.jpg",
+    imgMobile:"./images/pro-mobile.jpg",
+    example:"ecommerce-demo.com",
+    desc:"A medida para ecommerce, reservas o funcionalidades avanzadas.",
+    features:["25 plantillas premium + a medida","Páginas ilimitadas","Ecommerce / reservas / pagos","Editor drag & drop completo","Integraciones a medida","Hosting premium + soporte 24hs"]
+  }
+};
+
+function setPlan(p){
+  plan=p;
+  document.querySelectorAll('.plan-btn').forEach(b=>b.className='plan-btn flex-1 h-11 rounded-full border bg-white font-bold text-[12px]');
+  document.getElementById('btn-'+p).className='plan-btn flex-1 h-11 rounded-full border-2 border-[#0a1a3a] bg-[#0a1a3a] text-white font-bold text-[12px]';
+  document.getElementById('amount').innerText=amts[p];
+  const d=planData[p];
+  document.getElementById('plan-card-title').innerText=d.title;
+  document.getElementById('plan-card-price').innerText=d.price;
+  document.getElementById('plan-card-img').src=d.img;
+  document.getElementById('plan-card-example').innerText=d.example;
+  document.getElementById('plan-card-desc').innerText=d.desc;
+  document.getElementById('plan-card-features').innerHTML=d.features.map(f=>`<li class="flex gap-2"><span class="text-emerald-500">✓</span> ${f}</li>`).join('');
+}
+
+function setNet(n){
+  net=n;
+  document.querySelectorAll('.net-btn').forEach(b=>b.className='net-btn h-11 rounded-full bg-white border text-[11px] font-bold');
+  document.getElementById('net-'+n).className='net-btn h-11 rounded-full bg-[#0a1a3a] text-white text-[11px] font-bold';
+  document.getElementById('chain-label').innerText=n.toUpperCase();
+  document.getElementById('chain-addr').innerText=addrs[n];
+}
+
+function connectW(){
+  document.getElementById('btn-connect').innerText='Conectando...';
+  setTimeout(()=>{document.getElementById('btn-connect').classList.add('hidden'); document.getElementById('wallet-ok').classList.remove('hidden');},700);
+}
+function payW(){
+  document.getElementById('wallet-ok').classList.add('hidden');
+  document.getElementById('wallet-pay').classList.remove('hidden');
+  setTimeout(()=>{document.getElementById('wallet-pay').innerHTML='✅ Verificado en '+net+'<br><a href="dashboard.html" class="underline font-bold">Ir al Dashboard</a>';},1500);
+}
+function verify(){
+  const h=document.getElementById('tx-hash').value;
+  const r=document.getElementById('verify-res');
+  r.classList.remove('hidden');
+  r.className='mt-3 p-3 rounded-[12px] text-[11px] bg-blue-50 border';
+  r.innerText='Verificando '+h.slice(0,15)+'...';
+  setTimeout(()=>{r.className='mt-3 p-3 rounded-[12px] text-[11px] bg-emerald-50 border border-emerald-200'; r.innerHTML='✅ Hash valido - Cuenta activada<br><a href="dashboard.html" class="inline-flex mt-2 h-8 px-4 rounded-full bg-emerald-600 text-white font-bold items-center">Dashboard</a>';},1200);
+}
+
+function openPreview(){
+  const d=planData[plan];
+  document.getElementById('preview-plan-badge').innerText=d.title;
+  document.getElementById('preview-img-desktop').src=d.imgDesktop;
+  document.getElementById('preview-img-mobile').src=d.imgMobile;
+  setPreviewView(window.innerWidth < 768 ? 'mobile' : 'desktop');
+  document.getElementById('preview-modal').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+}
+function closePreview(){
+  document.getElementById('preview-modal').classList.add('hidden');
+  document.body.style.overflow='';
+}
+function setPreviewView(view){
+  previewView=view;
+  const btnD=document.getElementById('btn-view-desktop');
+  const btnM=document.getElementById('btn-view-mobile');
+  const imgD=document.getElementById('preview-img-desktop');
+  const imgM=document.getElementById('preview-img-mobile');
+  if(view==='desktop'){
+    btnD.className='h-7 px-3 rounded-full bg-white text-[#0a1a3a] text-[11px] font-bold';
+    btnM.className='h-7 px-3 rounded-full text-white/70 text-[11px] font-bold';
+    imgD.classList.remove('hidden');
+    imgM.classList.add('hidden');
+  }else{
+    btnM.className='h-7 px-3 rounded-full bg-white text-[#0a1a3a] text-[11px] font-bold';
+    btnD.className='h-7 px-3 rounded-full text-white/70 text-[11px] font-bold';
+    imgM.classList.remove('hidden');
+    imgD.classList.add('hidden');
+  }
+}
+
+// init
+setPlan(plan);
+setNet(net);
 </script>
 </body>
 </html>
