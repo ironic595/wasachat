@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wasa.chat / panel de usuario - ESTRUCTURA</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>*{font-family:"Instrument Sans",sans-serif}.display{font-family:"Syne",sans-serif} .toggle{width:28px;height:16px;background:#ccc;border-radius:99px;position:relative;cursor:pointer}.toggle.on{background:#000}.toggle::after{content:'';width:12px;height:12px;background:white;border-radius:50%;position:absolute;top:2px;left:2px;transition:0.2s}.toggle.on::after{left:14px}</style>
+</head>
+<body class="bg-[#7da9d6] min-h-screen">
+<!-- TOP BAR -->
+<div class="bg-black text-white flex justify-between items-center px-6 py-3">
+  <span class="text-[12px] tracking-[0.1em] font-bold">wasa.chat / panel de usuario</span>
+  <button onclick="location.href='dashboard.html'" class="bg-[#3a3a3a] border border-white/20 rounded-full px-4 py-1 text-[10px]">Volver al<br>dashboard</button>
+</div>
+<!-- TABS ESTRUCTURA / COLORES / TEXTO / PRODUCTOS -->
+<div class="bg-[#0a2a5a] text-white flex">
+  <button class="flex-1 py-2 text-[13px] font-extrabold bg-[#4a90e2] tracking-[0.1em]">ESTRUCTURA</button>
+  <button class="flex-1 py-2 text-[11px] opacity-60 tracking-[0.1em]">COLORES</button>
+  <button class="flex-1 py-2 text-[11px] opacity-60 tracking-[0.1em]">TEXTO</button>
+  <button class="flex-1 py-2 text-[11px] opacity-60 tracking-[0.1em]">PRODUCTOS/ARTICULOS</button>
+</div>
+
+<div class="flex h-[calc(100vh-88px)]">
+  <!-- LEFT SIDEBAR - EXACTO SCREENSHOT -->
+  <aside class="w-[260px] bg-[#4a4a4a] text-white flex flex-col overflow-auto">
+    <!-- Elegir plantilla -->
+    <div class="p-3 border-b border-white/10">
+      <p class="text-[11px] tracking-[0.1em] opacity-80">Elegir plantilla</p>
+      <div class="mt-2 grid grid-cols-2 gap-2">
+        <button onclick="setPlantilla('ecommerce')" id="tpl-ecommerce" class="rounded-[8px] bg-[#6b7280] p-2 h-[50px] flex flex-col items-center justify-center border-2 border-white"><span class="w-6 h-6 bg-[#1e3a5f] rounded"></span><span class="text-[8px] mt-1">Ecommerce</span></button>
+        <button onclick="setPlantilla('personal')" id="tpl-personal" class="rounded-[8px] bg-[#6b7280] p-2 h-[50px] flex flex-col items-center justify-center"><span class="w-6 h-6 bg-[#1e3a5f] rounded"></span><span class="text-[8px] mt-1">Personal</span></button>
+        <button onclick="setPlantilla('blog')" id="tpl-blog" class="rounded-[8px] bg-[#6b7280] p-2 h-[50px] flex flex-col items-center justify-center"><span class="w-6 h-6 bg-[#1e3a5f] rounded"></span><span class="text-[8px] mt-1">Blog</span></button>
+        <button onclick="setPlantilla('portfolio')" id="tpl-portfolio" class="rounded-[8px] bg-[#6b7280] p-2 h-[50px] flex flex-col items-center justify-center"><span class="w-6 h-6 bg-[#1e3a5f] rounded"></span><span class="text-[8px] mt-1">Portfolio</span></button>
+        <button class="rounded-[8px] bg-[#6b7280] p-2 h-[50px] flex flex-col items-center justify-center"><span class="w-6 h-6 bg-[#1e3a5f] rounded"></span></button>
+        <button class="rounded-[8px] bg-[#6b7280] p-2 h-[50px] flex flex-col items-center justify-center"><span class="w-6 h-6 bg-[#1e3a5f] rounded"></span></button>
+      </div>
+    </div>
+
+    <!-- Secciones/Home - PESTAÑAS DINAMICAS -->
+    <div class="p-3 border-b border-white/10">
+      <p class="text-[11px] tracking-[0.1em]"><span class="opacity-60">Secciones/</span><span class="text-[#f6d55c] font-bold" id="secciones-label">Home</span></p>
+      <div class="mt-2 flex gap-1">
+        <select id="tipo-seccion" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[10px] px-2 border">
+          <option value="">tipo de seccion (componente)</option>
+          <option value="hero">Hero (columnas 1 o 2)</option>
+          <option value="tarjetaTextoColumna">Tarjeta texto columna + boton inf der</option>
+          <option value="tarjetaImagenes">Tarjeta imagenes c/ titulo arriba y titulo abajo c/u</option>
+          <option value="faqs">Faqs</option>
+          <option value="planes">Planes</option>
+          <option value="sucursales">Buscar sucursales</option>
+        </select>
+        <button onclick="agregarSeccion()" class="h-6 px-3 rounded bg-[#f6d55c] text-black text-[10px] font-bold">Agregar!</button>
+      </div>
+      <div id="secciones-list" class="mt-3 space-y-1"></div>
+    </div>
+
+    <!-- Editar/Hero - EDITOR DINAMICO SEGUN TIPO DE SECCION -->
+    <div class="p-3 flex-1 bg-[#5a5a5a]">
+      <p class="text-[11px] tracking-[0.1em]"><span class="opacity-60">Editar/</span><span class="text-[#f6d55c] font-bold" id="editar-label">Hero</span></p>
+      <div id="editor-dinamico" class="mt-3 space-y-3"></div>
+    </div>
+  </aside>
+
+  <!-- CENTER - VISTA PREVIA CON PESTAÑAS HOME/CATEGORIAS/SUCURSALES/FAQS/CONTACTO -->
+  <main class="flex-1 p-4 overflow-auto">
+    <div class="flex justify-between items-center">
+      <p class="text-[11px] tracking-[0.1em] text-white/70">VISTA PREVIA/<span class="text-[#f6d55c] font-bold" id="vista-previa-label">HOME</span></p>
+    </div>
+    <div class="mt-3 bg-[#2a2a2a] rounded-[12px] p-3">
+      <!-- Tabs de subpaginas -->
+      <div class="flex gap-1 items-center">
+        <div id="tabs-subpaginas" class="flex gap-1"></div>
+        <button onclick="agregarSubpagina()" class="ml-auto h-7 px-3 rounded bg-[#22c55e] text-white text-[9px] font-bold flex items-center gap-1">+ AGREGAR SUBPAGINA 5/8</button>
+      </div>
+
+      <!-- Preview iframe style -->
+      <div class="mt-3 bg-[#1a1a1a] rounded-[8px] p-2">
+        <div id="preview" class="bg-[#e5e5e5] rounded-[4px] overflow-hidden min-h-[600px]"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+let plantilla='ecommerce';
+let pestanaActiva='HOME';
+let seccionActiva=null;
+
+let subpaginas=[
+  {id:'home', nombre:'HOME', slug:'', secciones:[
+    {id:'hero_1', tipo:'hero', nombre:'Hero - Ofertas', titulo:'OFERTAS DE LA SEMANA', estilo:'Carrousel', cantidadFotogramas:2, fotogramaActual:1, columnasFotogramas:'2', fondoTipo:'Color', fondoValor:'#a3d977', col1:{tipo:'Titulo/Subtitulo/Boton', titulo:'OFERTAS DE LA SEMANA', subtitulo:'', boton:'VER OFERTAS', link:'#ofertas'}, col2:{tipo:'Imagen', imagen:'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=300&h=200&fit=crop'}},
+    {id:'cat_1', tipo:'tarjetaTextoColumna', nombre:'CATEGORIAS', titulo:'CATEGORIAS', categorias:[{nombre:'RELOJES', imagen:''},{nombre:'COMPUTADORAS', imagen:''},{nombre:'HELADERAS', imagen:''}], botonTexto:'ver todas ---->', botonLink:'#categorias'},
+    {id:'vendidos_1', tipo:'tarjetaTextoColumna', nombre:'MAS VENDIDOS', titulo:'MAS VENDIDOS', categorias:[{nombre:'PROD 1'},{nombre:'PROD 2'},{nombre:'PROD 3'}], botonTexto:'ver mas vendidos'},
+    {id:'ofertas_1', tipo:'tarjetaTextoColumna', nombre:'OFERTAS', titulo:'OFERTAS', categorias:[{nombre:'OFERTA 1'}], botonTexto:'ver ofertas'},
+    {id:'suc_1', tipo:'sucursales', nombre:'BUSCAR SUCURSALES', titulo:'BUSCAR SUCURSALES'}
+  ]},
+  {id:'categorias', nombre:'CATEGORIAS', slug:'categorias', secciones:[
+    {id:'cat_list', tipo:'categorias', titulo:'Todas las categorias'}
+  ]},
+  {id:'sucursales', nombre:'SUCURSALES', slug:'sucursales', secciones:[
+    {id:'suc_search', tipo:'sucursales', titulo:'BUSCAR SUCURSALES'}
+  ]},
+  {id:'faqs', nombre:'FAQS', slug:'faqs', secciones:[
+    {id:'faq_1', tipo:'faqs', titulo:'Preguntas frecuentes'}
+  ]},
+  {id:'contacto', nombre:'CONTACTO', slug:'contacto', secciones:[]}
+];
+
+function setPlantilla(p){
+  plantilla=p;
+  ['ecommerce','personal','blog','portfolio'].forEach(k=>{
+    const el=document.getElementById('tpl-'+k);
+    if(el) el.classList.toggle('border-2', k===p);
+    if(el) el.classList.toggle('border-white', k===p);
+  });
+  render();
+}
+
+function agregarSubpagina(){
+  if(subpaginas.length>=8) return alert('Máx 5/8 en demo, 8 real');
+  const nombre=prompt('Nombre subpágina (ej: Nosotros)');
+  if(!nombre) return;
+  const slug=nombre.toLowerCase().replace(/\s+/g,'-');
+  subpaginas.push({id:'sub_'+Date.now(), nombre:nombre.toUpperCase(), slug, secciones:[]});
+  render();
+}
+
+function agregarSeccion(){
+  const tipo=document.getElementById('tipo-seccion').value;
+  if(!tipo) return alert('Elegí tipo de sección');
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  if(!pag) return;
+  let nueva={id:tipo+'_'+Date.now(), tipo};
+  if(tipo==='hero'){
+    nueva={...nueva, titulo:'NUEVO HERO', estilo:'Estatico', cantidadFotogramas:1, fotogramaActual:1, columnasFotogramas:'1', fondoTipo:'Color', fondoValor:'#a3d977', col1:{tipo:'Titulo/Subtitulo/Boton', titulo:'TITULO', subtitulo:'Subtitulo', boton:'VER MAS', link:'#'}, col2:{tipo:'Imagen', imagen:''}};
+  } else if(tipo==='tarjetaImagenes'){
+    nueva={...nueva, titulo:'Tarjeta de imágenes', tituloArriba:'TITULO ARRIBA', imagenes:[{titulo:'Imagen 1', imagen:'', link:'#'}, {titulo:'Imagen 2', imagen:'', link:'#'}, {titulo:'Imagen 3', imagen:'', link:'#'}], boton:{texto:'Ver más', link:'#', posicion:'abajo derecha'}};
+  } else if(tipo==='categorias'){
+    nueva={...nueva, titulo:'CATEGORIAS', categorias:[{nombre:'CATEGORIA 1'}], botonTexto:'ver todas'};
+  } else { // 2 columnas
+    nueva={...nueva, titulo:tipo.toUpperCase()};
+  }
+  pag.secciones.push(nueva);
+  seccionActiva=nueva.id;
+  render();
+}
+
+function selectPestana(nombre){
+  pestanaActiva=nombre;
+  seccionActiva=null;
+  render();
+}
+
+function selectSeccion(id){
+  seccionActiva=id;
+  render();
+}
+
+function renombrarSeccion(id){
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  const sec=pag.secciones.find(s=>s.id===id);
+  const actual=sec.nombre||sec.titulo||'';
+  const nuevo=prompt('Cambiar NOMBRE del titulo de la tarjeta (ej: CATEGORIAS, MAS VENDIDOS, OFERTAS) - El tipo sigue siendo: '+sec.tipo, actual);
+  if(nuevo===null) return;
+  if(nuevo.trim()==='') return;
+  sec.nombre=nuevo.trim().toUpperCase();
+  sec.titulo=nuevo.trim().toUpperCase();
+  render();
+}
+function borrarSeccion(id){
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  pag.secciones=pag.secciones.filter(s=>s.id!==id);
+  seccionActiva=null;
+  render();
+}
+
+function updateSeccionField(field, value){
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  const sec=pag.secciones.find(s=>s.id===seccionActiva);
+  if(field.includes('.')){
+    const [parent, child]=field.split('.');
+    sec[parent][child]=value;
+  } else { // 2 columnas
+    sec[field]=value;
+  }
+  renderPreview();
+}
+
+function updateColField(col, field, value){
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  const sec=pag.secciones.find(s=>s.id===seccionActiva);
+  sec[col][field]=value;
+  renderPreview();
+}
+
+function render(){
+  // Tabs subpaginas
+  document.getElementById('tabs-subpaginas').innerHTML=subpaginas.map(s=>`<button onclick="selectPestana('${s.nombre}')" class="h-7 px-3 rounded text-[10px] font-bold ${pestanaActiva===s.nombre?'bg-white text-black':'bg-[#4a4a4a] text-white/60'}">${s.nombre}</button>`).join('');
+  document.getElementById('secciones-label').innerText=pestanaActiva;
+  document.getElementById('vista-previa-label').innerText=pestanaActiva;
+  document.getElementById('editar-label').innerText= (()=>{
+    const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+    const sec=pag?.secciones.find(s=>s.id===seccionActiva);
+    return sec? sec.tipo.charAt(0).toUpperCase()+sec.tipo.slice(1) : 'Hero';
+  })();
+
+  // Secciones list - LIMPIO, sin texto chiquito ilegible
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  document.getElementById('secciones-list').innerHTML=(pag?.secciones||[]).map(s=>`
+    <div class="flex items-center gap-1 bg-[#3a3a3a] rounded px-2 py-1 ${seccionActiva===s.id?'ring-1 ring-[#f6d55c]':''}">
+      <button onclick="selectSeccion('${s.id}')" class="flex-1 text-left">
+        <span class="text-[11px] font-bold text-white tracking-wide">${s.nombre||s.titulo||s.tipo}</span>
+      </button>
+      <button onclick="renombrarSeccion('${s.id}')" class="h-6 w-6 rounded bg-[#f6d55c] flex items-center justify-center text-[11px]">✏️</button>
+      <button onclick="borrarSeccion('${s.id}')" class="h-6 px-2 rounded bg-[#3b82f6] text-white text-[9px] font-bold">Borrar</button>
+    </div>
+  `).join('') || '<p class="text-[10px] opacity-50">Sin secciones en '+pestanaActiva+'</p>';
+
+  // Editor dinámico según tipo de sección seleccionada
+  const secActiva=pag?.secciones.find(s=>s.id===seccionActiva) || pag?.secciones[0];
+  if(secActiva){
+    seccionActiva=secActiva.id;
+    renderEditor(secActiva);
+  } else { // 2 columnas
+    document.getElementById('editor-dinamico').innerHTML='<p class="text-[10px] opacity-60">Seleccioná una sección para editar. Cada sección tiene editor diferente: Hero no es lo mismo que Tarjeta de imágenes.</p>';
+  }
+
+  renderPreview();
+}
+
+function renderEditor(sec){
+  let html='';
+  if(sec.tipo==='hero'){
+    html+=`
+      <div class="space-y-2">
+        <div class="flex justify-between items-center"><label class="text-[9px]">Estilo</label><select onchange="updateSeccionField('estilo', this.value)" class="h-6 rounded bg-[#2a2a2a] text-[10px] px-2 w-[100px]"><option ${sec.estilo==='Carrousel'?'selected':''}>Carrousel</option><option ${sec.estilo==='Estatico'?'selected':''}>Estatico</option></select></div>
+        <div class="flex justify-between items-center"><label class="text-[9px]">Cantidad fotogramas</label><select onchange="updateSeccionField('cantidadFotogramas', parseInt(this.value))" class="h-6 rounded bg-[#2a2a2a] text-[10px] px-2 w-[60px]"><option ${sec.cantidadFotogramas===1?'selected':''}>1</option><option ${sec.cantidadFotogramas===2?'selected':''}>2</option><option ${sec.cantidadFotogramas===3?'selected':''}>3</option></select></div>
+        <div class="flex justify-between items-center"><label class="text-[9px]">Editar fotograma nº</label><select onchange="updateSeccionField('fotogramaActual', parseInt(this.value))" class="h-6 rounded bg-[#2a2a2a] text-[10px] px-2 w-[60px]"><option ${sec.fotogramaActual===1?'selected':''}>1</option><option ${sec.fotogramaActual===2?'selected':''}>2</option></select></div>
+        <div class="flex justify-between items-center"><label class="text-[9px]">Columnas fotogramas</label><select id="col-fotogramas" onchange="updateSeccionField('columnasFotogramas', this.value)" class="h-6 rounded bg-[#2a2a2a] text-[10px] px-2 w-[60px]"><option value="1" ${sec.columnasFotogramas==='1'?'selected':''}>1</option><option value="2" ${sec.columnasFotogramas==='2'?'selected':'' || sec.columnasFotogramas==='2 1'?'selected':''}>2</option></select></div>
+        <div class="flex justify-between items-center"><label class="text-[9px]">Fondo</label><select onchange="updateSeccionField('fondoTipo', this.value)" class="h-6 rounded bg-[#2a2a2a] text-[10px] px-2 w-[100px]"><option ${sec.fondoTipo==='Color'?'selected':''}>Color</option><option ${sec.fondoTipo==='Imagen'?'selected':''}>Imagen</option><option ${sec.fondoTipo==='Degrade'?'selected':''}>Degrade</option></select></div>
+        <div><label class="text-[8px] opacity-60">Elegir color/imagen/degrade</label><div class="mt-1 flex gap-1"><input type="${sec.fondoTipo==='Color'?'color':'text'}" value="${sec.fondoValor}" onchange="updateSeccionField('fondoValor', this.value)" class="w-full h-7 rounded bg-[#2a2a2a] text-[10px] px-2" placeholder="Input de color, degrade o imagen"></div></div>
+        <div class="border-t border-white/10 pt-2 mt-2"><p class="text-[9px] font-bold">Columna 1</p>
+          <div class="mt-1 space-y-1">
+            <div class="flex justify-between items-center"><span class="text-[9px]">Título</span><div class="toggle ${sec.col1.tipo==='Titulo'?'on':''}" onclick="updateColField('col1','tipo','Titulo')"></div></div>
+            <div class="flex justify-between items-center"><span class="text-[9px]">Título/Subtítulo</span><div class="toggle ${sec.col1.tipo==='Titulo/Subtitulo'?'on':''}" onclick="updateColField('col1','tipo','Titulo/Subtitulo')"></div></div>
+            <div class="flex justify-between items-center"><span class="text-[9px]">Título/Subtítulo/Boton</span><div class="toggle ${sec.col1.tipo==='Titulo/Subtitulo/Boton'?'on':''}" onclick="updateColField('col1','tipo','Titulo/Subtitulo/Boton')"></div></div>
+            <div class="flex justify-between items-center"><span class="text-[9px]">Imagen</span><div class="toggle ${sec.col1.tipo==='Imagen'?'on':''}" onclick="updateColField('col1','tipo','Imagen')"></div></div>
+          </div>
+          <div class="mt-2 space-y-1">
+            ${sec.col1.tipo==='Imagen'?`<div class="rounded border-2 border-dashed p-2 bg-[#2a2a2a] text-center"><input type="file" accept="image/*" onchange="handleImageUpload(this, 'col1')" class="w-full text-[9px]"><p class="text-[7px] opacity-60">Sistema genera URL auto</p></div>`:`<input value="${sec.col1.titulo||''}" oninput="updateColField('col1','titulo', this.value)" placeholder="OFERTAS DE LA SEMANA" class="w-full h-6 rounded bg-black text-[10px] px-2">`}
+            ${sec.col1.tipo.includes('Subtitulo')?`<input value="${sec.col1.subtitulo||''}" oninput="updateColField('col1','subtitulo', this.value)" placeholder="Subtitulo" class="w-full h-6 rounded bg-black text-[10px] px-2">`:''}
+            ${sec.col1.tipo.includes('Boton')?`<div class="flex gap-1"><input value="${sec.col1.boton||''}" oninput="updateColField('col1','boton', this.value)" placeholder="VER OFERTAS" class="flex-1 h-6 rounded bg-black text-[10px] px-2"><input value="${sec.col1.link||''}" oninput="updateColField('col1','link', this.value)" placeholder="#ofertas" class="flex-1 h-6 rounded bg-black text-[9px] px-2"></div>`:''}
+            ${sec.col1.tipo!=='Imagen'?`<div class="flex gap-1 mt-1"><input value="${sec.col1.subtitulo||''}" oninput="updateColField('col1','subtitulo', this.value)" placeholder="Subtitulo" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"><input value="${sec.col1.boton||''}" oninput="updateColField('col1','boton', this.value)" placeholder="VER OFERTAS" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"><input value="${sec.col1.link||''}" oninput="updateColField('col1','link', this.value)" placeholder="#ofertas" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"></div>`:''}
+          </div>
+        </div>
+        ${(sec.columnasFotogramas==='1' || sec.columnasFotogramas===1) ? '' : `
+        <div class="border-t border-white/10 pt-2"><p class="text-[9px] font-bold">Columna 2</p>
+          <div class="mt-1 space-y-1">
+            <div class="flex justify-between items-center"><span class="text-[9px]">Título</span><div class="toggle ${sec.col2?.tipo==='Titulo'?'on':''}" onclick="updateColField('col2','tipo','Titulo')"></div></div>
+            <div class="flex justify-between items-center"><span class="text-[9px]">Título/Subtitulo</span><div class="toggle ${sec.col2?.tipo==='Titulo/Subtitulo'?'on':''}" onclick="updateColField('col2','tipo','Titulo/Subtitulo')"></div></div>
+            <div class="flex justify-between items-center"><span class="text-[9px]">Título/Subtítulo/Boton</span><div class="toggle ${sec.col2?.tipo==='Titulo/Subtitulo/Boton'?'on':''}" onclick="updateColField('col2','tipo','Titulo/Subtitulo/Boton')"></div></div>
+            <div class="flex justify-between items-center"><span class="text-[9px]">Imagen</span><div class="toggle ${sec.col2?.tipo==='Imagen'?'on':''} on" onclick="updateColField('col2','tipo','Imagen')"></div></div>
+          </div>
+          <div class="mt-2 space-y-1">
+            ${sec.col2?.tipo==='Imagen' ? `<div class="rounded border-2 border-dashed p-2 bg-[#2a2a2a] text-center"><img src="${sec.col2?.imagen||''}" class="w-full h-12 object-cover rounded mb-1"><input type="file" accept="image/*" onchange="handleImageUpload(this, 'col2')" class="w-full text-[9px]"><p class="text-[7px] opacity-60">https://images.unsplash.com/... auto</p></div><input value="${sec.col2?.imagen||''}" oninput="updateColField('col2','imagen', this.value)" placeholder="Input imagen columna 2" class="w-full h-6 rounded bg-black text-[8px] px-2">` : `<input value="${sec.col2?.titulo||''}" oninput="updateColField('col2','titulo', this.value)" placeholder="Título columna 2" class="w-full h-6 rounded bg-black text-[10px] px-2">`}
+          </div>
+        </div>
+        `}
+      </div>
+    `;
+  } else if(sec.tipo==='tarjetaImagenes'){
+    html+=`
+      <div class="space-y-3">
+        <p class="text-[9px] font-bold">Tarjeta de imágenes - Tiene título arriba, cada imagen título abajo, botón abajo derecha a subpágina</p>
+        <div><label class="text-[9px]">Título arriba</label><input value="${sec.tituloArriba||''}" oninput="updateSeccionField('tituloArriba', this.value)" class="w-full h-6 rounded bg-[#2a2a2a] text-[10px] px-2"></div>
+        <div><label class="text-[9px]">Imágenes (cada una con título abajo)</label>
+          <div class="space-y-2 mt-1 max-h-[200px] overflow-auto">
+            ${(sec.imagenes||[]).map((img,i)=>`<div class="bg-[#2a2a2a] rounded p-2"><input value="${img.titulo||''}" oninput="updateImagenTarjeta(${i},'titulo', this.value)" placeholder="Título imagen ${i+1} abajo" class="w-full h-6 rounded bg-black text-[9px] px-2"><div class="flex gap-1 mt-1"><input value="${img.imagen||''}" placeholder="Imagen URL auto" class="flex-1 h-6 rounded bg-black text-[8px] px-1"><input value="${img.link||''}" placeholder="Link" class="flex-1 h-6 rounded bg-black text-[8px] px-1"></div><input type="file" accept="image/*" onchange="handleTarjetaImage(this, ${i})" class="w-full text-[8px] mt-1"></div>`).join('')}
+          </div>
+          <button onclick="addImagenTarjeta()" class="mt-2 h-6 w-full rounded bg-[#f6d55c] text-black text-[9px] font-bold">+ Agregar imagen a tarjeta</button>
+        </div>
+        <div class="border-t border-white/10 pt-2"><label class="text-[9px]">Botón abajo derecha → subpágina</label><div class="flex gap-1 mt-1"><input value="${sec.boton?.texto||''}" oninput="updateBotonTarjeta('texto', this.value)" placeholder="Texto botón" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"><input value="${sec.boton?.link||''}" oninput="updateBotonTarjeta('link', this.value)" placeholder="Link subpágina" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"></div></div>
+      </div>
+    `;
+  } else if(sec.tipo==='categorias'){
+    html+=`
+      <div class="space-y-2">
+        <p class="text-[9px]">Categorías vista previa - Grilla o texto alfabético tipo MercadoLibre screenshot</p>
+        <div><label class="text-[9px]">Título sección</label><input value="${sec.titulo||''}" oninput="updateSeccionField('titulo', this.value)" class="w-full h-6 rounded bg-[#2a2a2a] text-[10px] px-2"></div>
+        <div><label class="text-[9px]">Vista</label><select onchange="updateSeccionField('vista', this.value)" class="w-full h-6 rounded bg-[#2a2a2a] text-[10px] px-2"><option value="grilla" ${sec.vista==='grilla'?'selected':''}>Grilla con imagen</option><option value="texto" ${sec.vista==='texto'?'selected':''}>Texto alfabético</option></select></div>
+        <div><label class="text-[9px]">Categorías (ilimitadas, solo categorías, no sub)</label><div class="max-h-[120px] overflow-auto space-y-1 mt-1">${(sec.categorias||[]).map((c,i)=>`<div class="flex gap-1"><input value="${c.nombre}" oninput="updateCategoria(${i}, this.value)" class="flex-1 h-6 rounded bg-black text-[9px] px-2"><button onclick="removeCategoria(${i})" class="h-6 w-6 rounded bg-red-500 text-[9px]">×</button></div>`).join('')}</div><button onclick="addCategoria()" class="mt-1 h-6 w-full rounded bg-white text-black text-[9px]">+ Categoría</button></div>
+        <div class="flex gap-1"><input value="${sec.botonTexto||''}" oninput="updateSeccionField('botonTexto', this.value)" placeholder="Texto botón ver todas" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"><input value="${sec.botonLink||''}" oninput="updateSeccionField('botonLink', this.value)" placeholder="Link" class="flex-1 h-6 rounded bg-[#2a2a2a] text-[9px] px-2"></div>
+      </div>
+    `;
+  } else { // 2 columnas
+    html+=`<div><label class="text-[9px]">Título ${sec.tipo}</label><input value="${sec.titulo||''}" oninput="updateSeccionField('titulo', this.value)" class="w-full h-6 rounded bg-[#2a2a2a] text-[10px] px-2"><p class="text-[8px] opacity-60 mt-2">Editor varía según tipo de sección: ${sec.tipo} - no es lo mismo que Hero</p></div>`;
+  }
+  document.getElementById('editor-dinamico').innerHTML=html;
+}
+
+function renderPreview(){
+  const pag=subpaginas.find(s=>s.nombre===pestanaActiva);
+  let html=`<div class="bg-[#1e3a8a] text-white p-3 flex items-center gap-2"><span class="w-6 h-6 bg-white text-black flex items-center justify-center font-bold">W</span><span class="text-[12px] font-bold">Nombre de tienda</span></div>`;
+  (pag?.secciones||[]).forEach(sec=>{
+    if(sec.tipo==='hero'){
+      const bgStyle=sec.fondoTipo==='Color'?`background:${sec.fondoValor}`: sec.fondoTipo==='Imagen'?`background-image:url('${sec.fondoValor}');background-size:cover`:`background:linear-gradient(45deg, ${sec.fondoValor}, #fff)`;
+      if(sec.columnasFotogramas==='1' || sec.columnasFotogramas===1){
+        html+=`<div class="p-6 flex justify-center items-center text-center" style="${bgStyle}">
+          <div>
+            <p class="text-[14px] font-bold text-[#1e3a8a] tracking-[0.1em]">${sec.col1.tipo==='Imagen'?`<img src="${sec.col1.imagen||''}" class="mx-auto max-h-[120px] rounded">`: (sec.col1.titulo?.split(' ').join('<br>')||'OFERTAS DE LA SEMANA')}</p>
+            ${sec.col1.tipo.includes('Boton')?`<button class="mt-3 h-8 px-4 rounded-full bg-[#0ea5e9] text-white text-[11px] font-bold">${sec.col1.boton||'VER OFERTAS'}</button>`:''}
+            ${sec.col1.tipo.includes('Subtitulo')?`<p class="text-[11px] mt-1">${sec.col1.subtitulo||''}</p>`:''}
+          </div>
+        </div>`;
+      } else { // 2 columnas
+        html+=`<div class="p-6 flex gap-4 items-center" style="${bgStyle}">
+          <div class="flex-1">
+            <p class="text-[14px] font-bold text-[#1e3a8a] tracking-[0.1em]">${sec.col1.tipo==='Imagen'?`<img src="${sec.col1.imagen||''}" class="max-h-[100px] rounded">`:(sec.col1.titulo?.split(' ').join('<br>')||'OFERTAS DE LA SEMANA')}</p>
+            ${sec.col1.tipo.includes('Boton')?`<button class="mt-3 h-8 px-4 rounded-full bg-[#0ea5e9] text-white text-[11px] font-bold">${sec.col1.boton||'VER OFERTAS'}</button>`:''}
+            ${sec.col1.tipo.includes('Subtitulo')?`<p class="text-[11px]">${sec.col1.subtitulo||'Subtitulo'}</p>`:''}
+          </div>
+          <div class="w-[140px] h-[100px] bg-white rounded overflow-hidden">${sec.col2?.tipo==='Imagen'?`<img src="${sec.col2?.imagen||'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=200&h=150&fit=crop'}" class="w-full h-full object-cover">`:`<div class="p-2"><p class="text-[10px] font-bold">${sec.col2?.titulo||'Columna 2'}</p>${sec.col2?.tipo?.includes('Boton')?`<button class="mt-1 h-6 px-2 rounded-full bg-[#0ea5e9] text-white text-[9px]">${sec.col2?.boton||'BOTON'}</button>`:''}</div>`}</div>
+        </div>`;
+      }
+    } else if(sec.tipo==='categorias'){
+      html+=`<div class="m-4 p-4 rounded-[8px] bg-[#9ca3af]"><p class="text-[11px] font-bold text-white">${sec.titulo||'CATEGORIAS'}</p><div class="mt-3 grid grid-cols-3 gap-4">${(sec.categorias||[{nombre:'RELOJES'},{nombre:'COMPUTADORAS'},{nombre:'HELADERAS'}]).map(c=>`<div class="text-center"><div class="w-full h-[60px] bg-[#1e3a5f] rounded"></div><p class="text-[9px] mt-1 text-white">${c.nombre}</p></div>`).join('')}</div><p class="text-[8px] text-right mt-2 text-white/60">${sec.botonTexto||'ver todas ---->'}</p></div>`;
+    } else if(sec.tipo==='tarjetaImagenes'){
+      html+=`<div class="m-4 p-4 rounded-[8px] bg-white"><p class="text-[11px] font-bold">${sec.tituloArriba||'TITULO ARRIBA'}</p><div class="mt-3 grid grid-cols-3 gap-3">${(sec.imagenes||[]).map(img=>`<div><div class="w-full h-[60px] bg-[#1e3a5f] rounded overflow-hidden">${img.imagen?`<img src="${img.imagen}" class="w-full h-full object-cover">`:''}</div><p class="text-[9px] mt-1">${img.titulo||'Título abajo'}</p></div>`).join('')}</div><div class="flex justify-end mt-2"><button class="h-6 px-3 rounded bg-[#0a2a5a] text-white text-[9px]">${sec.boton?.texto||'Ir a subpágina'} →</button></div></div>`;
+    } else { // 2 columnas
+      html+=`<div class="m-4 p-4 rounded-[8px] bg-[#9ca3af]"><p class="text-[11px] font-bold text-white">${sec.titulo||sec.tipo.toUpperCase()}</p><p class="text-[9px] text-white/60">Sección tipo ${sec.tipo} - editor varía según tipo</p></div>`;
+    }
+  });
+  if((pag?.secciones||[]).length===0) html+=`<div class="p-10 text-center text-[11px] opacity-40">Sin secciones en ${pestanaActiva} - Agregá tipo de sección arriba</div>`;
+  document.getElementById('preview').innerHTML=html;
+}
+
+// Helpers
+function handleImageUpload(input, col){
+  const file=input.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=e=>{ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); sec[col].imagen=e.target.result; renderPreview(); };
+  r.readAsDataURL(file);
+}
+function addImagenTarjeta(){ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); if(!sec.imagenes) sec.imagenes=[]; sec.imagenes.push({titulo:'Nueva', imagen:'', link:'#'}); renderEditor(sec); renderPreview(); }
+function updateImagenTarjeta(i, field, val){ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); sec.imagenes[i][field]=val; renderPreview(); }
+function handleTarjetaImage(input, i){ const file=input.files[0]; if(!file) return; const r=new FileReader(); r.onload=e=>{ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); sec.imagenes[i].imagen=e.target.result; renderPreview(); renderEditor(sec); }; r.readAsDataURL(file); }
+function updateBotonTarjeta(f, v){ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); if(!sec.boton) sec.boton={}; sec.boton[f]=v; renderPreview(); }
+function addCategoria(){ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); if(!sec.categorias) sec.categorias=[]; sec.categorias.push({nombre:'NUEVA'}); renderEditor(sec); renderPreview(); }
+function updateCategoria(i, v){ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); sec.categorias[i].nombre=v; renderPreview(); }
+function removeCategoria(i){ const pag=subpaginas.find(s=>s.nombre===pestanaActiva); const sec=pag.secciones.find(s=>s.id===seccionActiva); sec.categorias.splice(i,1); renderEditor(sec); renderPreview(); }
+
+render();
+</script>
+</body>
+</html>
