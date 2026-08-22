@@ -78,7 +78,15 @@
 
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
-const CONFIG={price:250,left:10,sold:40,dolarMep:1420,mpLink:'https://www.mercadopago.com.ar/checkout/v1/redirect?preference-id=XXXX',alias:'RASCO.AQUI.RIPIO',USDT_CONTRACT:'0x55d398326f99059fF775485246999027B3197955',CHAIN_ID:56,RECEIVER_ADDRESS:'0x90e0cEFC05cCe2E3BaC67feCc594D5d97F013Fed',SHEET_WEBHOOK_URL:'https://script.google.com/macros/s/AKfycbwe17_brwnixWw9sahNcbVBVdBMqfhSZC853VXMwHL6cXfnup4o06mV5d5ZqhX87FzOzg/exec',SHEET_READ_URL:'https://script.google.com/macros/s/AKfycbwe17_brwnixWw9sahNcbVBVdBMqfhSZC853VXMwHL6cXfnup4o06mV5d5ZqhX87FzOzg/exec?action=read'};
+const CONFIG={
+  SHEET_WEBHOOK_URL:'PEGA_AQUI_TU_URL_WEB_APP', // la misma que te da Apps Script
+  SHEET_READ_URL:'PEGA_AQUI_TU_URL_WEB_APP?action=read',
+  USDT_CONTRACT:'0x55d398326f99059fF775485246999027B3197955', // USDT oficial BNB Chain
+  RECEIVER_ADDRESS:'0x90e0cEFC05cCe2E3BaC67feCc594D5d97F013Fed', // TU WALLET DE COBRO
+  CHAIN_ID:56,
+  price:250,
+  totalSlots:50
+};
 let qty=1,connected=false,accountFull='',lang='es';
 const dict={
 es:{
@@ -216,7 +224,7 @@ let to=CONFIG.RECEIVER_ADDRESS.toLowerCase().replace('0x','').padStart(64,'0');
 let amount=BigInt(qty*CONFIG.price)*10n**18n; let hex=amount.toString(16).padStart(64,'0'); let data='0xa9059cbb'+to+hex;
 let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
 document.getElementById('txHash').style.display='block'; document.getElementById('txHash').textContent='Tx: '+hash;
-await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,contract:CONFIG.USDT_CONTRACT,chain_id:CONFIG.CHAIN_ID,timestamp:new Date().toISOString(),method:'crypto'})});
+await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
 await fetchLive(); alert('OK '+hash);
 }catch(e){if(e.code===4001) alert('Rechazada'); else alert(e.message);}finally{btn.disabled=false; updateTexts();}
 };
