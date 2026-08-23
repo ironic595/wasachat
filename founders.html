@@ -214,20 +214,76 @@ document.getElementById('walletStatus').textContent='✅ '+accountFull.slice(0,6
 btn.style.display='none'; document.getElementById('btnUSDT').style.display='flex';
 }catch(e){alert(e.message);}finally{btn.disabled=false; btn.textContent=dict[lang].conectar;}
 };
+
+const USDT_ABI_BALANCE = '0x70a08231'; // balanceOf(address)
+
+async function getUSDTBalance(wallet){
+  // wallet sin 0x pad a 32 bytes
+  let padded = wallet.toLowerCase().replace('0x','').padStart(64,'0');
+  let data = USDT_ABI_BALANCE + padded;
+  let res = await window.ethereum.request({
+    method: 'eth_call',
+    params: [{to: CONFIG.USDT_CONTRACT, data}, 'latest']
+  });
+  return BigInt(res); // en base units
+}
+
+async function getBNBBalance(wallet){
+  let bal = await window.ethereum.request({
+    method: 'eth_getBalance',
+    params: [wallet, 'latest']
+  });
+  return BigInt(bal);
+}
+  
+// --- REEMPLAZA TU onclick POR ESTE ---
 document.getElementById('btnUSDT').onclick=async()=>{
-if(!validate()){alert(dict[lang].formError);return;}
-if(!connected){document.getElementById('btnConnect').click();return;}
-let btn=document.getElementById('btnUSDT'); btn.disabled=true; btn.textContent='Confirmando...';
-try{
-let name=document.getElementById('nameUSDT').value.trim(); let email=document.getElementById('emailUSDT').value.trim();
-let to=CONFIG.RECEIVER_ADDRESS.toLowerCase().replace('0x','').padStart(64,'0');
-let amount=BigInt(qty*CONFIG.price)*10n**18n; let hex=amount.toString(16).padStart(64,'0'); let data='0xa9059cbb'+to+hex;
-let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
-document.getElementById('txHash').style.display='block'; document.getElementById('txHash').textContent='Tx: '+hash;
-await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
-await fetchLive(); alert('OK '+hash);
-}catch(e){if(e.code===4001) alert('Rechazada'); else alert(e.message);}finally{btn.disabled=false; updateTexts();}
+  if(!validate()){alert(dict[lang].formError);return;}
+  if(!connected){document.getElementById('btnConnect').click();return;}
+  let btn=document.getElementById('btnUSDT'); btn.disabled=true; btn.textContent='Confirmando...';
+  try{
+    let name=document.getElementById('nameUSDT').value.trim();
+    let email=document.getElementById('emailUSDT').value.trim();
+
+    // 1. Chequeo de saldo ANTES de firmar
+    let needed = BigInt(qty) * BigInt(CONFIG.price) * 10n**18n;
+    let usdtBal = await getUSDTBalance(accountFull);
+    let bnbBal = await getBNBBalance(accountFull);
+
+    if(usdtBal < needed){
+      alert(lang==='es'? `No tenés USDT suficiente. Tenés ${(Number(usdtBal)/1e18).toFixed(2)} y necesitás ${qty*CONFIG.price}` : `Insufficient USDT. You have ${(Number(usdtBal)/1e18).toFixed(2)} need ${qty*CONFIG.price}`);
+      btn.disabled=false; updateTexts(); return;
+    }
+    if(bnbBal < 500000000000000n){ // 0.0005 BNB
+      alert(lang==='es'? `No tenés BNB para el gas. Necesitás ~0.001 BNB y tenés ${Number(bnbBal)/1e18}` : `No BNB for gas`);
+      btn.disabled=false; updateTexts(); return;
+    }
+
+    let to=CONFIG.RECEIVER_ADDRESS.toLowerCase().replace('0x','').padStart(64,'0');
+    let amount=BigInt(qty)*BigInt(CONFIG.price)*10n**18n;
+    let hex=amount.toString(16).padStart(64,'0');
+    let data='0xa9059cbb'+to+hex;
+
+    let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
+    document.getElementById('txHash').style.display='block';
+    document.getElementById('txHash').textContent='Tx: '+hash;
+
+    // No guardamos en Sheet todavía, avisamos que está en mempool
+    alert((lang==='es'?'Tx enviada, esperando confirmación en BSC... ':'Tx sent, waiting BSC...') + hash);
+
+    // Esperá 3 seg y recién ahí guarda, así no te llena de tx con gas 0
+    await new Promise(r=>setTimeout(r,3000));
+    await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
+    await fetchLive();
+
+  }catch(e){
+    if(e.code===4001) alert('Rechazada');
+    else alert(e.message);
+  }finally{
+    btn.disabled=false; updateTexts();
+  }
 };
+  
 async function fetchLive(){
 try{
 if(CONFIG.SHEET_READ_URL.includes('XXXX')){document.getElementById('sheetLive').textContent='Demo - pegá URL Apps Script'; update(); return;}
