@@ -62,12 +62,6 @@
 <div class="countdown-box"><div class="countdown-num" id="cdS">00</div><div class="countdown-label">Seg</div></div>
 </div>
 <button type="button" style="padding:15px;border-radius:15px;margin-top:20px;margin-right:20px;" onclick="bajarSeccion()">COMPRAR</button>
-  <script>
-  function bajarSeccion() {
-    const seccion = document.getElementById('partEyebrow');
-    seccion.scrollIntoView({ behavior: 'smooth' });
-  }
-</script>
 <button type="button" style="padding:15px;border-radius:15px;margin-top:20px;margin-right:20px;">MAS INFORMACION</button></div>
 <div class="hero-cert-wrap"><img class="hero-cert" src="assets/img/slots.png" alt="cert"></div>
 </div></div>
@@ -94,6 +88,12 @@ const CONFIG={
   price:250,
   totalSlots:50
 };
+
+  function bajarSeccion() {
+    const seccion = document.getElementById('progressFill');
+    seccion.scrollIntoView({ behavior: 'smooth' });
+  }
+  
 let qty=1,connected=false,accountFull='',lang='es';
 const dict={
 es:{
