@@ -289,7 +289,9 @@ try{
 if(CONFIG.SHEET_READ_URL.includes('XXXX')){document.getElementById('sheetLive').textContent='Demo - pegá URL Apps Script'; update(); return;}
 let r=await fetch(CONFIG.SHEET_READ_URL); let j=await r.json();
 if(j.ok){
- document.getElementById('recaudado').textContent=j.collected.toLocaleString('en-US');
+ // ANTES: document.getElementById('recaudado').textContent=j.collected.toLocaleString('en-US');
+ // AHORA: mostramos SLOTS
+ document.getElementById('recaudado').innerHTML = `${j.sold}<span style="font-size:0.6em; opacity:0.6">/${j.total}</span>`;
  document.getElementById('sold').textContent=j.sold;
  document.getElementById('left').textContent=j.available;
  document.getElementById('progressPct').textContent=Math.round(j.sold/j.total*100)+'%';
@@ -297,8 +299,11 @@ if(j.ok){
  document.getElementById('range').max=j.available;
  document.getElementById('dispVal').textContent=j.available;
  if(qty>j.available){qty=j.available;}
- document.getElementById('sheetLive').textContent='Live Sheets: '+j.sold+'/'+j.total+' vendidos - '+new Date().toLocaleTimeString();
+
+ // Texto chico de abajo también en slots
+ document.getElementById('sheetLive').textContent=`Live Sheets: ${j.sold}/${j.total} vendidos - ${new Date().toLocaleTimeString()}`;
  document.getElementById('sheetLive').style.color='#16A34A';
+
  if(j.available<=0 || j.sold>=j.total){
    document.getElementById('soldoutOverlay').classList.add('show');
    document.getElementById('heroBadge').textContent = lang==='es' ? '● Preventa terminada - 50/50' : '● Presale ended - 50/50';
