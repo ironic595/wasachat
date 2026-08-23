@@ -286,7 +286,7 @@ document.getElementById('btnUSDT').onclick=async()=>{
   
 async function fetchLive(){
 try{
-if(CONFIG.SHEET_READ_URL.includes('XXXX')){document.getElementById('sheetLive').textContent='Demo - pegá URL Apps Script'; update(); return;}
+if(CONFIG.SHEET_READ_URL.includes('XXXX')){document.getElementById('sheetLive').textContent=''; update(); return;}
 let r=await fetch(CONFIG.SHEET_READ_URL); let j=await r.json();
 if(j.ok){
  // ANTES: document.getElementById('recaudado').textContent=j.collected.toLocaleString('en-US');
@@ -301,7 +301,7 @@ if(j.ok){
  if(qty>j.available){qty=j.available;}
 
  // Texto chico de abajo también en slots
- document.getElementById('sheetLive').textContent=`Live Sheets: ${j.sold}/${j.total} vendidos - ${new Date().toLocaleTimeString()}`;
+ document.getElementById('sheetLive').textContent=`${j.sold}/${j.total} vendidos - ${new Date().toLocaleTimeString()}`;
  document.getElementById('sheetLive').style.color='#16A34A';
 
  if(j.available<=0 || j.sold>=j.total){
