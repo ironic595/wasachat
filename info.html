@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>wasa.chat / info</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B;line-height:1.4}
+.nav{position:fixed;top:0;left:0;right:0;height:64px;background:#1D4ED8;display:flex;align-items:center;justify-content:space-between;padding:0 5%;z-index:50}
+.nav .logo{color:white;font-weight:800;font-size:16px}
+.nav .links{display:flex;gap:20px;font-size:11px;font-weight:700;color:rgba(255,255,255,.7)}
+.nav .links a{color:inherit;text-decoration:none;text-transform:uppercase;letter-spacing:.05em}
+.nav .links a:hover{color:white}
+.hero{width:100vw;margin-left:calc(-50vw + 50%);background:linear-gradient(135deg,#BFDBFE,#93C5FD 30%,#C4B5FD 75%,#A5B4FC);padding:84px 0 28px;display:flex;justify-content:center}
+.hero-inner{max-width:720px;width:100%;padding:0 18px;display:grid;grid-template-columns:1.15fr 0.85fr;gap:28px;align-items:center}
+.hero-text{text-align:left}
+.badge{background:rgba(29,78,216,.12);border:1px solid rgba(29,78,216,.15);color:#1D4ED8;border-radius:999px;padding:5px 12px;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px;display:inline-block}
+.hero-text h1{font-size:32px;font-weight:800;line-height:.95}
+.hero-text p{margin-top:12px;font-size:13px;color:#1E3A8A;opacity:.7;max-width:460px;line-height:1.35}
+.hero-cert-wrap{display:flex;justify-content:center;align-items:center}
+.hero-cert{width:240px;transform:rotate(7deg);filter:drop-shadow(0 18px 32px rgba(0,0,0,.25))}
+@media(max-width:760px){.hero-inner{grid-template-columns:1fr;text-align:center}.hero-text{text-align:center}.hero-text p{margin:12px auto 0}.hero-cert-wrap{order:-1}.hero-cert{width:180px}}
 
+.wrap{max-width:720px;margin:0 auto;padding:24px 18px 80px}
+.card{background:#C2D9FF;border:1px solid #93B4FF;border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 8px 24px rgba(29,78,216,.08)}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.6;color:#1E3A8A;text-transform:uppercase}
+.title{font-size:18px;font-weight:800;margin-top:4px;color:#0F172A}
+.desc{font-size:13px;color:#1E3A8A;margin-top:8px;opacity:.85;line-height:1.45}
+.list{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.list-item{display:flex;gap:10px;align-items:flex-start;font-size:13px}
+.check{width:20px;height:20px;min-width:20px;background:#1D4ED8;border-radius:50%;display:grid;place-items:center;color:white;font-size:12px;font-weight:800;line-height:1}
+.callout{margin-top:16px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center}
+.callout .w{width:28px;height:28px;background:#1D4ED8;color:white;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px}
+.callout b{font-size:12px}
+.callout span{font-size:11px;opacity:.6;display:block}
+
+.btn-row{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.btn{height:44px;padding:0 22px;border-radius:12px;border:0;font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.btn-primary{background:#0A101F;color:white;border:1px solid #3B82F6;box-shadow:0 0 20px rgba(59,130,246,.3)}
+.btn-secondary{background:transparent;color:#1E293B;border:1px solid #93B4FF}
+
+.footer{text-align:center;font-size:11px;opacity:.5;margin-top:24px}
+
+/* --- BLOQUE TORTA EDITABLE --- */
+.pie-wrap{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.pie{width:180px;height:180px;border-radius:50%;border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,.1);flex-shrink:0}
+.legend{flex:1;min-width:200px;display:flex;flex-direction:column;gap:8px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:12px}
+.legend-color{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.legend-label{flex:1}
+.legend-pct{font-weight:800}
+.edit-note{background:#E6F0FF;border:1px dashed #93B4FF;border-radius:8px;padding:8px 10px;font-size:10px;margin-top:12px;color:#1E3A8A;opacity:.8}
+@media(max-width:600px){.pie-wrap{justify-content:center}.pie{width:160px;height:160px}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">wasa.chat<span style="color:#D4AF37;">/founders</span></div>
+  <div class="links">
+    <a href="/founders.html">HOME</a>
+    <a href="/info.html">INFO</a>
+    <a href="#faqs">FAQS</a>
+    <a href="mailto:founders@wasa.chat">CONTACTO</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="badge">● INFO PARA FOUNDERS</div>
+      <h1>Qué es wasa.chat<br>y por qué vendemos el 25%</h1>
+      <p>Sin VCs. Sin humo. 50 slots de 0.5% perpetuo para los que quieren ser parte desde el día 0.</p>
+      <div class="btn-row">
+        <a href="/founders.html" class="btn btn-primary">COMPRAR WASA BLOCK</a>
+        <a href="/founders.html#faqs" class="btn btn-secondary">MAS INFORMACION</a>
+      </div>
+    </div>
+    <div class="hero-cert-wrap">
+      <!-- PONE ACA TU PNG TRANSPARENTE DEL BLOCK -->
+      <img class="hero-cert" src="assets/img/slots.png" alt="Wasa Block">
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- CARD 1 - TU SCREENSHOT REAL -->
+  <div class="card">
+    <div class="eyebrow">EL PRODUCTO</div>
+    <div class="title">Qué es wasa.chat</div>
+    <div class="desc">Wasa.chat es WhatsApp para negocios, hecho simple. Conectamos tu número y te damos un inbox donde todo tu equipo puede responder.</div>
+
+    <div class="list">
+      <div class="list-item"><div class="check">✓</div><span><b>Inbox centralizado multi-agente:</b> asigná chats, etiquetas, notas internas.</span></div>
+      <div class="list-item"><div class="check">✓</div><span><b>CRM liviano integrado:</b> pipeline, contactos, historial completo de WhatsApp.</span></div>
+      <div class="list-item"><div class="check">✓</div><span><b>Automatizaciones sin código:</b> respuestas rápidas, bots, campañas masivas.</span></div>
+      <div class="list-item"><div class="check">✓</div><span><b>Métricas que importan:</b> tiempo de respuesta, conversión, revenue por agente.</span></div>
+    </div>
+
+    <div class="callout">
+      <div class="w">W</div>
+      <div>
+        <b>Un solo lugar para todo tu WhatsApp</b>
+        <span>WhatsApp + CRM + Automation. Sin cambiar de app. Sin perder contexto.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2 - POR QUE VENDES -->
+  <div class="card" style="background:#B8D0FF">
+    <div class="eyebrow">POR QUÉ VENDEMOS EL 25%</div>
+    <div class="title">Founders, no inversores</div>
+    <div class="desc">
+      No queremos VC. Queremos 50 founders que usen el producto, que nos den feedback y que cobren con nosotros para siempre.<br><br>
+      Vendemos 50 slots de 0.5% (total 25% de las ganancias netas futuras de wasa.chat). Cada slot cuesta $250 USDT perpetuo.<br><br>
+      <b>Modelo:</b> Distribución trimestral en USDT (BNB Chain) cada 90 días a partir de Abril 2027. Con cláusula de recompra 2x ($500 por slot) que podemos ejercer después de 12 meses. Si no la ejercemos, seguís cobrando de por vida.<br><br>
+      Esto financia servidores, números de WhatsApp, y soporte sin vender equity ni tokens truchos. Revenue share real.
+    </div>
+    <div class="btn-row">
+      <a href="/founders.html" class="btn btn-primary" style="width:100%">COMPRAR MI SLOT DE 0.5% → $250 USDT</a>
+    </div>
+  </div>
+
+  <!-- CARD 3 - NUEVO BLOQUE TORTA EDITABLE -->
+  <div class="card" id="usoFondos">
+    <div class="eyebrow">TRANSPARENCIA</div>
+    <div class="title">¿En qué se usará el dinero recaudado de la venta de futuras ganancias?</div>
+    <div class="desc">Total a recaudar: 50 slots × $250 = <b>$12,500 USDT</b>. Distribución 100% transparente.</div>
+
+    <!-- 
+      👇 EDITÁ ACA ABAJO LOS PORCENTAJES FÁCIL 👇
+      Cambiá solo los números. El gráfico se actualiza solo.
+    -->
+    <div class="pie-wrap">
+      <div class="pie" id="pieChart"></div>
+      <div class="legend" id="pieLegend">
+        <!-- Se genera con JS abajo, pero podés editar el texto acá -->
+      </div>
+    </div>
+
+    <div class="edit-note">
+      💡 <b>Para editar:</b> Andá al final del archivo, buscá <code>const DATA_USO = [...]</code> y cambiá los valores <code>value: 30</code> por los % que quieras. Tienen que sumar 100.
+    </div>
+  </div>
+
+  <div class="footer">© 2026 wasa.chat • Perpetual Revenue Share • founders@wasa.chat</div>
+
+</div>
+
+<script>
+// 👇👇👇 EDITÁ ACA - CAMBIÁ LOS % Y LOS NOMBRES - SUMA DEBE SER 100 👇👇👇
+const DATA_USO = [
+  { label: "Alquiler de locación", value: 45, color: "#1D4ED8" }, // azul oscuro
+  { label: "Mejora de hardware",       value: 10, color: "#3B82F6" }, // azul claro
+  { label: "Marketing y publicidad",     value: 15, color: "#93C5FD" }, // celeste
+  { label: "Gastos de lanzamiento",       value: 10, color: "#D4AF37" }, // dorado wasa
+  { label: "Fondos de reserva",           value: 20,  color: "#0A101F" }  // negro
+];
+
+function renderPie(){
+  let total = DATA_USO.reduce((s,x)=>s+x.value,0);
+  let acc = 0;
+  let gradient = DATA_USO.map(d=>{
+    let start = acc;
+    acc += d.value;
+    let end = acc;
+    return `${d.color} ${start/total*100}% ${end/total*100}%`;
+  }).join(", ");
+  
+  document.getElementById('pieChart').style.background = `conic-gradient(${gradient})`;
+  
+  // leyenda
+  let legend = document.getElementById('pieLegend');
+  legend.innerHTML = DATA_USO.map(d=>`
+    <div class="legend-item">
+      <div class="legend-color" style="background:${d.color}"></div>
+      <div class="legend-label">${d.label}</div>
+      <div class="legend-pct">${d.value}%</div>
+    </div>
+  `).join("");
+  
+  if(total!==100){
+    legend.innerHTML += `<div style="color:#DC2626;font-size:10px;margin-top:6px">⚠ La suma da ${total}% - debe dar 100%</div>`;
+  }
+}
+renderPie();
+</script>
+
+</body>
+</html>
