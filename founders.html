@@ -88,8 +88,8 @@
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
 const CONFIG={
-  SHEET_WEBHOOK_URL:'https://script.google.com/macros/s/AKfycbzfQhNE5XzrDJ2HUqjFapS9QUacmwPpb_Yjf4L7Jj8ORVaqTkMNcIDhU-0wvJGBF1ea0Q/exec',
-  SHEET_READ_URL:'https://script.google.com/macros/s/AKfycbzfQhNE5XzrDJ2HUqjFapS9QUacmwPpb_Yjf4L7Jj8ORVaqTkMNcIDhU-0wvJGBF1ea0Q/exec?action=read',
+  SHEET_WEBHOOK_URL:'https://script.google.com/macros/s/AKfycbz6FMwtfJYRSJT3EFMuwY131Cf7EaMqGRgMwEu4xRqKY3SHu7kCjXyt8gdFIizyIsoB/exec',
+  SHEET_READ_URL:'https://script.google.com/macros/s/AKfycbz6FMwtfJYRSJT3EFMuwY131Cf7EaMqGRgMwEu4xRqKY3SHu7kCjXyt8gdFIizyIsoB/exec?action=read',
   USDT_CONTRACT:'0x55d398326f99059fF775485246999027B3197955',
   RECEIVER_ADDRESS:'0x90e0cEFC05cCe2E3BaC67feCc594D5d97F013Fed',
   CHAIN_ID:56,
@@ -98,7 +98,7 @@ const CONFIG={
   totalSlots:50,
   dolarMep:1420,
   alias:'RASCO.AQUI.RIPIO',
-  mpLink:'https://link.mercadopago.com.ar/tu-link'
+  mpLink:'https://mercadopago.com.ar/'
 };
 
 function bajarSeccion(){document.getElementById('progressFill').scrollIntoView({behavior:'smooth'});}
@@ -279,7 +279,20 @@ document.getElementById('btnUSDT').onclick=async()=>{
     document.getElementById('txHash').textContent='Tx: '+hash;
     alert((lang==='es'?'Tx enviada, esperando confirmación en BSC... ':'Tx sent, waiting BSC...') + hash);
     await new Promise(r=>setTimeout(r,3000));
-    await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
+    console.log('Enviando a Sheets:', {nombre:name,email,wallet:accountFull,slots:qty});
+    try{
+      let resp = await fetch(CONFIG.SHEET_WEBHOOK_URL,{
+        method:'POST',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})
+      });
+      let txt = await resp.text();
+      console.log('Respuesta Sheets:', txt);
+      alert('Sheets respondió: ' + txt.slice(0,200));
+    }catch(err){
+      console.error('Error fetch Sheets:', err);
+      alert('Error enviando a Sheets: ' + err);
+    }
     await fetchLive();
   }catch(e){
     if(e.code===4001) alert('Rechazada');
