@@ -231,19 +231,28 @@ btn.style.display='none'; document.getElementById('btnUSDT').style.display='flex
 };
 
 
+
+
 function parseUSDTtoWei(str){
-  // evita errores de float: convierte "0.01" -> 10000000000000000n
   let parts = String(str).split('.');
   let whole = parts[0] || '0';
   let frac = (parts[1] || '').padEnd(18,'0').slice(0,18);
   return BigInt(whole + frac);
 }
-
 const USDT_ABI_BALANCE = '0x70a08231';
-function getWasaProvider(){
-  return window._wasaProvider || window.ethereum;
-}
+function getWasaProvider(){ return window._wasaProvider || window.ethereum; }
 function getProvider(){ return window.ethereum; }
+function showPopup(msg){
+  let id='wasaPopup'; let el=document.getElementById(id);
+  if(!el){
+    el=document.createElement('div'); el.id=id;
+    el.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    el.innerHTML='<div style="background:#C2D9FF;border:2px solid #93B4FF;border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center"><div id="wasaPopupMsg" style="font-size:14px;line-height:1.4"></div><button onclick="document.getElementById(\'wasaPopup\').style.display=\'none\'" style="margin-top:16px;height:40px;padding:0 20px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer">Cerrar</button></div>';
+    document.body.appendChild(el);
+  }
+  document.getElementById('wasaPopupMsg').innerHTML=msg;
+  el.style.display='flex';
+}
 async function getUSDTBalance(wallet){
   let provider = getWasaProvider();
   let padded = wallet.toLowerCase().replace('0x','').padStart(64,'0');
@@ -257,66 +266,59 @@ async function getBNBBalance(wallet){
   return BigInt(bal);
 }
 document.getElementById('btnUSDT').onclick=async()=>{
-  if(!validate()){alert(dict[lang].formError);return;}
+  if(!validate()){showPopup(dict[lang].formError);return;}
   if(!connected){document.getElementById('btnConnect').click();return;}
   let btn=document.getElementById('btnUSDT'); btn.disabled=true; btn.textContent='Confirmando...';
   try{
     let name=document.getElementById('nameUSDT').value.trim();
     let email=document.getElementById('emailUSDT').value.trim();
     let priceWei = parseUSDTtoWei(CONFIG.price);
-    let needed = BigInt(qty) * priceWei;
     let usdtBal = await getUSDTBalance(accountFull);
     let bnbBal = await getBNBBalance(accountFull);
-    if(usdtBal < needed){
-      alert(lang==='es'? `No tenés USDT suficiente. Tenés ${(Number(usdtBal)/1e18).toFixed(2)} y necesitás ${qty*CONFIG.price}` : `Insufficient USDT. You have ${(Number(usdtBal)/1e18).toFixed(2)} need ${qty*CONFIG.price}`);
-      btn.disabled=false; updateTexts(); return;
-    }
-    if(bnbBal < 50000000000000n){ // TEST: 0.00005 BNB minimo
-      alert(lang==='es'? `No tenés BNB para el gas. Necesitás ~0.001 BNB y tenés ${Number(bnbBal)/1e18}` : `No BNB for gas`);
-      btn.disabled=false; updateTexts(); return;
-    }
+    if(usdtBal < BigInt(qty)*priceWei){showPopup('No tenes USDT suficiente'); btn.disabled=false; updateTexts(); return;}
+    if(bnbBal < 50000000000000n){showPopup('No tenes BNB para gas'); btn.disabled=false; updateTexts(); return;}
     let to=CONFIG.RECEIVER_ADDRESS.toLowerCase().replace('0x','').padStart(64,'0');
-    let priceWei2 = parseUSDTtoWei(CONFIG.price);
-    let amount=BigInt(qty)*priceWei2;
+    let amount=BigInt(qty)*parseUSDTtoWei(CONFIG.price);
     let hex=amount.toString(16).padStart(64,'0');
     let data='0xa9059cbb'+to+hex;
     let providerTx = getWasaProvider();
-    console.log('Enviando tx con provider:', providerTx, 'from:', accountFull, 'amountWei:', amount.toString());
+    showPopup('Enviando transaccion en BSC...');
     let hash=await providerTx.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
     document.getElementById('txHash').style.display='block';
     document.getElementById('txHash').textContent='Tx: '+hash;
-    // Esperar receipt real en vez de 3s fijos
-    alert((lang==='es'?'Tx enviada, esperando confirmación en BSC... ':'Tx sent, waiting BSC...') + hash);
-    // Poll receipt
+    showPopup('Tx enviada, esperando confirmacion...<br><small>'+hash.slice(0,10)+'...'+hash.slice(-8)+'</small>');
     for(let i=0;i<30;i++){
-      try{
-        let receipt = await providerTx.request({method:'eth_getTransactionReceipt', params:[hash]});
-        if(receipt){ console.log('Receipt:', receipt); if(receipt.status=='0x0'){ throw new Error('Tx falló en BSC (status 0x0) - revisá que tengas USDT y BNB'); } break; }
-      }catch(e){ console.log('poll receipt error', e); }
+      try{let receipt=await providerTx.request({method:'eth_getTransactionReceipt',params:[hash]}); if(receipt){ if(receipt.status=='0x0') throw new Error('Tx fallo'); break; }}catch(e){}
       await new Promise(r=>setTimeout(r,2000));
     }
-    console.log('Enviando a Sheets:', {nombre:name,email,wallet:accountFull,slots:qty});
+    showPopup('Confirmado! Registrando compra...');
+    let sheetCodeId='';
     try{
-      let resp = await fetch(CONFIG.SHEET_WEBHOOK_URL,{
-        method:'POST',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})
-      });
-      let txt = await resp.text();
-      console.log('Respuesta Sheets:', txt);
-      alert('Sheets respondió: ' + txt.slice(0,200));
-    }catch(err){
-      console.error('Error fetch Sheets:', err);
-      alert('Error enviando a Sheets: ' + err);
-    }
+      let resp=await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
+      let txt=await resp.text();
+      try{let j=JSON.parse(txt); if(j.codeId) sheetCodeId=j.codeId; else if(j.code) sheetCodeId=j.code;}catch{let m=txt.match(/[A-Z0-9]{8}/); if(m) sheetCodeId=m[0];}
+    }catch(e){}
     await fetchLive();
-  }catch(e){
-    if(e.code===4001) alert('Rechazada');
-    else alert(e.message);
-  }finally{
-    btn.disabled=false; updateTexts();
-  }
+    showPopup('<b>Compra exitosa!</b><br>Se te redirigira al panel de inversores<br><small>Codigo enviado a '+email+'</small>');
+    setTimeout(()=>{ window.location.href='https://founders.wasa.chat/?email='+encodeURIComponent(email)+'&code='+encodeURIComponent(sheetCodeId)+'&tab=new'; },3000);
+    return;
+  }catch(e){ showPopup(e.message||'Rechazada'); } finally{ btn.disabled=false; updateTexts(); }
 };
+
+
+  
+
+
+
+  function showPopup(msg,type){
+  let id='wasaPopup'; let el=document.getElementById(id);
+  if(!el){ el=document.createElement('div'); el.id=id; el.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px'; el.innerHTML='<div id="wasaPopupCard" style="background:#C2D9FF;border:2px solid #93B4FF;border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,.3)"><div id="wasaPopupMsg" style="font-size:14px;line-height:1.4"></div><button onclick="document.getElementById(\'wasaPopup\').style.display=\'none\'" style="margin-top:16px;height:40px;padding:0 20px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer">Cerrar</button></div>'; document.body.appendChild(el); }
+  document.getElementById('wasaPopupMsg').innerHTML=msg;
+  el.style.display='flex';
+  if(type==='success'){ setTimeout(()=>{ el.style.display='none'; },4000); }
+}
+function getWasaProvider(){ return window._wasaProvider || window.ethereum; }
+function getProvider(){ return window.ethereum; }
   
 async function fetchLive(){
 try{
