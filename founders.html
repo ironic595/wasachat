@@ -45,6 +45,20 @@
 .btn-hero{padding:15px 28px;border-radius:15px;margin-top:20px;margin-right:12px;font-weight:800;cursor:pointer;border:0;display:inline-flex;align-items:center;gap:6px}
 .btn-hero-primary{background:#0A101F;color:white;border:1px solid #3B82F6;box-shadow:0 0 20px rgba(59,130,246,.3)}
 .btn-hero-secondary{background:rgba(255,255,255,.8);color:#1E293B;border:1px solid rgba(255,255,255,.5)}
+
+  .wasa-modal{position:fixed;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.wasa-modal.show{display:flex}
+.wasa-modal-box{background:#C2D9FF;border:2px solid #93B4FF;border-radius:24px;padding:24px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.wasa-modal-icon{width:56px;height:56px;border-radius:50%;background:#1D4ED8;display:grid;place-items:center;margin:0 auto 12px;color:white;font-size:28px}
+.wasa-modal-title{font-size:18px;font-weight:800;color:#0F172A}
+.wasa-modal-sub{font-size:12px;opacity:.7;margin-top:6px;line-height:1.4;white-space:pre-line}
+.wasa-progress{height:10px;background:#E6F0FF;border-radius:999px;overflow:hidden;margin-top:16px;border:1px solid #93B4FF;position:relative}
+.wasa-progress-fill{height:100%;width:40%;background:linear-gradient(90deg,#1D4ED8,#3B82F6,#93C5FD);border-radius:999px;animation:wasaMove 1.1s ease-in-out infinite}
+@keyframes wasaMove{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+.wasa-tx{margin-top:12px;font-size:10px;word-break:break-all;background:#E6F0FF;border:1px solid #93B4FF;border-radius:10px;padding:8px;opacity:.8;display:none;text-align:left}
+.wasa-btn{margin-top:16px;width:100%;height:44px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;display:none}
+.wasa-btn.show{display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -251,55 +265,31 @@ async function getBNBBalance(wallet){
   return BigInt(bal);
 }
 document.getElementById('btnUSDT').onclick=async()=>{
-  if(!validate()){alert(dict[lang].formError);return;}
+  if(!validate()){showWasaModal('error',{message:dict[lang].formError});return;}
   if(!connected){document.getElementById('btnConnect').click();return;}
   let btn=document.getElementById('btnUSDT'); btn.disabled=true; btn.textContent='Confirmando...';
   try{
     let name=document.getElementById('nameUSDT').value.trim();
     let email=document.getElementById('emailUSDT').value.trim();
-    let priceWei = parseUSDTtoWei(CONFIG.price);
-    let needed = BigInt(qty) * priceWei;
-    let usdtBal = await getUSDTBalance(accountFull);
-    let bnbBal = await getBNBBalance(accountFull);
-    if(usdtBal < needed){
-      alert(lang==='es'? `No tenés USDT suficiente. Tenés ${(Number(usdtBal)/1e18).toFixed(2)} y necesitás ${qty*CONFIG.price}` : `Insufficient USDT. You have ${(Number(usdtBal)/1e18).toFixed(2)} need ${qty*CONFIG.price}`);
-      btn.disabled=false; updateTexts(); return;
-    }
-    if(bnbBal < 50000000000000n){ // TEST: 0.00005 BNB minimo
-      alert(lang==='es'? `No tenés BNB para el gas. Necesitás ~0.001 BNB y tenés ${Number(bnbBal)/1e18}` : `No BNB for gas`);
-      btn.disabled=false; updateTexts(); return;
-    }
+    let priceWei=parseUSDTtoWei(CONFIG.price);let needed=BigInt(qty)*priceWei;
+    let usdtBal=await getUSDTBalance(accountFull);let bnbBal=await getBNBBalance(accountFull);
+    if(usdtBal<needed){showWasaModal('error',{message: lang==='es'? `No tenés USDT suficiente. Tenés ${(Number(usdtBal)/1e18).toFixed(4)} y necesitás ${qty*CONFIG.price}` : `Insufficient USDT`});btn.disabled=false;updateTexts();return;}
+    if(bnbBal<50000000000000n){showWasaModal('error',{message: lang==='es'? `No tenés BNB para gas` : `No BNB for gas`});btn.disabled=false;updateTexts();return;}
     let to=CONFIG.RECEIVER_ADDRESS.toLowerCase().replace('0x','').padStart(64,'0');
-    let priceWei2 = parseUSDTtoWei(CONFIG.price);
-    let amount=BigInt(qty)*priceWei2;
-    let hex=amount.toString(16).padStart(64,'0');
-    let data='0xa9059cbb'+to+hex;
+    let amount=BigInt(qty)*priceWei;let hex=amount.toString(16).padStart(64,'0');let data='0xa9059cbb'+to+hex;
     let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
-    document.getElementById('txHash').style.display='block';
-    document.getElementById('txHash').textContent='Tx: '+hash;
-    alert((lang==='es'?'Tx enviada, esperando confirmación en BSC... ':'Tx sent, waiting BSC...') + hash);
+    document.getElementById('txHash').style.display='block';document.getElementById('txHash').textContent='Tx: '+hash;
+    showWasaModal('processing',{hash:hash});
     await new Promise(r=>setTimeout(r,3000));
-    console.log('Enviando a Sheets:', {nombre:name,email,wallet:accountFull,slots:qty});
-    try{
-      let resp = await fetch(CONFIG.SHEET_WEBHOOK_URL,{
-        method:'POST',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})
-      });
-      let txt = await resp.text();
-      console.log('Respuesta Sheets:', txt);
-      alert('Sheets respondió: ' + txt.slice(0,200));
-    }catch(err){
-      console.error('Error fetch Sheets:', err);
-      alert('Error enviando a Sheets: ' + err);
-    }
+    let resp=await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
+    let txt=await resp.text();let j;try{j=JSON.parse(txt);}catch{j={ok:true};}
+    console.log('Sheets:',txt);
+    showWasaModal('success',{hash:hash,codeId:j.codeId||j.codeld||''});
     await fetchLive();
   }catch(e){
-    if(e.code===4001) alert('Rechazada');
-    else alert(e.message);
-  }finally{
-    btn.disabled=false; updateTexts();
-  }
+    if(e.code===4001) showWasaModal('error',{message: lang==='es'?'Transacción rechazada en wallet':'Transaction rejected'});
+    else showWasaModal('error',{message:e.message});
+  }finally{btn.disabled=false;updateTexts();}
 };
   
 async function fetchLive(){
@@ -363,6 +353,51 @@ function checkDeadline(){
 setInterval(checkDeadline,1000);
 checkDeadline();
 document.getElementById('langBtn').onclick=()=>applyLang(lang==='es'?'en':'es');
+</script>
+
+  <div id="wasaModal" class="wasa-modal">
+  <div class="wasa-modal-box">
+    <div class="wasa-modal-icon" id="wasaModalIcon">⏳</div>
+    <div class="wasa-modal-title" id="wasaModalTitle">Procesando transacción</div>
+    <div class="wasa-modal-sub" id="wasaModalSub">Confirmá en tu wallet...</div>
+    <div class="wasa-progress" id="wasaProgress"><div class="wasa-progress-fill"></div></div>
+    <div class="wasa-tx" id="wasaModalTx"></div>
+    <button class="wasa-btn" id="wasaModalBtn" onclick="closeWasaModal()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+function showWasaModal(type,data){
+ let modal=document.getElementById('wasaModal');
+ let icon=document.getElementById('wasaModalIcon');
+ let title=document.getElementById('wasaModalTitle');
+ let sub=document.getElementById('wasaModalSub');
+ let prog=document.getElementById('wasaProgress');
+ let tx=document.getElementById('wasaModalTx');
+ let btn=document.getElementById('wasaModalBtn');
+ let d=dict[lang];
+ if(type==='processing'){
+   icon.textContent='⏳'; icon.style.background='#1D4ED8';
+   title.textContent=lang==='es'?'Procesando transacción':'Processing transaction';
+   sub.textContent=lang==='es'?'Confirmá en tu wallet y esperá la confirmación en BSC...\n\nNo cierres esta ventana':'Confirm in wallet and wait BSC...';
+   prog.style.display='block'; tx.style.display=data&&data.hash?'block':'none';
+   if(data&&data.hash){tx.textContent='Tx: '+data.hash;}
+   btn.classList.remove('show'); btn.style.display='none';
+ }else if(type==='success'){
+   icon.textContent='✅'; icon.style.background='#16A34A';
+   title.textContent=lang==='es'?'Tu compra ha sido exitosa':'Your purchase was successful';
+   sub.textContent=lang==='es'?'¡Bienvenido Founder!\n\nRecibirás tu WASA BLOCK por email con tu código.\n'+(data&&data.codeId?'Código: '+data.codeId:''):'Welcome! Check email.\n'+(data&&data.codeId?'Code: '+data.codeId:'');
+   prog.style.display='none'; tx.style.display='none';
+   btn.textContent=lang==='es'?'¡Listo!':'Done!'; btn.classList.add('show'); btn.style.display='flex';
+ }else{
+   icon.textContent='❌'; icon.style.background='#DC2626';
+   title.textContent='Error'; sub.textContent=data&&data.message?data.message:'Error';
+   prog.style.display='none'; tx.style.display='none'; btn.textContent='Cerrar'; btn.classList.add('show'); btn.style.display='flex';
+ }
+ modal.classList.add('show');
+}
+function closeWasaModal(){document.getElementById('wasaModal').classList.remove('show');}
+document.getElementById('wasaModal').onclick=(e)=>{if(e.target.id==='wasaModal') closeWasaModal();};
 </script>
 </body>
 </html>
