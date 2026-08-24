@@ -217,10 +217,10 @@ function validate(){let n=document.getElementById('nameUSDT').value.trim(); let 
 document.getElementById('nameUSDT').oninput=validate; document.getElementById('emailUSDT').oninput=validate;
 document.getElementById('btnConnect').onclick=async()=>{
 if(!validate()){alert(dict[lang].formError);return;}
-if(!window.ethereum){alert('Install MetaMask');return;}
+if(!){alert('Install MetaMask');return;}
 let btn=document.getElementById('btnConnect'); btn.textContent='Conectando...'; btn.disabled=true;
 try{
-let accs=await window.ethereum.request({method:'eth_requestAccounts'});
+let accs=await .request({method:'eth_requestAccounts'});
 let chain=await window.ethereum.request({method:'eth_chainId'});
 if(parseInt(chain,16)!==CONFIG.CHAIN_ID){try{await window.ethereum.request({method:'wallet_switchChain',params:[{chainId:'0x38'}]});}catch{}}
 accountFull=accs[0]; connected=true;
@@ -241,8 +241,10 @@ function parseUSDTtoWei(str){
 
 const USDT_ABI_BALANCE = '0x70a08231';
 function getWasaProvider(){
-  return window._wasaProvider || getProvider() || window.ethereum;
+  return window._wasaProvider || window.ethereum;
 }
+function getProvider(){ return window.ethereum; }
+  
 async function getUSDTBalance(wallet){
   let provider = getWasaProvider();
   let padded = wallet.toLowerCase().replace('0x','').padStart(64,'0');
