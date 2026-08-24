@@ -65,7 +65,7 @@
 </div></div>
 
 <div class="wrap">
-<div class="card"><div class="eyebrow" id="recEyebrow">RECAUDADO • TIEMPO REAL</div><div style="display:flex;align-items:center;gap:6px"><div class="title" id="recTitle">Recaudado desde 22/08/2026</div><span class="live" id="recLive">EN VIVO</span></div><div style="font-size:11px;opacity:.7;margin-top:4px" id="recSub">En vivo • La ronda founder avanza en tiempo real</div><div style="font-size:10px;opacity:.6" id="sheetLive">Cargando datos...</div><div class="amount">Compraron <span id="recaudado">10,000</span> <span style="font-size:11px;opacity:.6">• <span id="progressPct">80%</span></span></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px"><span><b id="sold">40</b> <span id="soldLabel">Slots vendidos</span></span><span><span id="quedanLabel">Quedan</span> <b id="left">10</b> <span id="slotsLabel">slots</span></span></div><div style="font-size:11px;opacity:.6;margin-top:8px" id="cadaSlot">Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada slot = 0.5% perpetuo. Recompra 2x ($500) desde mes 12.</div></div>
+<div class="card"><div class="eyebrow" id="recEyebrow">RECAUDADO • TIEMPO REAL</div><div style="display:flex;align-items:center;gap:6px"><div class="title" id="recTitle">Recaudado desde 22/08/2026</div><span class="live" id="recLive">EN VIVO</span></div><div style="font-size:11px;opacity:.7;margin-top:4px" id="recSub">En vivo • La ronda founder avanza en tiempo real</div><div style="font-size:10px;opacity:.6" id="sheetLive">Cargando datos...</div><div class="amount">Compraron <span id="recaudado">0</span> <span style="font-size:11px;opacity:.6">• <span id="progressPct">-%</span></span></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px"><span><b id="sold">0</b> <span id="soldLabel">Slots vendidos</span></span><span><span id="quedanLabel">Quedan</span> <b id="left">50</b> <span id="slotsLabel">slots</span></span></div><div style="font-size:11px;opacity:.6;margin-top:8px" id="cadaSlot">Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada WASABLOCK = 0.5%. Recompra 2x ($500) desde mes 12.</div></div>
 
 <div class="card-outer"><div class="card" style="margin:0;background:#C2D9FF"><div class="eyebrow" id="partEyebrow">PARTICIPACIÓN FOUNDER PERPETUA</div><div class="title" id="partTitle">Compra WASA BLOCKS</div><div style="font-size:11px;opacity:.6;margin-top:4px"><span id="costoLabel">TEST: 0.5% = $0.01 USDT (modo prueba)</span> <span id="dispLabel">Cantidad disponible</span> <span id="dispVal">10</span></div>
 <div class="qty-row"><button class="qty-btn" id="btnMinus">−</button><div class="qty-val" id="qtyVal">1</div><button class="qty-btn" id="btnPlus">+</button><div style="margin-left:auto;font-size:11px"><span id="qtySlots">1 slot</span> = <b id="qtyPercent">0.5%</b> perpetuo</div></div><input type="range" min="1" max="10" value="1" class="range" id="range"><div class="total-box"><span style="font-size:11px;opacity:.6" id="totalLabel">Total a pagar:</span><b>$<span id="total">250</span> USDT</b></div>
@@ -93,12 +93,12 @@ const CONFIG={
   USDT_CONTRACT:'0x55d398326f99059fF775485246999027B3197955',
   RECEIVER_ADDRESS:'0x90e0cEFC05cCe2E3BaC67feCc594D5d97F013Fed',
   CHAIN_ID:56,
-  price:0.01, // TEST 0.01 - cambiar a 250 en prod
+  price:0.003, // TEST 0.01 - cambiar a 250 en prod
   TEST_MODE:true,
   totalSlots:50,
   dolarMep:1420,
   alias:'RASCO.AQUI.RIPIO',
-  mpLink:'https://link.mercadopago.com.ar/tu-link'
+  mpLink:'https://mercadopago.com.ar'
 };
 
 function bajarSeccion(){document.getElementById('progressFill').scrollIntoView({behavior:'smooth'});}
