@@ -264,6 +264,7 @@ async function getBNBBalance(wallet){
   let bal = await window.ethereum.request({method:'eth_getBalance',params:[wallet, 'latest']});
   return BigInt(bal);
 }
+
 document.getElementById('btnUSDT').onclick=async()=>{
   if(!validate()){showWasaModal('error',{message:dict[lang].formError});return;}
   if(!connected){document.getElementById('btnConnect').click();return;}
@@ -280,17 +281,38 @@ document.getElementById('btnUSDT').onclick=async()=>{
     let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
     document.getElementById('txHash').style.display='block';document.getElementById('txHash').textContent='Tx: '+hash;
     showWasaModal('processing',{hash:hash});
-    await new Promise(r=>setTimeout(r,3000));
-    let resp=await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})});
-    let txt=await resp.text();let j;try{j=JSON.parse(txt);}catch{j={ok:true};}
-    console.log('Sheets:',txt);
-    showWasaModal('success',{hash:hash,codeId:j.codeId||j.codeld||''});
-    await fetchLive();
+
+    // MOSTRAR EXITO INMEDIATO, SIN ESPERAR SHEETS
+    // La tx ya salio, eso es lo que le importa al usuario
+    setTimeout(()=>{
+      showWasaModal('success',{hash:hash,codeId:''});
+    },1500);
+
+    // Sheets + holograma + email en segundo plano, no bloquea el popup
+    fetch(CONFIG.SHEET_WEBHOOK_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,timestamp:new Date().toISOString(),method:'crypto'})
+    }).then(r=>r.text()).then(txt=>{
+      console.log('Sheets OK en background:',txt);
+      try{
+        let j=JSON.parse(txt);
+        if(j.codeId){
+          // Actualiza el popup con el codigo real cuando llegue
+          let sub=document.getElementById('wasaModalSub');
+          if(sub) sub.textContent=(lang==='es'?'¡Bienvenido Founder!\n\nRecibirás tu WASA BLOCK por email con tu código.\nCódigo: ':'Welcome! Code: ')+j.codeId;
+        }
+      }catch{}
+      fetchLive();
+    }).catch(e=>console.error('Sheets background error',e));
+
   }catch(e){
     if(e.code===4001) showWasaModal('error',{message: lang==='es'?'Transacción rechazada en wallet':'Transaction rejected'});
     else showWasaModal('error',{message:e.message});
   }finally{btn.disabled=false;updateTexts();}
 };
+
+  
   
 async function fetchLive(){
 try{
