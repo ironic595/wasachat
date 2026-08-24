@@ -298,11 +298,15 @@ document.getElementById('btnUSDT').onclick=async()=>{
       let txt=await resp.text();
       try{let j=JSON.parse(txt); if(j.codeId) sheetCodeId=j.codeId; else if(j.code) sheetCodeId=j.code;}catch{let m=txt.match(/[A-Z0-9]{8}/); if(m) sheetCodeId=m[0];}
     }catch(e){}
-    await fetchLive();
-    showPopup('<b>Compra exitosa!</b><br>Se te redirigira al panel de inversores<br><small>Codigo enviado a '+email+'</small>');
-    setTimeout(()=>{ window.location.href='https://founders.wasa.chat/?email='+encodeURIComponent(email)+'&code='+encodeURIComponent(sheetCodeId)+'&tab=new'; },3000);
+     await fetchLive();
+    // REDIRIGE SOLO CON EMAIL, el input de codigo queda vacio para que pegue el SVE7RT8S del mail
+    showPopup('<b>Compra exitosa!</b><br>Se te redirigira al panel de inversores<br><small>Revisa tu email: '+email+'<br>Te enviamos el codigo de 8 digitos a tu correo electrónico. Si no lo encuentras, revisa en la carpeta de SPAM</small>','success');
+    setTimeout(()=>{
+      window.location.href='https://founders.wasa.chat/?email='+encodeURIComponent(email)+'&tab=new';
+    },3000);
     return;
-  }catch(e){ showPopup(e.message||'Rechazada'); } finally{ btn.disabled=false; updateTexts(); }
+  }catch(e){ showPopup(e.message||'Rechazada','error'); }
+  finally{ btn.disabled=false; updateTexts(); }
 };
 
 
