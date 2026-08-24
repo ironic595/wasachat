@@ -6,7 +6,7 @@
 <title>Wasa.chat/founders</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#2d81ff;color:#1E293B}
 .nav{position:fixed;top:0;left:0;right:0;height:64px;background:#1D4ED8;display:flex;align-items:center;justify-content:space-between;padding:0 5%;z-index:50}
 .nav .logo{color:white;font-weight:800}.nav .links{display:flex;gap:20px;font-size:11px;font-weight:700;color:rgba(255,255,255,.7)}.nav .links a{color:inherit;text-decoration:none}
 .hero{width:100vw;margin-left:calc(-50vw + 50%);background:linear-gradient(135deg,#BFDBFE,#93C5FD 30%,#C4B5FD 75%,#A5B4FC);padding:84px 0 28px;display:flex;justify-content:center}
@@ -88,17 +88,17 @@
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
 const CONFIG={
-  SHEET_WEBHOOK_URL:'https://script.google.com/macros/s/AKfycbyJhDEegiqDmY1KwqzVyHx3yjlfmqppa5UWWCgwA98q2SXxNLM73ucHZypvGe1PayM3EQ/exec',
-  SHEET_READ_URL:'https://script.google.com/macros/s/AKfycbyJhDEegiqDmY1KwqzVyHx3yjlfmqppa5UWWCgwA98q2SXxNLM73ucHZypvGe1PayM3EQ/exec?action=read',
+  SHEET_WEBHOOK_URL:'https://script.google.com/macros/s/AKfycbxwEAWB_c55EOnmYDA0cUGcxHIFF4nBMzATtMT2EFIb2duvm2ARRiEmfLivBt6mlTtrmg/exec',
+  SHEET_READ_URL:'https://script.google.com/macros/s/AKfycbxwEAWB_c55EOnmYDA0cUGcxHIFF4nBMzATtMT2EFIb2duvm2ARRiEmfLivBt6mlTtrmg/exec?action=read',
   USDT_CONTRACT:'0x55d398326f99059fF775485246999027B3197955',
-  RECEIVER_ADDRESS:'0x90e0cEFC05cCe2E3BaC67feCc594D5d97F013Fed',
+  RECEIVER_ADDRESS:'0x6aF7Fec81b5Fcd154e06504Ba53624e660025B67',
   CHAIN_ID:56,
-  price:0.002, // TEST 0.01 - cambiar a 250 en prod
+  price:0.005, // TEST 0.01 - cambiar a 250 en prod
   TEST_MODE:true,
   totalSlots:50,
   dolarMep:1420,
   alias:'RASCO.AQUI.RIPIO',
-  mpLink:'https://link.mercadopago.com.ar/tu-link'
+  mpLink:'https://mercadopago.com.ar/'
 };
 
 function bajarSeccion(){document.getElementById('progressFill').scrollIntoView({behavior:'smooth'});}
@@ -213,43 +213,21 @@ document.getElementById('btnPlus').onclick=()=>{let max=parseInt(range.max); if(
 range.oninput=e=>{qty=parseInt(e.target.value);update();};
 document.getElementById('copyBtn').onclick=()=>{navigator.clipboard.writeText(CONFIG.alias); let m=document.getElementById('copyMsg'); m.style.display='inline'; m.textContent=dict[lang].copyBtn.includes('Copiar')?'Copiado!':'Copied!'; setTimeout(()=>m.style.display='none',2000);};
 document.getElementById('btnMP').onclick=()=>window.open(CONFIG.mpLink,'_blank');
-function getProvider(){
-  if(window.ethereum){
-    if(window.ethereum.providers && Array.isArray(window.ethereum.providers)){
-      let trust = window.ethereum.providers.find(p=>p.isTrust || p.isTrustWallet);
-      if(trust) return trust;
-      return window.ethereum.providers[0];
-    }
-    return window.ethereum;
-  }
-  if(window.trustwallet) return window.trustwallet;
-  if(window.trustWallet) return window.trustWallet;
-  return null;
-}
 function validate(){let n=document.getElementById('nameUSDT').value.trim(); let e=document.getElementById('emailUSDT').value.trim(); let ok=n.length>=3 && e.includes('@') && e.includes('.'); document.getElementById('formError').style.display=ok?'none':'block'; document.getElementById('btnConnect').style.opacity=ok?'1':'.5'; document.getElementById('btnUSDT').style.opacity=ok?'1':'.5'; return ok;}
 document.getElementById('nameUSDT').oninput=validate; document.getElementById('emailUSDT').oninput=validate;
 document.getElementById('btnConnect').onclick=async()=>{
 if(!validate()){alert(dict[lang].formError);return;}
-if(window.top !== window.self){ try{ window.top.location = window.self.location; }catch(e){} }
-let provider = getProvider();
-if(!provider){alert('Install MetaMask / Trust Wallet');return;}
+if(!window.ethereum){alert('Install MetaMask');return;}
 let btn=document.getElementById('btnConnect'); btn.textContent='Conectando...'; btn.disabled=true;
 try{
-let accs=await provider.request({method:'eth_requestAccounts'});
-let chain=await provider.request({method:'eth_chainId'});
-if(parseInt(chain,16)!==CONFIG.CHAIN_ID){try{await provider.request({method:'wallet_switchChain',params:[{chainId:'0x38'}]});}catch{}}
+let accs=await window.ethereum.request({method:'eth_requestAccounts'});
+let chain=await window.ethereum.request({method:'eth_chainId'});
+if(parseInt(chain,16)!==CONFIG.CHAIN_ID){try{await window.ethereum.request({method:'wallet_switchChain',params:[{chainId:'0x38'}]});}catch{}}
 accountFull=accs[0]; connected=true;
-window._wasaProvider = provider;
 document.getElementById('walletStatus').style.display='block';
 document.getElementById('walletStatus').textContent='✅ '+accountFull.slice(0,6)+'...'+accountFull.slice(-4);
 btn.style.display='none'; document.getElementById('btnUSDT').style.display='flex';
-}catch(e){
-  console.error(e);
-  let msg = e.message || '';
-  if(msg.toLowerCase().includes('embedded')){
-    alert('Trust Wallet bloqueo por embedded frame tras muchas pruebas. Hace Ctrl+Shift+R, desactiva/activa Trust en chrome://extensions, o usa MetaMask / incognito.');
-  }else{ alert(e.message); }
-}finally{btn.disabled=false; btn.textContent=dict[lang].conectar;}
+}catch(e){alert(e.message);}finally{btn.disabled=false; btn.textContent=dict[lang].conectar;}
 };
 
 
