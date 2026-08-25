@@ -30,8 +30,8 @@
 <b>Importante:</b> Tu código de referido se genera DESPUÉS de tu primera compra, pero podés registrarte ya. Si no tenés WASABLOCKS aún, tu link se activará cuando compres 0.01 mínimo (para evitar spam). Si ya sos founder, tu link es tu WASA-CODE genesis.
 </div>
 </div>
+<script src="/wasa-config.js"></script>
 <script>
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyi8njSlvRNdDxUdr8lzdwDo6nmLJ4Tjuykwd9TMFN2kBipdebJtEm0m5NHz2LS_PMVBA/exec';
 async function register(){
   let email=document.getElementById('email').value.trim().toLowerCase();
   let pass=document.getElementById('pass').value.trim();
@@ -42,7 +42,7 @@ async function register(){
   let btn=document.getElementById('btnReg'); btn.disabled=true; btn.textContent='Creando...';
   try{
     // Usamos el mismo registro que panel pero con wallet
-    let r=await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'registerReferrer', email:email, password:pass, wallet:wallet})});
+    let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'registerReferrer', email:email, password:pass, wallet:wallet})});
     let j=await r.json();
     if(j.ok){
       msg.style.display='block'; msg.style.background='#F0FDF4'; msg.style.color='#166534';
