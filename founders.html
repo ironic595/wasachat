@@ -65,19 +65,17 @@
 </div></div>
 
 <div class="wrap">
-<div class="card"><div class="eyebrow" id="recEyebrow">RECAUDADO • TIEMPO REAL</div><div style="display:flex;align-items:center;gap:6px"><div class="title" id="recTitle">Recaudado desde 22/08/2026</div><span class="live" id="recLive">EN VIVO</span></div><div style="font-size:11px;opacity:.7;margin-top:4px" id="recSub">En vivo • La ronda founder avanza en tiempo real</div><div style="font-size:10px;opacity:.6" id="sheetLive">Cargando datos...</div><div class="amount">Compraron <span id="recaudado">10,000</span> <span style="font-size:11px;opacity:.6">• <span id="progressPct">80%</span></span></div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px"><span><b id="sold">40</b> <span id="soldLabel">Slots vendidos</span></span><span><span id="quedanLabel">Quedan</span> <b id="left">10</b> <span id="slotsLabel">slots</span></span></div><div style="font-size:11px;opacity:.6;margin-top:8px" id="cadaSlot">Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada slot = 0.5% perpetuo. Recompra 2x ($500) desde mes 12.</div></div>
+<div class="card"><div class="eyebrow" id="recEyebrow">RECAUDADO • TIEMPO REAL</div><div style="display:flex;align-items:center;gap:6px"><div class="title" id="recTitle">Recaudado desde 22/08/2026</div><span class="live" id="recLive">EN VIVO</span></div><div style="font-size:11px;opacity:.7;margin-top:4px" id="recSub">En vivo • La ronda founder avanza en tiempo real</div><div style="font-size:10px;opacity:.6" id="sheetLive">Cargando datos desde Sheet...</div><div class="amount">Compraron <span id="recaudado">-</span> <span style="font-size:11px;opacity:.6">• <span id="progressPct">-</span></span></div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px"><span><b id="sold">-</b> <span id="soldLabel">Slots vendidos</span></span><span><span id="quedanLabel">Quedan</span> <b id="left">-</b> <span id="slotsLabel">slots</span></span></div><div style="font-size:11px;opacity:.6;margin-top:8px" id="cadaSlot">Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada slot = 0.5% perpetuo. Recompra 2x ($500) desde mes 12.</div></div>
 
-<div class="card-outer"><div class="card" style="margin:0;background:#C2D9FF"><div class="eyebrow" id="partEyebrow">PARTICIPACIÓN FOUNDER PERPETUA</div><div class="title" id="partTitle">Compra WASA BLOCKS</div><div style="font-size:11px;opacity:.6;margin-top:4px"><span id="costoLabel">TEST: 0.5% = $0.01 USDT (modo prueba)</span> <span id="dispLabel">Cantidad disponible</span> <span id="dispVal">10</span></div>
-<div class="qty-row"><button class="qty-btn" id="btnMinus">−</button><div class="qty-val" id="qtyVal">1</div><button class="qty-btn" id="btnPlus">+</button><div style="margin-left:auto;font-size:11px"><span id="qtySlots">1 slot</span> = <b id="qtyPercent">0.5%</b> perpetuo</div></div><input type="range" min="1" max="10" value="1" class="range" id="range"><div class="total-box"><span style="font-size:11px;opacity:.6" id="totalLabel">Total a pagar:</span><b>$<span id="total">250</span> USDT</b></div>
+<div class="card-outer"><div class="card" style="margin:0;background:#C2D9FF"><div class="eyebrow" id="partEyebrow">PARTICIPACIÓN FOUNDER PERPETUA</div><div class="title" id="partTitle">Compra WASA BLOCKS</div><div style="font-size:11px;opacity:.6;margin-top:4px"><span id="costoLabel">Cargando precio desde config...</span> <span id="dispLabel">Cantidad disponible</span> <span id="dispVal">-</span></div>
+<div class="qty-row"><button class="qty-btn" id="btnMinus">−</button><div class="qty-val" id="qtyVal">1</div><button class="qty-btn" id="btnPlus">+</button><div style="margin-left:auto;font-size:11px"><span id="qtySlots">1 slot</span> = <b id="qtyPercent">0.5%</b> perpetuo</div></div><input type="range" min="1" max="10" value="1" class="range" id="range"><div class="total-box"><span style="font-size:11px;opacity:.6" id="totalLabel">Total a pagar:</span><b>$<span id="total">-</span> USDT</b></div>
 <div class="buyback"><b id="buybackTitle">🔄 Recompra 2x:</b> <span id="buybackText">WASA puede recomprar tu slot a $500 (2x) después de 12 meses. Si no ejerce, seguís cobrando para siempre.</span></div>
 <div style="margin-top:14px;display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:800;letter-spacing:.1em;opacity:.6" id="metodosLabel">MÉTODOS DE PAGO</span><span style="font-size:10px;opacity:.5" id="tarjetaLabel">1 tarjeta • 2 automáticos</span></div>
 
-<!-- METODO 1 ORIGINAL INTACTO -->
-<div class="method"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b style="font-size:13px" id="metodo1Label">Método 1 • Recomendado</b><span class="tag" id="onchainTag">ON-CHAIN</span></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:32px;height:32px;border-radius:50%;background:#26A17B;display:grid;place-items:center;color:white;font-weight:800;font-size:10px">₮</div><div><div style="font-weight:700;font-size:13px" id="usdtTitle">USDT en BNB Chain</div><div style="font-size:10px;opacity:.6" id="usdtSub">BEP-20 • Confirmación automática</div></div></div><input class="input" id="nameUSDT" placeholder="Nombre completo"><input class="input" id="emailUSDT" placeholder="Email"><div id="formError" style="font-size:11px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:6px 10px;display:none;margin-bottom:8px">⚠ Completá nombre y email</div><div id="walletStatus" style="font-size:11px;color:#1D4ED8;font-weight:700;background:rgba(29,78,216,.08);padding:6px 10px;border-radius:8px;display:none;margin-bottom:8px"></div><div id="txHash" style="font-size:10px;word-break:break-all;opacity:.7;display:none;margin-bottom:8px"></div><button class="btn" id="btnConnect">🔌 Conectar Wallet (MetaMask / Rabby)</button><button class="btn" id="btnUSDT" style="display:none;margin-top:8px">Pagar 250 USDT</button><div style="font-size:10px;opacity:.5;margin-top:6px" id="contratoLabel">Contrato USDT: 0x55d3...7955 • Chain 56 • Call 2x desde mes 12</div></div>
+<div class="method"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b style="font-size:13px" id="metodo1Label">Método 1 • Recomendado</b><span class="tag" id="onchainTag">ON-CHAIN</span></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:32px;height:32px;border-radius:50%;background:#26A17B;display:grid;place-items:center;color:white;font-weight:800;font-size:10px">₮</div><div><div style="font-weight:700;font-size:13px" id="usdtTitle">USDT en BNB Chain</div><div style="font-size:10px;opacity:.6" id="usdtSub">BEP-20 • Confirmación automática</div></div></div><input class="input" id="nameUSDT" placeholder="Nombre completo"><input class="input" id="emailUSDT" placeholder="Email"><div id="formError" style="font-size:11px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:6px 10px;display:none;margin-bottom:8px">⚠ Completá nombre y email</div><div id="walletStatus" style="font-size:11px;color:#1D4ED8;font-weight:700;background:rgba(29,78,216,.08);padding:6px 10px;border-radius:8px;display:none;margin-bottom:8px"></div><div id="txHash" style="font-size:10px;word-break:break-all;opacity:.7;display:none;margin-bottom:8px"></div><button class="btn" id="btnConnect">🔌 Conectar Wallet (MetaMask / Rabby)</button><button class="btn" id="btnUSDT" style="display:none;margin-top:8px">Pagar - USDT</button><div style="font-size:10px;opacity:.5;margin-top:6px" id="contratoLabel">Cargando contrato...</div></div>
 
-<!-- METODO 2 REEMPLAZADO: NOWPAYMENTS FIAT AUTOMATICO -->
 <div class="method" style="border:2px solid #1D4ED8;background:#E0E7FF"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><b style="font-size:13px" id="metodo2Label">Método 2 • Tarjeta (Auto)</b><span class="tag" style="background:#1D4ED8" id="fiatTag">FIAT → CRYPTO</span></div><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="width:48px;height:32px;border-radius:8px;background:#1D4ED8;display:grid;place-items:center;color:white;font-weight:800;font-size:18px">💳</div><div><div style="font-weight:700;font-size:13px" id="fiatTitle">Visa / Mastercard / Apple Pay</div><div style="font-size:10px;opacity:.6" id="fiatSub">NowPayments + Guardarian • Recibís USDT igual que Método 1</div></div></div>
-<div style="background:#E6F0FF;border:1px solid #93B4FF;border-radius:10px;padding:10px;display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px"><div><div style="font-size:10px;opacity:.6" id="fiatPayLabel">Pagás en USD (variable)</div><div style="font-weight:800">$<span id="fiatTotal">250</span> <span style="font-size:10px;opacity:.6">+ fee</span></div></div><div style="text-align:right"><div style="font-size:10px;opacity:.6">Recibimos</div><div style="font-weight:800"><span id="fiatReceive">250</span> USDT BSC</div></div></div>
+<div style="background:#E6F0FF;border:1px solid #93B4FF;border-radius:10px;padding:10px;display:flex;justify-content:space-between;font-size:12px;margin-bottom:10px"><div><div style="font-size:10px;opacity:.6" id="fiatPayLabel">Pagás en USD (variable)</div><div style="font-weight:800">$<span id="fiatTotal">-</span> <span style="font-size:10px;opacity:.6">+ fee</span></div></div><div style="text-align:right"><div style="font-size:10px;opacity:.6">Recibimos</div><div style="font-weight:800"><span id="fiatReceive">-</span> USDT BSC</div></div></div>
 <input class="input" id="nameFIAT" placeholder="Nombre completo (igual que tarjeta)"><input class="input" id="emailFIAT" placeholder="Email (para tu código de 8 dígitos)">
 <button class="btn" id="btnFIAT" style="background:#1D4ED8">Pagar con tarjeta → USDT automático ↗</button>
 <div style="font-size:11px;background:#FFD60A;border-radius:10px;padding:8px;margin-top:8px;color:black" id="fiatImportant"><b>✅ 100% automático:</b> No subís comprobante. El sistema detecta el pago via IPN de NowPayments y te manda el código de 8 dígitos por mail igual que con cripto. Monto variable según slots.</div>
@@ -97,35 +95,52 @@
 
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
-const CONFIG={
+const BASE_CONFIG={
   SHEET_WEBHOOK_URL:'https://script.google.com/macros/s/AKfycbxYExzCmhkjgWIW3A_ccQmU0KMWYtZpHH1qxUrlkppI85KVt3Si04e_dHwQAwhJ5M7IBQ/exec',
-  SHEET_READ_URL:'https://script.google.com/macros/s/AKfycbxYExzCmhkjgWIW3A_ccQmU0KMWYtZpHH1qxUrlkppI85KVt3Si04e_dHwQAwhJ5M7IBQ/exec?action=read',
-  USDT_CONTRACT:'0x55d398326f99059fF775485246999027B3197955',
-  RECEIVER_ADDRESS:'0x6aF7Fec81b5Fcd154e06504Ba53624e660025B67',
-  CHAIN_ID:56,
-  price:10,
-  TEST_MODE:true,
-  totalSlots:50
+  CHAIN_ID:56
 };
+let CONFIG_DYNAMIC = null; // viene de Sheets
+
+async function loadDynamicConfig(){
+  try{
+    const url = BASE_CONFIG.SHEET_WEBHOOK_URL + '?action=getConfig';
+    const res = await fetch(url);
+    const j = await res.json();
+    if(!j.ok) throw new Error('config no ok');
+    CONFIG_DYNAMIC = j;
+    
+    // Actualizar UI con datos reales de la hoja
+    document.getElementById('costoLabel').textContent = `0.5% = $${CONFIG_DYNAMIC.PRICE_PER_SLOT} USDT • Perpetuo`;
+    document.getElementById('contratoLabel').textContent = `Contrato USDT: ${CONFIG_DYNAMIC.USDT_CONTRACT.slice(0,6)}...${CONFIG_DYNAMIC.USDT_CONTRACT.slice(-4)} • Chain 56 • Destino: ${CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,6)}...${CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(-4)}`;
+    document.getElementById('sheetLive').textContent = `Config live: ${CONFIG_DYNAMIC.TOTAL_SLOTS} slots | $${CONFIG_DYNAMIC.PRICE_PER_SLOT}/slot | ${CONFIG_DYNAMIC.PERCENT_PER_SLOT}% c/u`;
+    
+    update(); // recalcular totales
+    return j;
+  }catch(e){
+    console.error('Error loadDynamicConfig', e);
+    document.getElementById('sheetLive').textContent = 'Error cargando config: '+e.message;
+  }
+}
+
 function bajarSeccion(){document.getElementById('progressFill').scrollIntoView({behavior:'smooth'});}
 let qty=1,connected=false,accountFull='',lang='es';
 const dict={
 es:{
 heroBadge:'● Ronda founders abierta • Perpetuo',heroTitle:'Compra SLOTS de futuras ganancias de WASA.CHAT',
 recEyebrow:'RECAUDADO • TIEMPO REAL',recTitle:'Recaudado desde 22/08/2026',recLive:'EN VIVO',recSub:'En vivo • La ronda founder avanza en tiempo real',soldLabel:'Slots vendidos',quedanLabel:'Quedan',slotsLabel:'slots',cadaSlot:'Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada slot = 0.5% perpetuo.',
-partEyebrow:'PARTICIPACIÓN FOUNDER PERPETUA',partTitle:'Compra WASA BLOCKS',costoLabel:'TEST: 0.5% = $0.01 USDT (modo prueba)',dispLabel:'Cantidad disponible',totalLabel:'Total a pagar:',metodosLabel:'MÉTODOS DE PAGO',tarjetaLabel:'1 tarjeta • 2 automáticos',
+partEyebrow:'PARTICIPACIÓN FOUNDER PERPETUA',partTitle:'Compra WASA BLOCKS',dispLabel:'Cantidad disponible',totalLabel:'Total a pagar:',metodosLabel:'MÉTODOS DE PAGO',tarjetaLabel:'1 tarjeta • 2 automáticos',
 metodo1Label:'Método 1 • Recomendado',onchainTag:'ON-CHAIN',usdtTitle:'USDT en BNB Chain',usdtSub:'BEP-20 • Confirmación automática',metodo2Label:'Método 2 • Tarjeta (Auto)',fiatTag:'FIAT → CRYPTO',fiatTitle:'Visa / Mastercard / Apple Pay',fiatSub:'NowPayments + Guardarian • Recibís USDT igual que Método 1',fiatPayLabel:'Pagás en USD (variable)',fiatImportant:'✅ 100% automático: No subís comprobante. El sistema detecta el pago via IPN y te manda el código de 8 dígitos por mail. Monto variable según slots.',
 buybackTitle:'🔄 Recompra 2x:',buybackText:'WASA puede recomprar tu slot a $500 (2x) después de 12 meses. Si no ejerce, seguís cobrando para siempre.',
-conectar:'🔌 Conectar Wallet (MetaMask / Rabby)',contratoLabel:'Contrato USDT: 0x55d3...7955 • Chain 56 • Call 2x desde mes 12',nombre:'Nombre completo',email:'Email',formError:'⚠ Completá nombre (mín 3 letras) y email válido para poder pagar con cripto',
+conectar:'🔌 Conectar Wallet (MetaMask / Rabby)',nombre:'Nombre completo',email:'Email',formError:'⚠ Completá nombre (mín 3 letras) y email válido para poder pagar con cripto',
 faqsTitle:'Preguntas frecuentes',faqsSub:'',faq1q:'¿Qué es wasa.chat?',faq1a:'Wasa.chat es una plataforma de generación automática de sitios web y múltiples servicios automatizados que se lanzará a fines de 2026.',faq2q:'¿Qué es un WASA BLOCK?',faq2a:'Un WASA BLOCK es un porcentaje de futuras ganancias totales mensuales de wasa.chat. Cada WASA BLOCK equivale a 0,5% de las ganancias totales de wasa.chat.',faq3q:'¿Cómo puedo comprar un WASA BLOCK?',faq3a:'Puedes comprar uno o más WASA BLOCK de acuerdo a la disponibilidad en este mismo sitio en la sección de comprar WASA BLOCK, a través de pago automático con USDT o con tarjeta via NowPayments que convierte fiat a USDT automático.',faq4q:'¿Cuándo empiezo a cobrar?',faq4a:'Los pagos de ganancias comienzan el 15 de abril de 2027 y se distribuyen de forma mensual. Cobrás en USDT a tu wallet o por transferencia bancaria, según elijas.',faq5q:'¿Puedo revender mi WASA BLOCK?',faq5a:'Sí. Tu WASA BLOCK es transferible. Solo tenés que notificarnos por email a founders@wasa.chat con los datos del nuevo titular. A partir de 2027 habrá un marketplace P2P interno.',faq6q:'¿Qué incluye wasa.chat como constructor web?',faq6a:'Hosting de alto rendimiento, dominio gratis el primer año, SSL, editor drag & drop sin código, plantillas, y botón de WhatsApp/chat integrado para convertir visitantes en clientes.',faq7q:'¿Qué pasa si no se venden los 50 slots?',faq7a:'La ronda cierra el 30/08/2026 o al agotar los 50 slots, lo que ocurra primero. Si quedan slots sin vender, se queman y el % total ofrecido se reduce proporcionalmente, beneficiando a los founders que entraron.',footer:'© 2026 wasa.chat • info@wasa.chat',soldoutBadge:'● PREVENTA TERMINADA',soldoutTitle:'¡50/50 slots vendidos!\nPreventa terminada',soldoutSub:'Gracias a todos los founders. Seguí en lista de espera para el marketplace P2P de 2027.'
 },
 en:{
 heroBadge:'● Founder round open • Perpetual',heroTitle:'Buy a share of Wasa.chat future profits.',
 recEyebrow:'RAISED • LIVE',recTitle:'Raised since 08/22/2026',recLive:'LIVE',recSub:'Live • Founder round moving in real time',soldLabel:'Slots sold',quedanLabel:'',slotsLabel:'slots left',cadaSlot:'Each slot = 0.5% perpetual future profits. 2x buyback ($500) from month 12.',
-partEyebrow:'PERPETUAL FOUNDER ALLOCATION',partTitle:'Buy your WASA BLOCKS',costoLabel:'Cost: 0.5% = $250 (USD) forever.',dispLabel:'Available',totalLabel:'Total to pay:',metodosLabel:'PAYMENT METHODS',tarjetaLabel:'1 card • 2 auto',
+partEyebrow:'PERPETUAL FOUNDER ALLOCATION',partTitle:'Buy your WASA BLOCKS',dispLabel:'Available',totalLabel:'Total to pay:',metodosLabel:'PAYMENT METHODS',tarjetaLabel:'1 card • 2 auto',
 metodo1Label:'Method 1 • Recommended',onchainTag:'ON-CHAIN',usdtTitle:'USDT on BNB Chain',usdtSub:'BEP-20 • Auto confirmation',metodo2Label:'Method 2 • Card (Auto)',fiatTag:'FIAT → CRYPTO',fiatTitle:'Visa / Mastercard / Apple Pay',fiatSub:'NowPayments + Guardarian • You receive USDT same as Method 1',fiatPayLabel:'You pay in USD (variable)',fiatImportant:'✅ 100% auto: No receipt upload. System detects payment via NowPayments IPN and sends 8-digit code by mail. Variable amount.',
 buybackText:'WASA can buy back your slot at $500 (2x) after 12 months. If not exercised, you keep earning forever.',
-conectar:'🔌 Connect Wallet (MetaMask / Rabby)',contratoLabel:'USDT Contract: 0x55d3...7955 • Chain 56 • 2x Call from month 12',nombre:'Full name',email:'Email',formError:'⚠ Fill name (min 3 chars) and valid email to pay with crypto',
+conectar:'🔌 Connect Wallet (MetaMask / Rabby)',nombre:'Full name',email:'Email',formError:'⚠ Fill name (min 3 chars) and valid email to pay with crypto',
 faqsTitle:'FAQs',faqsSub:'',faq1q:'What is wasa.chat?',faq1a:'Wasa.chat is a platform for automatic generation of websites and multiple automated services launching late 2026.',faq2q:'What is a WASA BLOCK?',faq2a:'A WASA BLOCK is a percentage of future total monthly profits of wasa.chat. Each WASA BLOCK equals 0.5% of total profits.',faq3q:'How can I buy a WASA BLOCK?',faq3a:'You can buy one or more WASA BLOCKS in this site, via USDT with crypto wallet or via card via NowPayments that converts fiat to USDT automatically',faq4q:'When do I start earning?',faq4a:'Profit distributions start April 15, 2027, monthly. You receive USDT to your wallet or bank transfer.',faq5q:'Can I resell my WASA BLOCK?',faq5a:'Yes, transferable by notifying founders@wasa.chat. A P2P marketplace will launch in 2027.',faq6q:'What does wasa.chat include as website builder?',faq6a:'High-performance hosting, free domain first year, SSL, drag & drop editor, templates, WhatsApp/chat button.',faq7q:'What if not all 50 slots sell?',faq7a:'Round closes 08/30/2026 or when 50 slots sold. Unsold slots are burned, reducing total % offered, benefiting early founders.',footer:'© 2026 wasa.chat • info@wasa.chat',soldoutBadge:'● PRESALE ENDED',soldoutTitle:'50/50 slots sold!\nPresale ended',soldoutSub:'Thanks to all founders. Join waitlist for 2027 P2P marketplace.'
 }
 };
@@ -146,7 +161,6 @@ safeSet('slotsLabel',d.slotsLabel);
 safeSet('cadaSlot',d.cadaSlot);
 safeSet('partEyebrow',d.partEyebrow);
 safeSet('partTitle',d.partTitle);
-safeSet('costoLabel',d.costoLabel);
 safeSet('dispLabel',d.dispLabel);
 safeSet('totalLabel',d.totalLabel);
 safeSet('metodosLabel',d.metodosLabel);
@@ -162,18 +176,22 @@ safeSet('fiatSub',d.fiatSub);
 safeSet('fiatPayLabel',d.fiatPayLabel);
 safeSet('fiatImportant',d.fiatImportant);
 safeSet('buybackText',d.buybackText);
-safeSet('contratoLabel',d.contratoLabel);
 safeSet('faqsTitle',d.faqsTitle);
 let st=document.getElementById('soldoutTitle'); if(st) st.innerText=d.soldoutTitle;
 }
 let qtyVal=document.getElementById('qtyVal'),range=document.getElementById('range'),totalEl=document.getElementById('total');
 function update(){
-qtyVal.textContent=qty; range.value=qty; let t=(qty*CONFIG.price).toFixed(2); totalEl.textContent=t;
-document.getElementById('fiatTotal').textContent=t;
-document.getElementById('fiatReceive').textContent=t;
-let pct=(qty*0.5).toFixed(1);
-document.getElementById('qtyPercent').textContent=pct+'%';
-document.getElementById('qtySlots').textContent=qty===1?'1 slot':qty+' slots';
+  if(!CONFIG_DYNAMIC){ return; }
+  qtyVal.textContent=qty; range.value=qty; 
+  let price = Number(CONFIG_DYNAMIC.PRICE_PER_SLOT);
+  let t=(qty*price).toFixed(2); 
+  totalEl.textContent=t;
+  document.getElementById('fiatTotal').textContent=t;
+  document.getElementById('fiatReceive').textContent=t;
+  document.getElementById('btnUSDT').textContent = `Pagar ${t} USDT`;
+  let pct=(qty*Number(CONFIG_DYNAMIC.PERCENT_PER_SLOT)).toFixed(1);
+  document.getElementById('qtyPercent').textContent=pct+'%';
+  document.getElementById('qtySlots').textContent=qty===1?'1 slot':qty+' slots';
 }
 document.getElementById('btnMinus').onclick=()=>{if(qty>1){qty--;update();}};
 document.getElementById('btnPlus').onclick=()=>{let max=parseInt(range.max); if(qty<max){qty++;update();}};
@@ -189,37 +207,74 @@ try{
 let accs=await window.ethereum.request({method:'eth_requestAccounts'});
 accountFull=accs[0]; connected=true;
 document.getElementById('walletStatus').style.display='block';
-document.getElementById('walletStatus').textContent='✅ '+accountFull.slice(0,6)+'...'+accountFull.slice(-4);
+document.getElementById('walletStatus').textContent='✅ '+accountFull.slice(0,6)+'...'+accountFull.slice(-4)+' | Pagando a: '+CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,6)+'...';
 btn.style.display='none'; document.getElementById('btnUSDT').style.display='flex';
 }catch(e){alert(e.message);}finally{btn.disabled=false;}
 };
 function parseUSDTtoWei(str){ let parts=String(str).split('.'); let whole=parts[0]||'0'; let frac=(parts[1]||'').padEnd(18,'0').slice(0,18); return BigInt(whole+frac); }
 function showPopup(msg){ let id='wasaPopup'; let el=document.getElementById(id); if(!el){ el=document.createElement('div'); el.id=id; el.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px'; el.innerHTML='<div style="background:#C2D9FF;border:2px solid #93B4FF;border-radius:20px;padding:24px;max-width:380px;width:100%;text-align:center"><div id="wasaPopupMsg"></div><button onclick="document.getElementById(\'wasaPopup\').style.display=\'none\'" style="margin-top:16px;height:40px;padding:0 20px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer">Cerrar</button></div>'; document.body.appendChild(el); } document.getElementById('wasaPopupMsg').innerHTML=msg; el.style.display='flex'; }
+
 document.getElementById('btnUSDT').onclick=async()=>{
+  if(!CONFIG_DYNAMIC){ return showPopup('Config aún cargando...'); }
   if(!validate()){showPopup(dict[lang].formError);return;}
   let btn=document.getElementById('btnUSDT'); btn.disabled=true; btn.textContent='Confirmando...';
   try{
     let name=document.getElementById('nameUSDT').value.trim(); let email=document.getElementById('emailUSDT').value.trim();
-    let to=CONFIG.RECEIVER_ADDRESS.toLowerCase().replace('0x','').padStart(64,'0');
-    let amount=BigInt(qty)*parseUSDTtoWei(CONFIG.price); let hex=amount.toString(16).padStart(64,'0'); let data='0xa9059cbb'+to+hex;
-    let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:CONFIG.USDT_CONTRACT,data}]});
+    // AHORA TOMA TODO DEL SHEET - NO EDITABLE EN FRONT
+    let receiver = CONFIG_DYNAMIC.RECEIVER_ADDRESS;
+    let contract = CONFIG_DYNAMIC.USDT_CONTRACT;
+    let price = CONFIG_DYNAMIC.PRICE_PER_SLOT;
+    
+    let to=receiver.toLowerCase().replace('0x','').padStart(64,'0');
+    let amount=BigInt(qty)*parseUSDTtoWei(String(price)); 
+    let hex=amount.toString(16).padStart(64,'0'); 
+    let data='0xa9059cbb'+to+hex;
+    let hash=await window.ethereum.request({method:'eth_sendTransaction',params:[{from:accountFull,to:contract,data}]});
     document.getElementById('txHash').style.display='block'; document.getElementById('txHash').textContent='Tx: '+hash;
-    await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*0.5,total_usdt:qty*CONFIG.price,tx_hash:hash,method:'crypto'})});
+    await fetch(BASE_CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({nombre:name,email,wallet:accountFull,slots:qty,percent:qty*Number(CONFIG_DYNAMIC.PERCENT_PER_SLOT),total_usdt:qty*price,tx_hash:hash,method:'crypto'})});
     showPopup('<b>Compra exitosa!</b><br>Revisa tu email: '+email); setTimeout(()=>{window.location.href='https://founders.wasa.chat/?email='+encodeURIComponent(email)+'&tab=new';},3000);
   }catch(e){showPopup(e.message);} finally{btn.disabled=false;}
 };
+
 async function payWithCardFiat(){
+ if(!CONFIG_DYNAMIC){ return alert('Config cargando...'); }
  let name=document.getElementById('nameFIAT').value.trim(); let email=document.getElementById('emailFIAT').value.trim();
  if(name.length<3||!email.includes('@')) return alert('Completá nombre y email');
  let btn=document.getElementById('btnFIAT'); btn.textContent='Creando link seguro...'; btn.disabled=true;
  try{
-  let res=await fetch(CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'createFiatInvoice', email:email, nombre:name, slots:qty, percent:qty*0.5, usdt:qty*CONFIG.price})});
+  let price = CONFIG_DYNAMIC.PRICE_PER_SLOT;
+  let res=await fetch(BASE_CONFIG.SHEET_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'createFiatInvoice', email:email, nombre:name, slots:qty, percent:qty*Number(CONFIG_DYNAMIC.PERCENT_PER_SLOT), usdt:qty*price})});
   let data=await res.json(); if(data.ok && data.invoice_url){ window.location.href=data.invoice_url; } else throw new Error(data.error||'No invoice');
  }catch(e){ alert('Error fiat: '+e.message); btn.textContent='Pagar con tarjeta → USDT automático ↗'; btn.disabled=false; }
 }
 document.getElementById('btnFIAT').onclick=payWithCardFiat;
-async function fetchLive(){ try{ let r=await fetch(CONFIG.SHEET_READ_URL); let j=await r.json(); if(j.ok){ document.getElementById('recaudado').textContent=j.sold; document.getElementById('sold').textContent=j.sold; document.getElementById('left').textContent=j.available; document.getElementById('progressPct').textContent=Math.round(j.sold/j.total*100)+'%'; document.getElementById('progressFill').style.width=Math.round(j.sold/j.total*100)+'%'; document.getElementById('range').max=j.available; document.getElementById('dispVal').textContent=j.available; if(qty>j.available) qty=j.available; update(); } }catch(e){} }
-let initialLang=detectLang(); applyLang(initialLang); update(); fetchLive(); setInterval(fetchLive,10000);
+
+async function fetchLive(){ 
+  try{ 
+    let r=await fetch(BASE_CONFIG.SHEET_WEBHOOK_URL+'?action=read'); 
+    let j=await r.json(); 
+    if(j.ok){ 
+      document.getElementById('recaudado').textContent=j.sold; 
+      document.getElementById('sold').textContent=j.sold; 
+      document.getElementById('left').textContent=j.available; 
+      document.getElementById('progressPct').textContent=Math.round(j.sold/j.total*100)+'%'; 
+      document.getElementById('progressFill').style.width=Math.round(j.sold/j.total*100)+'%'; 
+      document.getElementById('range').max=j.available; 
+      document.getElementById('dispVal').textContent=j.available; 
+      if(qty>j.available) qty=j.available; 
+      if(CONFIG_DYNAMIC) update(); 
+    } 
+  }catch(e){} 
+}
+
+(async()=>{
+  let initialLang=detectLang(); applyLang(initialLang); 
+  await loadDynamicConfig(); // PRIMERO carga precio y address del Sheet
+  update(); 
+  fetchLive(); 
+  setInterval(fetchLive,10000);
+})();
+
 function checkDeadline(){ const now=new Date(); const diff=DEADLINE-now; if(diff<=0){ document.getElementById('cdD').textContent='00'; document.getElementById('cdH').textContent='00'; document.getElementById('cdM').textContent='00'; document.getElementById('cdS').textContent='00'; return; } const d=Math.floor(diff/86400000); const h=Math.floor((diff%86400000)/3600000); const m=Math.floor((diff%3600000)/60000); const s=Math.floor((diff%60000)/1000); document.getElementById('cdD').textContent=String(d).padStart(2,'0'); document.getElementById('cdH').textContent=String(h).padStart(2,'0'); document.getElementById('cdM').textContent=String(m).padStart(2,'0'); document.getElementById('cdS').textContent=String(s).padStart(2,'0'); }
 setInterval(checkDeadline,1000); checkDeadline();
 document.getElementById('langBtn').onclick=()=>applyLang(lang==='es'?'en':'es');
