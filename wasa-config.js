@@ -1,6 +1,6 @@
 // wasa.chat - Config centralizada
 // Cambiá SOLO esta URL cada vez que deployás nuevo Apps Script y se actualiza todo el sitio
-const WASA_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxbM2dDltCw5igfyDmIOsau7ljHzTckTBdiD2qGJ41zkG8-b8XrJK8SlaVsOorfLBZoOA/exec';
+const WASA_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyKD1QaDhPavcArEb98UeYRk_H-Xlbh426Kgyl-zz96D2r-RlwWyW5nrVjywkXB0OEYKA/exec';
 
 // Compatibilidad con código viejo que usa WEBHOOK_URL o SHEET_WEBHOOK_URL
 const WEBHOOK_URL = WASA_WEBHOOK_URL;
