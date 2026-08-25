@@ -68,8 +68,8 @@
 </div>
 </div>
 
+<script src="/wasa-config.js"></script>
 <script>
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyi8njSlvRNdDxUdr8lzdwDo6nmLJ4Tjuykwd9TMFN2kBipdebJtEm0m5NHz2LS_PMVBA/exec';
 function copyLink(){ let v=document.getElementById('refLink').value; navigator.clipboard.writeText(v); let m=document.getElementById('msg'); m.style.display='block'; m.style.background='#F0FDF4'; m.textContent='Copiado: '+v; setTimeout(()=>m.style.display='none',3000); }
 function shareWpp(){ let v=document.getElementById('refLink').value; let txt=encodeURIComponent('Comprá WASABLOCKS con mi link founder: '+v); window.open('https://wa.me/?text='+txt,'_blank'); }
 
@@ -78,7 +78,7 @@ async function load(){
   if(!token){ location.href='/'; return; }
   document.getElementById('navEmail').textContent = localStorage.getItem('wasa_email')||'';
   try{
-    let r=await fetch(WEBHOOK_URL+'?action=referralStats&token='+encodeURIComponent(token));
+    let r=await fetch(WASA_WEBHOOK_URL+'?action=referralStats&token='+encodeURIComponent(token));
     let j=await r.json();
     if(!j.ok){ document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">${j.error}</td></tr>`; return; }
     let d=j.data;
