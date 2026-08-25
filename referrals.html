@@ -30,11 +30,11 @@
 <nav class="nav"><div class="logo">wasa.chat/founders / referidos</div><div class="links"><span id="navEmail"></span> <a href="/dashboard.html">PANEL</a> <a href="/marketplace.html">MARKETPLACE</a> <a href="#" onclick="localStorage.clear();location.href='/'">SALIR</a></div></nav>
 <div class="wrap">
 <div class="card">
-<div class="eyebrow">PROGRAMA DE REFERIDOS - SOLO CON VENTA CONCRETADA</div>
+<div class="eyebrow">PROGRAMA DE REFERIDOS - SOLO CON VENTA CONCRETADA - 10%</div>
 <div class="title" id="title">Tu link de referido</div>
-<div class="sub" id="sub">Solo cobrás si tu referido CONCRETA compra validada on-chain. Nada de clicks. Comisión automática 5% del total en USDT. Mínimo para cobrar: $10 USDT. Se paga el 15 de cada mes junto con tus ganancias.</div>
+<div class="sub" id="sub">Solo cobrás si tu referido CONCRETA compra validada on-chain. Comisión 10% automática. Pago manual tuyo. Config desde wasa-config.js</div>
 <div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:12px">
-<div style="font-size:11px;font-weight:800">TU ENLACE ÚNICO (tu codeId genesis)</div>
+<div style="font-size:11px;font-weight:800">TU ENLACE ÚNICO (tu codeId genesis) - https://wasa.chat/founders.html?ref=</div>
 <input class="input" id="refLink" readonly value="Cargando...">
 <div style="display:flex;gap:8px;margin-top:10px">
 <button class="btn" style="flex:1" onclick="copyLink()">COPIAR ENLACE</button>
@@ -45,25 +45,25 @@
 <div class="stat-grid">
 <div class="stat"><div class="num" id="statClicks">0</div><div class="lbl">CLICKS EN TU LINK</div></div>
 <div class="stat"><div class="num" id="statSales">0</div><div class="lbl">VENTAS CONCRETADAS</div></div>
-<div class="stat"><div class="num" id="statComm">$0</div><div class="lbl">COMISIÓN TOTAL (5%)</div></div>
+<div class="stat"><div class="num" id="statComm">$0</div><div class="lbl">COMISIÓN TOTAL (10%)</div></div>
 </div>
 </div>
 
 <div class="card">
 <div class="eyebrow">HISTORIAL DE REFERIDOS - SOLO VENTAS VALIDADAS</div>
-<div class="sub">Solo aparecen acá los que compraron y la TX fue validada en BSC. Comisión automática.</div>
-<table class="table" id="refTable"><thead><tr><th>Fecha</th><th>Referido</th><th>Slots</th><th>Total venta</th><th>Tu comisión 5%</th><th>Estado</th></tr></thead><tbody><tr><td colspan="6" class="empty">Cargando referidos...</td></tr></tbody></table>
+<div class="sub">Solo aparecen acá los que compraron y la TX fue validada en BSC. Comisión 10% - pago manual.</div>
+<table class="table" id="refTable"><thead><tr><th>Fecha</th><th>Referido</th><th>Slots</th><th>Total venta</th><th>Tu comisión 10%</th><th>Estado</th></tr></thead><tbody><tr><td colspan="6" class="empty">Cargando referidos...</td></tr></tbody></table>
 </div>
 
 <div class="card" style="background:#FEF9C3;border:1px dashed #EAB308">
-<div style="font-size:11px;font-weight:800">¿Cómo funciona?</div>
+<div style="font-size:11px;font-weight:800">¿Cómo funciona? - URL desde wasa-config.js</div>
 <div style="font-size:11px;margin-top:6px;line-height:1.5">
-1. Solo founders con al menos 0.01 WASABLOCK pueden referir (evita spam).<br>
-2. Tu link es con tu WASA-CODE genesis, no podés generar infinitos.<br>
-3. Si alguien entra con tu link y compra en founders.html, queda guardado en localStorage.<br>
-4. Solo cuando paga USDT y la TX es validada on-chain, se genera comisión 5% automática en la hoja <b>referrals</b>.<br>
+1. Cualquiera puede registrarse en /refer-register.html.<br>
+2. Tu link es https://wasa.chat/founders.html?ref=TU_CODIGO genesis.<br>
+3. Si alguien entra con tu link y compra en founders.html, queda guardado en localStorage wasa_ref.<br>
+4. Solo cuando paga USDT y la TX es validada on-chain, se genera comisión 10% automática en la hoja <b>referrals</b>.<br>
 5. Si cancela o la TX falla, no hay comisión.<br>
-6. Cobrás junto con tus ganancias mensuales el 15, en tu wallet registrada.
+6. Vos pagás manual cuando querés.
 </div>
 </div>
 </div>
@@ -82,16 +82,16 @@ async function load(){
     let j=await r.json();
     if(!j.ok){ document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">${j.error}</td></tr>`; return; }
     let d=j.data;
-    document.getElementById('refLink').value = d.refLink || 'Necesitás al menos 0.01 WASABLOCK para generar link';
-    document.getElementById('title').textContent = d.hasMin ? 'Tu link activo' : 'Necesitás ser founder';
-    document.getElementById('sub').textContent = d.hasMin ? `Link con tu código ${d.codeId} - Comisión 5% automática solo si vende` : 'Comprá mínimo 0.01 en founders.html para activar referidos y evitar spam.';
+    document.getElementById('refLink').value = d.refLink || 'Necesitás al menos 0.01 WASABLOCK para generar link - tu código: '+ (d.codeId||'sin código aún');
+    document.getElementById('title').textContent = d.hasMin ? 'Tu link activo (10%)' : 'Registrado como referidor';
+    document.getElementById('sub').textContent = `Link con tu código ${d.codeId||''} - Comisión 10% - Clicks: ${d.clicks||0} - Total: $${(d.totalCommission||0).toFixed(2)}`;
     document.getElementById('statClicks').textContent = d.clicks||0;
     document.getElementById('statSales').textContent = d.sales||0;
     document.getElementById('statComm').textContent = '$'+(d.totalCommission||0).toFixed(2);
     
     let rows = d.referrals||[];
     if(rows.length===0){
-      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aún no hay ventas con tu link. Compartí tu enlace.</td></tr>';
+      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aún no hay ventas con tu link. Compartí tu enlace https://wasa.chat/founders.html?ref='+ (d.codeId||'') +'</td></tr>';
     } else {
       document.querySelector('#refTable tbody').innerHTML = rows.map(r=>`
         <tr>
@@ -105,7 +105,7 @@ async function load(){
       `).join('');
     }
   }catch(e){
-    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">Error: ${e.message}</td></tr>`;
+    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">Error: ${e.message} - URL: ${WASA_WEBHOOK_URL}</td></tr>`;
   }
 }
 load();
