@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Referidos - wasa.chat/founders</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B}
+.nav{height:64px;background:#1D4ED8;display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:fixed;top:0;left:0;right:0;z-index:20}
+.nav .logo{color:white;font-weight:800}.nav .links a{color:white;text-decoration:none;margin-left:12px;font-size:11px;font-weight:700}
+.wrap{max-width:900px;margin:0 auto;padding:84px 18px 40px}
+.card{background:white;border:2px solid #93B4FF;border-radius:20px;padding:20px;margin-bottom:14px}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.6;color:#1E3A8A;text-transform:uppercase}
+.title{font-size:20px;font-weight:800;margin-top:4px}
+.sub{font-size:11px;opacity:.6;margin-top:6px;line-height:1.5}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
+.stat{background:#E6F0FF;border:1px solid #93B4FF;border-radius:14px;padding:14px}
+.stat .num{font-size:22px;font-weight:800}.stat .lbl{font-size:10px;opacity:.6;margin-top:4px;text-transform:uppercase}
+.input{height:46px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:10px;font-family:monospace;font-size:12px;background:#E6F0FF}
+.btn{height:44px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;width:100%}
+.table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
+.table th{font-size:10px;text-align:left;opacity:.6;padding:8px;border-bottom:1px solid #93B4FF;text-transform:uppercase}
+.table td{padding:10px 8px;border-bottom:1px solid #E6F0FF}
+.badge{font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px}
+.badge-ok{background:#BBF7D0;color:#166534}.badge-pend{background:#FEF08A;color:#854D0E}
+.empty{padding:24px;text-align:center;opacity:.6;font-size:12px}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="logo">wasa.chat/founders / referidos</div><div class="links"><span id="navEmail"></span> <a href="/dashboard.html">PANEL</a> <a href="/marketplace.html">MARKETPLACE</a> <a href="#" onclick="localStorage.clear();location.href='/'">SALIR</a></div></nav>
+<div class="wrap">
+<div class="card">
+<div class="eyebrow">PROGRAMA DE REFERIDOS - SOLO CON VENTA CONCRETADA</div>
+<div class="title" id="title">Tu link de referido</div>
+<div class="sub" id="sub">Solo cobrás si tu referido CONCRETA compra validada on-chain. Nada de clicks. Comisión automática 5% del total en USDT. Mínimo para cobrar: $10 USDT. Se paga el 15 de cada mes junto con tus ganancias.</div>
+<div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:12px">
+<div style="font-size:11px;font-weight:800">TU ENLACE ÚNICO (tu codeId genesis)</div>
+<input class="input" id="refLink" readonly value="Cargando...">
+<div style="display:flex;gap:8px;margin-top:10px">
+<button class="btn" style="flex:1" onclick="copyLink()">COPIAR ENLACE</button>
+<button class="btn" style="flex:1;background:white;color:#1E293B;border:1px solid #93B4FF" onclick="shareWpp()">COMPARTIR WHATSAPP</button>
+</div>
+<div id="msg" style="font-size:11px;margin-top:8px;display:none;padding:8px;border-radius:8px"></div>
+</div>
+<div class="stat-grid">
+<div class="stat"><div class="num" id="statClicks">0</div><div class="lbl">CLICKS EN TU LINK</div></div>
+<div class="stat"><div class="num" id="statSales">0</div><div class="lbl">VENTAS CONCRETADAS</div></div>
+<div class="stat"><div class="num" id="statComm">$0</div><div class="lbl">COMISIÓN TOTAL (5%)</div></div>
+</div>
+</div>
+
+<div class="card">
+<div class="eyebrow">HISTORIAL DE REFERIDOS - SOLO VENTAS VALIDADAS</div>
+<div class="sub">Solo aparecen acá los que compraron y la TX fue validada en BSC. Comisión automática.</div>
+<table class="table" id="refTable"><thead><tr><th>Fecha</th><th>Referido</th><th>Slots</th><th>Total venta</th><th>Tu comisión 5%</th><th>Estado</th></tr></thead><tbody><tr><td colspan="6" class="empty">Cargando referidos...</td></tr></tbody></table>
+</div>
+
+<div class="card" style="background:#FEF9C3;border:1px dashed #EAB308">
+<div style="font-size:11px;font-weight:800">¿Cómo funciona?</div>
+<div style="font-size:11px;margin-top:6px;line-height:1.5">
+1. Solo founders con al menos 0.01 WASABLOCK pueden referir (evita spam).<br>
+2. Tu link es con tu WASA-CODE genesis, no podés generar infinitos.<br>
+3. Si alguien entra con tu link y compra en founders.html, queda guardado en localStorage.<br>
+4. Solo cuando paga USDT y la TX es validada on-chain, se genera comisión 5% automática en la hoja <b>referrals</b>.<br>
+5. Si cancela o la TX falla, no hay comisión.<br>
+6. Cobrás junto con tus ganancias mensuales el 15, en tu wallet registrada.
+</div>
+</div>
+</div>
+
+<script>
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxYExzCmhkjgWIW3A_ccQmU0KMWYtZpHH1qxUrlkppI85KVt3Si04e_dHwQAwhJ5M7IBQ/exec';
+function copyLink(){ let v=document.getElementById('refLink').value; navigator.clipboard.writeText(v); let m=document.getElementById('msg'); m.style.display='block'; m.style.background='#F0FDF4'; m.textContent='Copiado: '+v; setTimeout(()=>m.style.display='none',3000); }
+function shareWpp(){ let v=document.getElementById('refLink').value; let txt=encodeURIComponent('Comprá WASABLOCKS con mi link founder: '+v); window.open('https://wa.me/?text='+txt,'_blank'); }
+
+async function load(){
+  let token=localStorage.getItem('wasa_token');
+  if(!token){ location.href='/'; return; }
+  document.getElementById('navEmail').textContent = localStorage.getItem('wasa_email')||'';
+  try{
+    let r=await fetch(WEBHOOK_URL+'?action=referralStats&token='+encodeURIComponent(token));
+    let j=await r.json();
+    if(!j.ok){ document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">${j.error}</td></tr>`; return; }
+    let d=j.data;
+    document.getElementById('refLink').value = d.refLink || 'Necesitás al menos 0.01 WASABLOCK para generar link';
+    document.getElementById('title').textContent = d.hasMin ? 'Tu link activo' : 'Necesitás ser founder';
+    document.getElementById('sub').textContent = d.hasMin ? `Link con tu código ${d.codeId} - Comisión 5% automática solo si vende` : 'Comprá mínimo 0.01 en founders.html para activar referidos y evitar spam.';
+    document.getElementById('statClicks').textContent = d.clicks||0;
+    document.getElementById('statSales').textContent = d.sales||0;
+    document.getElementById('statComm').textContent = '$'+(d.totalCommission||0).toFixed(2);
+    
+    let rows = d.referrals||[];
+    if(rows.length===0){
+      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aún no hay ventas con tu link. Compartí tu enlace.</td></tr>';
+    } else {
+      document.querySelector('#refTable tbody').innerHTML = rows.map(r=>`
+        <tr>
+          <td>${(r.date||'').slice(0,10)}</td>
+          <td>${(r.referredEmail||'').slice(0,3)}***</td>
+          <td>${(r.slots||0).toFixed(2)}</td>
+          <td>$${(r.totalUsdt||0).toFixed(2)}</td>
+          <td><b>$${(r.commission||0).toFixed(2)}</b></td>
+          <td><span class="badge ${r.status==='pagado'?'badge-ok':'badge-pend'}">${r.status||'pendiente'}</span></td>
+        </tr>
+      `).join('');
+    }
+  }catch(e){
+    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">Error: ${e.message}</td></tr>`;
+  }
+}
+load();
+</script>
+</body>
+</html>
