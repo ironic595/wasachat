@@ -69,7 +69,7 @@
 </div>
 
 <script>
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxYExzCmhkjgWIW3A_ccQmU0KMWYtZpHH1qxUrlkppI85KVt3Si04e_dHwQAwhJ5M7IBQ/exec';
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyi8njSlvRNdDxUdr8lzdwDo6nmLJ4Tjuykwd9TMFN2kBipdebJtEm0m5NHz2LS_PMVBA/exec';
 function copyLink(){ let v=document.getElementById('refLink').value; navigator.clipboard.writeText(v); let m=document.getElementById('msg'); m.style.display='block'; m.style.background='#F0FDF4'; m.textContent='Copiado: '+v; setTimeout(()=>m.style.display='none',3000); }
 function shareWpp(){ let v=document.getElementById('refLink').value; let txt=encodeURIComponent('Comprá WASABLOCKS con mi link founder: '+v); window.open('https://wa.me/?text='+txt,'_blank'); }
 
