@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ser Referidor - wasa.chat</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:18px}
+.card{background:white;border:2px solid #93B4FF;border-radius:20px;padding:24px;max-width:420px;width:100%}
+.eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.6;color:#1E3A8A;text-transform:uppercase;text-align:center}
+.title{font-size:20px;font-weight:800;text-align:center;margin-top:6px}
+.sub{font-size:11px;opacity:.6;text-align:center;margin-top:8px;line-height:1.5}
+.input{height:46px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:12px}
+.btn{height:48px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:12px}
+.msg{margin-top:12px;padding:10px;border-radius:10px;font-size:12px;display:none}
+</style>
+</head>
+<body>
+<div class="card">
+<div class="eyebrow">WASA.CHAT - PROGRAMA DE REFERIDOS 10%</div>
+<div class="title">Registrate como referidor</div>
+<div class="sub">Cualquiera puede registrarse. No necesitás comprar WASABLOCKS. Compartís tu link <b>wasa.chat/founders.html?ref=TU_CODIGO</b> y cobrás 10% automático solo cuando tu referido CONCRETA compra validada on-chain. Pago manual por vos el 15 de cada mes.</div>
+<input class="input" id="email" type="email" placeholder="tu@email.com">
+<input class="input" id="pass" type="password" placeholder="Contraseña (para tu panel de referidos)">
+<input class="input" id="wallet" type="text" placeholder="Wallet BSC para cobrar comisiones 0x...">
+<button class="btn" id="btnReg" onclick="register()">CREAR CUENTA REFERIDOR</button>
+<div style="text-align:center;margin-top:10px;font-size:11px"><a href="/referrals.html" style="color:#1D4ED8;text-decoration:none;font-weight:700">Ya tengo cuenta -> Ir a mi panel</a></div>
+<div id="msg" class="msg"></div>
+<div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:10px;font-size:11px;line-height:1.4">
+<b>Importante:</b> Tu código de referido se genera DESPUÉS de tu primera compra, pero podés registrarte ya. Si no tenés WASABLOCKS aún, tu link se activará cuando compres 0.01 mínimo (para evitar spam). Si ya sos founder, tu link es tu WASA-CODE genesis.
+</div>
+</div>
+<script>
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxYExzCmhkjgWIW3A_ccQmU0KMWYtZpHH1qxUrlkppI85KVt3Si04e_dHwQAwhJ5M7IBQ/exec';
+async function register(){
+  let email=document.getElementById('email').value.trim().toLowerCase();
+  let pass=document.getElementById('pass').value.trim();
+  let wallet=document.getElementById('wallet').value.trim();
+  let msg=document.getElementById('msg');
+  if(!email||!pass){ msg.style.display='block'; msg.style.background='#FEF2F2'; msg.textContent='Falta email y contraseña'; return; }
+  if(!wallet.startsWith('0x')||wallet.length<20){ msg.style.display='block'; msg.style.background='#FEF2F2'; msg.textContent='Wallet BSC inválida 0x...'; return; }
+  let btn=document.getElementById('btnReg'); btn.disabled=true; btn.textContent='Creando...';
+  try{
+    // Usamos el mismo registro que panel pero con wallet
+    let r=await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'registerReferrer', email:email, password:pass, wallet:wallet})});
+    let j=await r.json();
+    if(j.ok){
+      msg.style.display='block'; msg.style.background='#F0FDF4'; msg.style.color='#166534';
+      msg.textContent='Cuenta creada. Token: '+j.token.slice(0,10)+'... Redirigiendo a tu panel...';
+      localStorage.setItem('wasa_token', j.token);
+      localStorage.setItem('wasa_email', email);
+      setTimeout(()=>location.href='/referrals.html',1200);
+    } else {
+      msg.style.display='block'; msg.style.background='#FEF2F2'; msg.textContent='Error: '+j.error;
+      btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR';
+    }
+  }catch(e){ msg.style.display='block'; msg.textContent='Error: '+e.message; btn.disabled=false; }
+}
+</script>
+</body>
+</html>
