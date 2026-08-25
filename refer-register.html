@@ -10,52 +10,120 @@
 .eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.6;color:#1E3A8A;text-transform:uppercase;text-align:center}
 .title{font-size:20px;font-weight:800;text-align:center;margin-top:6px}
 .sub{font-size:11px;opacity:.6;text-align:center;margin-top:8px;line-height:1.5}
+.tabs{display:flex;gap:8px;margin-top:14px}
+.tab{flex:1;height:40px;border-radius:12px;border:1px solid #93B4FF;background:#E6F0FF;font-weight:700;cursor:pointer;font-size:12px}
+.tab.active{background:#1D4ED8;color:white}
 .input{height:46px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:12px}
 .btn{height:48px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:12px}
 .msg{margin-top:12px;padding:10px;border-radius:10px;font-size:12px;display:none}
+.hidden{display:none!important}
+.link{color:#1D4ED8;text-decoration:none;font-weight:700;font-size:11px}
 </style>
 </head>
 <body>
 <div class="card">
 <div class="eyebrow">WASA.CHAT - PROGRAMA DE REFERIDOS 10%</div>
-<div class="title">Registrate como referidor</div>
-<div class="sub">Cualquiera puede registrarse. No necesitás comprar WASABLOCKS. Compartís tu link <b>wasa.chat/founders.html?ref=TU_CODIGO</b> y cobrás 10% automático solo cuando tu referido CONCRETA compra validada on-chain. Pago manual por vos el 15 de cada mes.</div>
-<input class="input" id="email" type="email" placeholder="tu@email.com">
-<input class="input" id="pass" type="password" placeholder="Contraseña (para tu panel de referidos)">
-<input class="input" id="wallet" type="text" placeholder="Wallet BSC para cobrar comisiones 0x...">
+<div class="title">Gana dinero refiriendo</div>
+<div class="sub">Cualquiera puede registrarse. <b>NO necesitás comprar WASABLOCKS</b>. Compartís tu link <b>wasa.chat/founders.html?ref=TU_CODIGO</b> y cobrás 10% automático solo cuando tu referido CONCRETA compra validada on-chain. La wallet para cobrar la configurás adentro de tu panel.</div>
+
+<div class="tabs">
+<button class="tab active" id="tabReg" onclick="switchTab('reg')">REGISTRARME</button>
+<button class="tab" id="tabLogin" onclick="switchTab('login')">YA TENGO CUENTA</button>
+</div>
+
+<div id="viewReg">
+<input class="input" id="regEmail" type="email" placeholder="tu@email.com">
+<input class="input" id="regPass" type="password" placeholder="Contraseña (para tu panel de referidos)">
+<input class="input" id="regPass2" type="password" placeholder="Repetir contraseña">
 <button class="btn" id="btnReg" onclick="register()">CREAR CUENTA REFERIDOR</button>
-<div style="text-align:center;margin-top:10px;font-size:11px"><a href="/referrals.html" style="color:#1D4ED8;text-decoration:none;font-weight:700">Ya tengo cuenta -> Ir a mi panel</a></div>
+</div>
+
+<div id="viewLogin" class="hidden">
+<input class="input" id="loginEmail" type="email" placeholder="tu@email.com">
+<input class="input" id="loginPass" type="password" placeholder="Contraseña">
+<button class="btn" id="btnLogin" onclick="login()">ENTRAR A MI PANEL</button>
+<div style="text-align:center;margin-top:12px"><a href="/founders.html" class="link">← Volver a founders</a></div>
+</div>
+
 <div id="msg" class="msg"></div>
+
 <div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:10px;font-size:11px;line-height:1.4">
-<b>Importante:</b> Tu código de referido se genera DESPUÉS de tu primera compra, pero podés registrarte ya. Si no tenés WASABLOCKS aún, tu link se activará cuando compres 0.01 mínimo (para evitar spam). Si ya sos founder, tu link es tu WASA-CODE genesis.
+<b>Importante:</b> No necesitás comprar nada para ser referidor. Tu código <b>REF-XXXX</b> se genera al instante al registrarte. Si después comprás WASABLOCKS, tu código pasa a ser tu WASA-CODE genesis y seguís usando el mismo login. Todo founder queda automáticamente en la hoja de posibles referidores.
 </div>
+<div style="text-align:center;margin-top:12px;font-size:11px"><a href="/founders.html" class="link">¿Qué es WASA? Ver founders</a></div>
 </div>
+
 <script src="/wasa-config.js"></script>
 <script>
+let currentTab='reg';
+function switchTab(t){
+  currentTab=t;
+  document.getElementById('tabReg').classList.toggle('active',t==='reg');
+  document.getElementById('tabLogin').classList.toggle('active',t==='login');
+  document.getElementById('viewReg').classList.toggle('hidden',t!=='reg');
+  document.getElementById('viewLogin').classList.toggle('hidden',t!=='login');
+  document.getElementById('msg').style.display='none';
+}
+function showMsg(text,ok){
+  let m=document.getElementById('msg');
+  m.style.display='block';
+  m.style.background= ok ? '#F0FDF4' : '#FEF2F2';
+  m.style.color= ok ? '#166534' : '#991B1B';
+  m.textContent=text;
+}
+
 async function register(){
-  let email=document.getElementById('email').value.trim().toLowerCase();
-  let pass=document.getElementById('pass').value.trim();
-  let wallet=document.getElementById('wallet').value.trim();
-  let msg=document.getElementById('msg');
-  if(!email||!pass){ msg.style.display='block'; msg.style.background='#FEF2F2'; msg.textContent='Falta email y contraseña'; return; }
-  if(!wallet.startsWith('0x')||wallet.length<20){ msg.style.display='block'; msg.style.background='#FEF2F2'; msg.textContent='Wallet BSC inválida 0x...'; return; }
+  let email=document.getElementById('regEmail').value.trim().toLowerCase();
+  let p1=document.getElementById('regPass').value.trim();
+  let p2=document.getElementById('regPass2').value.trim();
+  if(!email||!p1){ showMsg('Falta email y contraseña',false); return; }
+  if(p1.length<6){ showMsg('Contraseña mínima 6 caracteres',false); return; }
+  if(p1!==p2){ showMsg('Contraseñas no coinciden',false); return; }
   let btn=document.getElementById('btnReg'); btn.disabled=true; btn.textContent='Creando...';
   try{
-    // Usamos el mismo registro que panel pero con wallet
-    let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'registerReferrer', email:email, password:pass, wallet:wallet})});
+    let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'registerReferrer', email:email, password:p1})});
     let j=await r.json();
     if(j.ok){
-      msg.style.display='block'; msg.style.background='#F0FDF4'; msg.style.color='#166534';
-      msg.textContent='Cuenta creada. Token: '+j.token.slice(0,10)+'... Redirigiendo a tu panel...';
+      showMsg('Cuenta creada. Entrando a tu panel...',true);
       localStorage.setItem('wasa_token', j.token);
       localStorage.setItem('wasa_email', email);
-      setTimeout(()=>location.href='/referrals.html',1200);
+      setTimeout(()=>location.href='/referrals.html',800);
     } else {
-      msg.style.display='block'; msg.style.background='#FEF2F2'; msg.textContent='Error: '+j.error;
+      showMsg('Error: '+j.error,false);
       btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR';
     }
-  }catch(e){ msg.style.display='block'; msg.textContent='Error: '+e.message; btn.disabled=false; }
+  }catch(e){ showMsg('Error: '+e.message,false); btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR'; }
 }
+
+async function login(){
+  let email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  let pass=document.getElementById('loginPass').value.trim();
+  if(!email||!pass){ showMsg('Falta email y contraseña',false); return; }
+  let btn=document.getElementById('btnLogin'); btn.disabled=true; btn.textContent='Entrando...';
+  try{
+    let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login', email:email, password:pass})});
+    let j=await r.json();
+    if(j.ok){
+      showMsg('Login OK. Entrando...',true);
+      localStorage.setItem('wasa_token', j.token);
+      localStorage.setItem('wasa_email', email);
+      setTimeout(()=>location.href='/referrals.html',600);
+    } else {
+      showMsg('Error: '+j.error,false);
+      btn.disabled=false; btn.textContent='ENTRAR A MI PANEL';
+    }
+  }catch(e){ showMsg('Error: '+e.message,false); btn.disabled=false; }
+}
+
+// auto-fill email from ?email=
+(function(){
+  let p=new URLSearchParams(location.search);
+  let e=p.get('email');
+  if(e){
+    document.getElementById('regEmail').value=e;
+    document.getElementById('loginEmail').value=e;
+  }
+})();
 </script>
 </body>
 </html>
