@@ -7,8 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B}
-.nav{position:fixed;top:0;left:0;right:0;height:64px;background:#1D4ED8;display:flex;align-items:center;justify-content:space-between;z-index:50;padding:0 24px; gap:16px}
-.nav .logo{color:white;font-weight:800;white-space:nowrap; flex-shrink:0;}.nav .links{display:flex;gap:20px;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);gap:14px; align-items:center; white-space:nowrap}.nav .links a[href*="refer-register"]{background:#FFD60A;color:black!important;padding:7px 14px;border-radius:999px}
+.nav{position:fixed;top:0;left:0;right:0;height:64px;background:#1D4ED8;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:50;gap:16px}
+.nav .logo{color:white;font-weight:800;white-space:nowrap;flex-shrink:0}
+.nav .links{display:flex;gap:14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85);align-items:center;white-space:nowrap}
+.nav .links a{color:inherit;text-decoration:none;display:flex;align-items:center}
+.nav .links a[href*="refer-register"]{background:#FFD60A;color:black!important;padding:7px 14px;border-radius:999px;font-weight:800;line-height:1}
+@media(max-width:600px){.nav{padding:0 14px}.nav .links{gap:10px;font-size:10px}.nav .logo{font-size:14px}}
 .hero{width:100vw;margin-left:calc(-50vw + 50%);background:linear-gradient(135deg,#BFDBFE,#93C5FD 30%,#C4B5FD 75%,#A5B4FC);padding:84px 0 28px;display:flex;justify-content:center}
 .hero-inner{max-width:720px;width:100%;padding:0 18px;display:grid;grid-template-columns:1.15fr 0.85fr;gap:28px;align-items:center}
 .hero-text{text-align:left}
@@ -49,7 +53,7 @@
 </style>
 </head>
 <body>
-<nav class="nav"><div class="logo">wasa.chat<span style="color: #D4AF37;">/founders</span></div><div style="display:flex;align-items:center;gap:14px"><div class="links"><a href="/founders.html">HOME</a><a href="/info.html">INFO</a><a href="/refer-register.html" style="background:#FFD60A;color:black;padding:6px 14px;border-radius:999px;font-weight:800;">GANA dinero aquí</a></div><button id="langBtn" style="height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:white;font-size:11px;font-weight:800;cursor:pointer">EN</button></div></nav>
+<nav class="nav"><div class="logo">wasa.chat<span style="color: #D4AF37;">/founders</span></div><div style="display:flex;align-items:center;gap:10px;flex-shrink:0"><div class="links"><a href="/founders.html">HOME</a><a href="/info.html">INFO</a><a href="/refer-register.html">GANA dinero aquí</a></div><button id="langBtn" style="height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:white;font-size:11px;font-weight:800;cursor:pointer">EN</button></div></nav>
 
 <div id="soldoutOverlay" class="soldout-overlay"><div class="soldout-badge" id="soldoutBadge">● PREVENTA TERMINADA</div><div class="soldout-title" id="soldoutTitle">¡50/50 slots vendidos!<br>Preventa terminada</div><div class="soldout-sub" id="soldoutSub">Gracias a todos los founders. Seguí en lista de espera para el marketplace P2P de 2027.</div><button class="btn" style="margin-top:20px;max-width:280px;background:white;color:#1E293B" onclick="window.open('mailto:founders@wasa.chat','_blank')">Lista de espera ↗</button></div>
 
@@ -118,6 +122,7 @@
 
 <!-- CONFIG CENTRALIZADA - UNICO LUGAR DONDE SE CAMBIA LA URL -->
 <script src="/wasa-config.js"></script>
+<script src="/escritor.js"></script>
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
 let CONFIG_DYNAMIC = null;
@@ -261,9 +266,31 @@ document.getElementById('btnUSDT').onclick=async()=>{
     let j = await resp.json();
     if(!j.ok) throw new Error('Error Sheet: '+(j.error||'unknown')+'. Tx OK pero no se guardó. Contactá con hash '+hash);
 
-    showPopup(`<b style="color:#16a34a">✅ Compra VALIDADA!</b><br>Hash: ${hash.slice(0,16)}...<br>Bloque: ${parseInt(receipt.blockNumber,16)}<br>Email: ${email}`); 
+    // NUEVO FLUJO: editar imagen en el navegador con escritor.js
+    showPopup(`<b style="color:#16a34a">✅ Compra VALIDADA!</b><br>WASA ID: ${j.codeId}<br>Generando holograma con código quemado...`);
+    try {
+      // j trae codeId, panelCode, slotNum, percent
+      if(window.editarYEnviarHolograma) {
+        await window.editarYEnviarHolograma({
+          slots: qty,
+          codeId: j.codeId,
+          email: email,
+          nombre: name,
+          accessCode: j.panelCode,
+          tx_hash: hash,
+          percent: qty*Number(CONFIG_DYNAMIC.PERCENT_PER_SLOT)
+        });
+        showPopup(`<b style="color:#16a34a">✅ Holograma ${j.codeId} enviado a ${email} con código quemado abajo!</b><br>Revisá tu email - adjunto ${j.codeId}-${j.slotNum}.png`);
+      } else {
+        console.log('escritor.js no cargado');
+      }
+    } catch(e) {
+      console.error('Error escritor', e);
+      showPopup(`<b style="color:#16a34a">✅ Compra VALIDADA!</b><br>WASA ID: ${j.codeId}<br><span style="color:orange">Imagen no se pudo editar: ${e.message}</span><br>Pero tu código ${j.panelCode} ya funciona para crear contraseña`);
+    }
+
     localStorage.removeItem('wasa_ref');
-    setTimeout(()=>{window.location.href='https://founders.wasa.chat/?email='+encodeURIComponent(email)+'&tab=new';},3000);
+    setTimeout(()=>{window.location.href='https://founders.wasa.chat/?email='+encodeURIComponent(email)+'&tab=new';},4000);
 
   }catch(e){
     txStatusDiv.style.background='#FEE2E2'; txStatusDiv.style.borderColor='#DC2626';
