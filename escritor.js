@@ -1,7 +1,7 @@
 // escritor.js - SEGURO - Fixedsys TTF de /fnts/ - SIN LOGS - CON X-WASA-KEY
 async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode, tx_hash, percent}) {
   const WORKER_URL = window.WASA_WORKER_URL || window.WASA_WEBHOOK_URL || 'https://founderswasablocks.javimsites.workers.dev';
-  const WORKER_KEY = window.WASA_WORKER_KEY || 'wasa_blocks_f0und3rs_uidf8923hryuwe3987';
+  const WORKER_KEY = window.WASA_WORKER_KEY || 'wasa_2026_f0und3rs_9k2j4l8x';
   
   const slotNum = Math.max(1, Math.min(50, Math.round(slots)||1));
   const url = `/images/${slotNum}.png?v=${Date.now()}`;
