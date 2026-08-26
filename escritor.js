@@ -10,11 +10,11 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
   const W=baseImg.width, H=baseImg.height;
   const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d'); ctx.drawImage(baseImg,0,0);
-  const fontSize=Math.floor(W*0.029); const yPos=H-Math.floor(H*0.069);
-  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=`800 ${fontSize}px 'Courier New', monospace`;
+  const fontSize=Math.floor(W*0.021); const yPos=H-Math.floor(H*0.076);
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=`700 ${fontSize}px 'Courier New', monospace`;
   ctx.fillStyle='rgba(0,0,0,0.8)'; ctx.fillText(codeId, W/2+1.5, yPos+1.5);
   ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillText(codeId, W/2-0.8, yPos-0.8);
-  ctx.fillStyle='#db9651'; ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=Math.max(1,fontSize*0.08);
+  ctx.fillStyle='#db9651'; ctx.strokeStyle='rgba(0,0,0,0)'; ctx.lineWidth=Math.max(1,fontSize*0.07);
   ctx.strokeText(codeId, W/2, yPos); ctx.fillText(codeId, W/2, yPos);
   const b64=canvas.toDataURL('image/png').split(',')[1];
   const r=await fetch(WEBHOOK,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'sendEditedImage',email,codeId,slots,slotNum,nombre,accessCode,tx_hash,percent,image_b64:b64,image_filename:`${codeId}-${slotNum}.png`})});
@@ -23,4 +23,4 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
   return j;
 }
 window.editarYEnviarHolograma=editarYEnviarHolograma;
-console.log('escritor v4 SIN FRANJA',Date.now());
+console.log('escritor v6 SIN FRANJA',Date.now());
