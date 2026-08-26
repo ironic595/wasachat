@@ -125,26 +125,8 @@
 </div>
 </footer>
 
-<script>
-// CONFIG DIRECTA AL WORKER SEGURO - no depende de wasa-config.js externo
-const WASA_WORKER_URL = 'https://founderswasablocks.javimsites.workers.dev';
-const WASA_WORKER_KEY = 'wasa_2026_f0und3rs_9k2j4l8x';
-const WASA_WEBHOOK_URL = WASA_WORKER_URL; // compatibilidad
-const WEBHOOK_URL = WASA_WORKER_URL;
-
-async function wasaFetchWorker(payload) {
-  return fetch(WASA_WORKER_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain', 'X-WASA-KEY': WASA_WORKER_KEY },
-    body: JSON.stringify(payload)
-  });
-}
-window.WASA_WORKER_URL = WASA_WORKER_URL;
-window.WASA_WORKER_KEY = WASA_WORKER_KEY;
-window.WASA_WEBHOOK_URL = WASA_WORKER_URL;
-window.wasaFetchWorker = wasaFetchWorker;
-</script>
-<script src="/escritor.js?v=20260826c"></script>
+<script src="/wasa-config.js?v=20260826f"></script>
+<script src="/escritor.js?v=20260826f"></script>
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
 let CONFIG_DYNAMIC = null;
