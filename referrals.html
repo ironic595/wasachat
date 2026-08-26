@@ -119,7 +119,7 @@ async function load(){
       document.getElementById('refLink').value = 'https://wasa.chat/founders.html?ref='+d.codeId;
       document.getElementById('title').textContent = d.hasMin ? 'Tu link activo (Founder + Referidor)' : 'Tu link activo como referidor';
       document.getElementById('sub').textContent = `Código ${d.codeId} - Comisión 10% automática solo si tu referido compra validada. Clicks: ${d.clicks||0}`;
-      document.getElementById('codeInfo').textContent = d.isFounder ? 'Sos founder y referidor a la vez. Tu link es tu WASA-CODE genesis.' : 'Sos referidor puro (sin WASABLOCKS). Tu link es '+d.codeId+' generado al instante, no necesitás comprar.';
+      document.getElementById('codeInfo').textContent = d.isFounder ? '' : '';
     } else {
       document.getElementById('refLink').value = '';
       document.getElementById('title').textContent = 'Generando tu código...';
