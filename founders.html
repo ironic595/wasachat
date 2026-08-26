@@ -77,9 +77,9 @@
 <div class="wrap">
 <div id="refBanner" class="ref-banner">🎉 Entraste con link de referido <b id="refCodeShow"></b> - Si comprás, tu referidor cobra 10% automático. Vos no pagás extra.</div>
 
-<div class="card"><div class="eyebrow" id="recEyebrow">RECAUDADO • TIEMPO REAL</div><div style="display:flex;align-items:center;gap:6px"><div class="title" id="recTitle">Recaudado desde 22/08/2026</div><span class="live" id="recLive">EN VIVO</span></div><div style="font-size:11px;opacity:.7;margin-top:4px" id="recSub">En vivo • La ronda founder avanza en tiempo real</div><div style="font-size:10px;opacity:.6" id="sheetLive">Cargando datos desde wasa-config.js...</div><div class="amount">Compraron <span id="recaudado">-</span> <span style="font-size:11px;opacity:.6">• <span id="progressPct">-</span></span></div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px"><span><b id="sold">-</b> <span id="soldLabel">Slots vendidos</span></span><span><span id="quedanLabel">Quedan</span> <b id="left">-</b> <span id="slotsLabel">slots</span></span></div><div style="font-size:11px;opacity:.6;margin-top:8px" id="cadaSlot">Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada slot = 0.5% perpetuo. Recompra 2x ($500) desde mes 12.</div></div>
+<div class="card"><div class="eyebrow" id="recEyebrow">RECAUDADO • TIEMPO REAL</div><div style="display:flex;align-items:center;gap:6px"><div class="title" id="recTitle">Recaudado desde 22/08/2026</div><span class="live" id="recLive">EN VIVO</span></div><div style="font-size:11px;opacity:.7;margin-top:4px" id="recSub">En vivo • La ronda founder avanza en tiempo real</div><div style="font-size:10px;opacity:.6" id="sheetLive">Conectando al worker...</div><div class="amount">Compraron <span id="recaudado">-</span> <span style="font-size:11px;opacity:.6">• <span id="progressPct">-</span></span></div><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px"><span><b id="sold">-</b> <span id="soldLabel">Slots vendidos</span></span><span><span id="quedanLabel">Quedan</span> <b id="left">-</b> <span id="slotsLabel">slots</span></span></div><div style="font-size:11px;opacity:.6;margin-top:8px" id="cadaSlot">Hasta agotar stock (50 slots) o hasta el 30/08/2026. Cada slot = 0.5% perpetuo. Recompra 2x ($500) desde mes 12.</div></div>
 
-<div class="card-outer"><div class="card" style="margin:0;background:#C2D9FF"><div class="eyebrow" id="partEyebrow">PARTICIPACIÓN FOUNDER PERPETUA</div><div class="title" id="partTitle">Compra WASA BLOCKS</div><div style="font-size:11px;opacity:.6;margin-top:4px"><span id="costoLabel">Cargando precio desde config...</span> <span id="dispLabel">Cantidad disponible</span> <span id="dispVal">-</span></div>
+<div class="card-outer"><div class="card" style="margin:0;background:#C2D9FF"><div class="eyebrow" id="partEyebrow">PARTICIPACIÓN FOUNDER PERPETUA</div><div class="title" id="partTitle">Compra WASA BLOCKS</div><div style="font-size:11px;opacity:.6;margin-top:4px"><span id="costoLabel">Cargando precio desde worker...</span> <span id="dispLabel">Cantidad disponible</span> <span id="dispVal">-</span></div>
 <div class="qty-row"><button class="qty-btn" id="btnMinus">−</button><div class="qty-val" id="qtyVal">1</div><button class="qty-btn" id="btnPlus">+</button><div style="margin-left:auto;font-size:11px"><span id="qtySlots">1 slot</span> = <b id="qtyPercent">0.5%</b> perpetuo</div></div><input type="range" min="1" max="10" value="1" class="range" id="range"><div class="total-box"><span style="font-size:11px;opacity:.6" id="totalLabel">Total a pagar:</span><b>$<span id="total">-</span> USDT</b></div>
 <div class="buyback"><b id="buybackTitle">🔄 Recompra 2x:</b> <span id="buybackText">WASA puede recomprar tu slot a $500 (2x) después de 12 meses. Si no ejerce, seguís cobrando para siempre.</span></div>
 
@@ -92,7 +92,7 @@
 <div id="txHash" style="font-size:10px;word-break:break-all;opacity:.7;display:none;margin-bottom:8px"></div>
 <button class="btn" id="btnConnect">🔌 Conectar Wallet (MetaMask / Rabby)</button>
 <button class="btn" id="btnUSDT" style="display:none;margin-top:8px">Pagar - USDT</button>
-<div style="font-size:10px;opacity:.5;margin-top:6px" id="contratoLabel">Cargando contrato desde wasa-config.js...</div></div>
+<div style="font-size:10px;opacity:.5;margin-top:6px" id="contratoLabel">Cargando contrato desde worker...</div></div>
 
 </div></div>
 
@@ -121,17 +121,34 @@
 </div>
 <div style="max-width:720px;margin:24px auto 0;padding-top:16px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:10px;opacity:.4">
 <span>© 2026 wasa.chat • Todos los derechos reservados</span>
-<span>USDT BSC • Contrato validado • Config desde wasa-config.js</span>
+<span>USDT BSC • Contrato validado • Worker con clave</span>
 </div>
 </footer>
 
-<script src="/wasa-config.js?v=20260826c"></script>
+<script>
+// CONFIG DIRECTA AL WORKER SEGURO - no depende de wasa-config.js externo
+const WASA_WORKER_URL = 'https://founderswasablocks.javimsites.workers.dev';
+const WASA_WORKER_KEY = 'wasa_2026_f0und3rs_9k2j4l8x';
+const WASA_WEBHOOK_URL = WASA_WORKER_URL; // compatibilidad
+const WEBHOOK_URL = WASA_WORKER_URL;
+
+async function wasaFetchWorker(payload) {
+  return fetch(WASA_WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain', 'X-WASA-KEY': WASA_WORKER_KEY },
+    body: JSON.stringify(payload)
+  });
+}
+window.WASA_WORKER_URL = WASA_WORKER_URL;
+window.WASA_WORKER_KEY = WASA_WORKER_KEY;
+window.WASA_WEBHOOK_URL = WASA_WORKER_URL;
+window.wasaFetchWorker = wasaFetchWorker;
+</script>
 <script src="/escritor.js?v=20260826c"></script>
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
 let CONFIG_DYNAMIC = null;
 
-// === CAPTURA REFERIDO ?ref= EN wasa.chat/founders.html ===
 (function(){
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('ref');
@@ -140,26 +157,24 @@ let CONFIG_DYNAMIC = null;
     localStorage.setItem('wasa_ref', code);
     document.getElementById('refCodeShow').textContent = code;
     document.getElementById('refBanner').style.display = 'block';
-    // contar click
-    fetch(WASA_WEBHOOK_URL + '?action=refclick&ref=' + encodeURIComponent(code)).catch(()=>{});
-    console.log('Referido capturado:', code);
+    fetch(WASA_WORKER_URL + '?action=refclick&ref=' + encodeURIComponent(code)).catch(()=>{});
   }
 })();
 
 async function loadDynamicConfig(){
   try{
-    const url = WASA_WEBHOOK_URL + '?action=getConfig';
+    const url = WASA_WORKER_URL + '?action=getconfig&v=' + Date.now();
     const res = await fetch(url);
     const j = await res.json();
     if(!j.ok) throw new Error('config no ok');
     CONFIG_DYNAMIC = j;
     document.getElementById('costoLabel').textContent = `0.5% = $${CONFIG_DYNAMIC.PRICE_PER_SLOT} USDT • Destino ${CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,6)}... • ${CONFIG_DYNAMIC.PERCENT_PER_SLOT}% c/u`;
-    document.getElementById('contratoLabel').textContent = `Contrato: ${CONFIG_DYNAMIC.USDT_CONTRACT.slice(0,10)}... | Destino: ${CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,10)}... (de wasa-config.js)`;
-    document.getElementById('sheetLive').textContent = `Config: ${CONFIG_DYNAMIC.TOTAL_SLOTS} slots | $${CONFIG_DYNAMIC.PRICE_PER_SLOT}/slot | ${CONFIG_DYNAMIC.PERCENT_PER_SLOT}% | URL: ${WASA_WEBHOOK_URL.slice(-25)}`;
+    document.getElementById('contratoLabel').textContent = `Contrato: ${CONFIG_DYNAMIC.USDT_CONTRACT.slice(0,10)}... | Destino: ${CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,10)}...`;
+    document.getElementById('sheetLive').textContent = `Worker: ${CONFIG_DYNAMIC.TOTAL_SLOTS} slots | $${CONFIG_DYNAMIC.PRICE_PER_SLOT}/slot | ${CONFIG_DYNAMIC.PERCENT_PER_SLOT}% | OK`;
     update();
     return j;
   }catch(e){
-    document.getElementById('sheetLive').textContent = 'Error cargando config: '+e.message+' URL:'+WASA_WEBHOOK_URL;
+    document.getElementById('sheetLive').textContent = 'Error cargando config: '+e.message+' URL:'+WASA_WORKER_URL;
   }
 }
 
@@ -199,7 +214,7 @@ document.getElementById('btnConnect').onclick=async()=>{
     let accs=await window.ethereum.request({method:'eth_requestAccounts'});
     accountFull=accs[0];
     document.getElementById('walletStatus').style.display='block';
-    document.getElementById('walletStatus').textContent='✅ '+accountFull.slice(0,6)+'...'+accountFull.slice(-4)+' → '+CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,6)+'... (de config)';
+    document.getElementById('walletStatus').textContent='✅ '+accountFull.slice(0,6)+'...'+accountFull.slice(-4)+' → '+CONFIG_DYNAMIC.RECEIVER_ADDRESS.slice(0,6)+'...';
     btn.style.display='none'; document.getElementById('btnUSDT').style.display='flex';
   }catch(e){alert(e.message);}finally{btn.disabled=false;}
 };
@@ -254,10 +269,7 @@ document.getElementById('btnUSDT').onclick=async()=>{
     txStatusDiv.style.background='#DCFCE7'; txStatusDiv.style.borderColor='#22C55E';
     txStatusDiv.textContent='✅ Tx CONFIRMADA. Guardando...';
 
-    let resp = await fetch(WASA_WEBHOOK_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({
+    let resp = await wasaFetchWorker({
         nombre:name,email:email,wallet:accountFull,slots:qty,
         percent:qty*Number(CONFIG_DYNAMIC.PERCENT_PER_SLOT),
         total_usdt:qty*price,tx_hash:hash,
@@ -265,15 +277,12 @@ document.getElementById('btnUSDT').onclick=async()=>{
         method:'crypto_DEX_validated',
         ref_code: localStorage.getItem('wasa_ref') || '',
         ref: localStorage.getItem('wasa_ref') || ''
-      })
-    });
+      });
     let j = await resp.json();
-    if(!j.ok) throw new Error('Error Sheet: '+(j.error||'unknown')+'. Tx OK pero no se guardó. Contactá con hash '+hash);
+    if(!j.ok) throw new Error('Error Worker: '+(j.error||'unknown')+'. Tx OK pero no se guardó. Contactá con hash '+hash);
 
-    // NUEVO FLUJO: editar imagen en el navegador con escritor.js
     showPopup(`<b style="color:#16a34a">✅ Compra VALIDADA!</b><br>WASA ID: ${j.codeId}<br>Generando holograma con código quemado...`);
     try {
-      // j trae codeId, panelCode, slotNum, percent
       if(window.editarYEnviarHolograma) {
         await window.editarYEnviarHolograma({
           slots: qty,
@@ -285,11 +294,8 @@ document.getElementById('btnUSDT').onclick=async()=>{
           percent: qty*Number(CONFIG_DYNAMIC.PERCENT_PER_SLOT)
         });
         showPopup(`<b style="color:#16a34a">✅ Holograma ${j.codeId} enviado a ${email} con código quemado abajo!</b><br>Revisá tu email - adjunto ${j.codeId}-${j.slotNum}.png`);
-      } else {
-        console.log('escritor.js no cargado');
       }
     } catch(e) {
-      console.error('Error escritor', e);
       showPopup(`<b style="color:#16a34a">✅ Compra VALIDADA!</b><br>WASA ID: ${j.codeId}<br><span style="color:orange">Imagen no se pudo editar: ${e.message}</span><br>Pero tu código ${j.panelCode} ya funciona para crear contraseña`);
     }
 
@@ -307,7 +313,7 @@ document.getElementById('btnUSDT').onclick=async()=>{
 
 async function fetchLive(){ 
   try{ 
-    let r=await fetch(WASA_WEBHOOK_URL+'?action=read'); 
+    let r=await fetch(WASA_WORKER_URL+'?action=read&v='+Date.now()); 
     let j=await r.json(); 
     if(j.ok){ 
       document.getElementById('recaudado').textContent=j.sold; 
