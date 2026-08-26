@@ -126,8 +126,8 @@
 </footer>
 
 <!-- CONFIG CENTRALIZADA - UNICO LUGAR DONDE SE CAMBIA LA URL -->
-<script src="/wasa-config.js"></script>
-<script src="/escritor.js?v=7"></script>
+<script src="/wasa-config.js?v=<?= time() ?>"></script>
+<script src="/escritor.js?v=<?= time() ?>"></script>
 <script>
 const DEADLINE = new Date('2026-08-30T23:00:00-03:00');
 let CONFIG_DYNAMIC = null;
