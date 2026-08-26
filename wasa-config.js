@@ -5,5 +5,3 @@ const WASA_WEBHOOK_URL = 'https://founderswasablocks.javimsites.workers.dev';
 const WEBHOOK_URL = WASA_WEBHOOK_URL;
 const SHEET_WEBHOOK_URL = WASA_WEBHOOK_URL;
 const BASE_CONFIG = { SHEET_WEBHOOK_URL: WASA_WEBHOOK_URL, CHAIN_ID: 56 };
-
-console.log('WASA Config cargada:', WASA_WEBHOOK_URL);
