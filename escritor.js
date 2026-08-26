@@ -10,8 +10,8 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
   const W=baseImg.width, H=baseImg.height;
   const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
   const ctx=canvas.getContext('2d'); ctx.drawImage(baseImg,0,0);
-  const fontSize=Math.floor(W*0.021); const yPos=H-Math.floor(H*0.076);
-  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=`700 ${fontSize}px 'Courier New', monospace`;
+  const fontSize=Math.floor(W*0.025); const yPos=H-Math.floor(H*0.085);
+  ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=`750 ${fontSize}px 'Fixedsys','Courier New', monospace`;
   ctx.fillStyle='rgba(0,0,0,0.8)'; ctx.fillText(codeId, W/2+1.5, yPos+1.5);
   ctx.fillStyle='rgba(255,255,255,0.35)'; ctx.fillText(codeId, W/2-0.8, yPos-0.8);
   ctx.fillStyle='#db9651'; ctx.strokeStyle='rgba(0,0,0,0)'; ctx.lineWidth=Math.max(1,fontSize*0.07);
