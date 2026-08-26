@@ -40,4 +40,3 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
   return j;
 }
 window.editarYEnviarHolograma=editarYEnviarHolograma;
-console.log('escritor FIXEDSYS TTF desde /fnts/', Date.now());
