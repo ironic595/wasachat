@@ -3,7 +3,7 @@
 // Apps Script viejo: https://script.google.com/macros/s/AKfycby.../exec
 // Nuevo Worker: https://api.wasa.chat
 
-const WASA_WEBHOOK_URL = 'https://api.wasa.chat';
+const WASA_WEBHOOK_URL = 'https://founderswasablocks.javimsites.workers.dev/';
 
 // Compatibilidad con código viejo que usa WEBHOOK_URL o SHEET_WEBHOOK_URL
 const WEBHOOK_URL = WASA_WEBHOOK_URL;
