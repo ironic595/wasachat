@@ -1,11 +1,13 @@
-// wasa.chat - Config centralizada
-// Cambiá SOLO esta URL cada vez que deployás nuevo Apps Script y se actualiza todo el sitio
-const WASA_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyLAxDzrV1QnGPTAcA3UoIo-RTpfDKfA6yMH1Q56TXJlKhmS8yBvg696DnWN9-RdDcUkw/exec';
+// wasa.chat - Config centralizada V2 - Cloudflare Worker
+// Cambiá SOLO esta URL y todo tu sitio pasa de Apps Script a Cloudflare
+// Apps Script viejo: https://script.google.com/macros/s/AKfycby.../exec
+// Nuevo Worker: https://api.wasa.chat
+
+const WASA_WEBHOOK_URL = 'https://api.wasa.chat';
 
 // Compatibilidad con código viejo que usa WEBHOOK_URL o SHEET_WEBHOOK_URL
 const WEBHOOK_URL = WASA_WEBHOOK_URL;
 const SHEET_WEBHOOK_URL = WASA_WEBHOOK_URL;
 const BASE_CONFIG = { SHEET_WEBHOOK_URL: WASA_WEBHOOK_URL, CHAIN_ID: 56 };
 
-// Opcional: log para debug
-console.log('WASA Config cargada:', WASA_WEBHOOK_URL.slice(-20));
+console.log('WASA Config V2 (Cloudflare Worker):', WASA_WEBHOOK_URL);
