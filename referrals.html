@@ -101,36 +101,39 @@ async function saveWallet(){
   }catch(e){ msg.textContent='Error: '+e.message; }
 }
 
+
 async function load(){
   let token=localStorage.getItem('wasa_token');
   if(!token){ location.href='/refer-register.html'; return; }
   document.getElementById('navEmail').textContent = localStorage.getItem('wasa_email')||'';
   try{
-    let r=await fetch(WASA_WEBHOOK_URL+'?action=referralStats&token='+encodeURIComponent(token));
+    let r=await fetch(WASA_WEBHOOK_URL+'?action=referralStats&token='+encodeURIComponent(token)+'&v='+Date.now());
     let j=await r.json();
+    console.log('referralStats response', j);
     if(!j.ok){ 
       if((j.error||'').toLowerCase().includes('vencida')){ localStorage.clear(); location.href='/refer-register.html'; return; }
-      document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">${j.error}</td></tr>`; 
+      document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">${j.error}</td></tr>`;
+      document.getElementById('refLink').value='Error: '+j.error;
       return; 
     }
     let d=j.data;
-    // FIX SEPARADO: refCode = REF-XXXX, wasaCode = WASA-XXXX
-    let ref = d.refCode || d.codeId;
+    let ref = d.refCode || d.codeId || '';
     let wasa = d.wasaCode || '';
+    console.log('parsed ref', ref, 'wasa', wasa, 'data', d);
     if(ref){
       document.getElementById('refLink').value = 'https://wasa.chat/founders.html?ref='+ref;
       document.getElementById('title').textContent = d.isFounder ? 'Tu link de referido (REF) - Sos Founder' : 'Tu link de referido (REF)';
-      document.getElementById('sub').textContent = `Tu REF: ${ref} - Comisión 10% automática solo si tu referido compra validada. Clicks: ${d.clicks||0}`;
+      document.getElementById('sub').textContent = `Tu REF: ${ref} - Comision 10% automatica. Clicks: ${d.clicks||0}`;
       if(d.isFounder && wasa){
-        document.getElementById('codeInfo').innerHTML = `Sos founder. Tu WASA ID es <b>${wasa}</b> (es tu NFT, no es tu link). Tu link de referidos es <b>${ref}</b> (formato REF-). Son dos IDs distintos a propósito.`;
+        document.getElementById('codeInfo').innerHTML = `Sos founder. Tu WASA ID es <b>${wasa}</b> (NFT). Tu link de referidos es <b>${ref}</b> (REF-).`;
       } else {
-        document.getElementById('codeInfo').textContent = 'Sos referidor puro (sin WASABLOCKS). Tu link es '+ref+' (formato REF-). No necesitas comprar para cobrar.';
+        document.getElementById('codeInfo').textContent = 'Sos referidor puro (sin WASABLOCKS). Tu link es '+ref+' (formato REF-).';
       }
-    }
     } else {
-      document.getElementById('refLink').value = '';
-      document.getElementById('title').textContent = 'Generando tu código...';
-      document.getElementById('sub').textContent = 'Si ves esto, recargá o contactá soporte. Tu REF debería generarse al registrarte.';
+      document.getElementById('refLink').value = 'No se genero REF - recarga';
+      document.getElementById('title').textContent = 'Generando tu codigo...';
+      document.getElementById('sub').textContent = 'Si ves esto, recarga o contacta soporte. Tu REF deberia generarse.';
+      document.getElementById('codeInfo').textContent = JSON.stringify(d).slice(0,200);
     }
     
     document.getElementById('statClicks').textContent = d.clicks||0;
@@ -140,7 +143,7 @@ async function load(){
 
     let rows = d.referrals||[];
     if(rows.length===0){
-      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aún no hay ventas con tu link. Compartí: https://wasa.chat/founders.html?ref='+(d.refCode||d.codeId||'')+'</td></tr>';
+      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aun no hay ventas con tu link. Comparti: https://wasa.chat/founders.html?ref='+(ref||'')+'</td></tr>';
     } else {
       document.querySelector('#refTable tbody').innerHTML = rows.map(r=>`
         <tr>
@@ -154,10 +157,13 @@ async function load(){
       `).join('');
     }
   }catch(e){
-    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">Error: ${e.message}</td></tr>`;
+    console.error('load error', e);
+    document.getElementById('refLink').value='Error JS: '+e.message;
+    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">Error: ${e.message} - F12 consola</td></tr>`;
   }
 }
 load();
+
 </script>
 </body>
 </html>
