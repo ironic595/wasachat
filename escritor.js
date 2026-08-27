@@ -34,14 +34,14 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
 
   // --- ESTILO COMO .fixedsys-card-text + Fixedsys ---
   const code = (codeId||'').toString().toUpperCase();
-  const fontSize = Math.floor(W * 0.034); // 3.2rem equivalente
+  const fontSize = Math.floor(W * 0.026); // 
   const yPos = H - Math.floor(H * 0.072);
   const xPos = W/2;
 
   ctx.textAlign='center';
   ctx.textBaseline='middle';
   // Usamos FixedsysTTF primero, si no existe cae a Courier New (tu CSS pide Courier new)
-  ctx.font = `500 ${fontSize}px "FixedsysTTF", "Fixedsys", "Courier New", Courier, monospace`;
+  ctx.font = `400 ${fontSize}px "FixedsysTTF", "Fixedsys", "Courier New", Courier, monospace`;
   try { ctx.letterSpacing = '4px'; } catch {}
 
   // Relieve estilo tarjeta pixelada - tu CSS exacto
