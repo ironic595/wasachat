@@ -35,7 +35,7 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
   // --- ESTILO COMO .fixedsys-card-text + Fixedsys ---
   const code = (codeId||'').toString().toUpperCase();
   const fontSize = Math.floor(W * 0.045); // 3.2rem equivalente
-  const yPos = H - Math.floor(H * 0.076);
+  const yPos = H - Math.floor(H * 0.072);
   const xPos = W/2;
 
   ctx.textAlign='center';
