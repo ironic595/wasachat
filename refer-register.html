@@ -6,54 +6,60 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:18px}
-.card{background:white;border:2px solid #93B4FF;border-radius:20px;padding:24px;max-width:420px;width:100%}
+.card{background:white;border:2px solid #93B4FF;border-radius:20px;padding:24px;max-width:440px;width:100%;box-shadow:0 8px 24px rgba(29,78,216,.12)}
 .eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.6;color:#1E3A8A;text-transform:uppercase;text-align:center}
 .title{font-size:20px;font-weight:800;text-align:center;margin-top:6px}
 .sub{font-size:11px;opacity:.6;text-align:center;margin-top:8px;line-height:1.5}
-.tabs{display:flex;gap:8px;margin-top:14px}
-.tab{flex:1;height:40px;border-radius:12px;border:1px solid #93B4FF;background:#E6F0FF;font-weight:700;cursor:pointer;font-size:12px}
+.tabs{display:flex;gap:8px;margin-top:16px}
+.tab{flex:1;height:42px;border-radius:12px;border:1px solid #93B4FF;background:#E6F0FF;font-weight:700;cursor:pointer;font-size:12px}
 .tab.active{background:#1D4ED8;color:white}
-.input{height:46px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:12px}
-.btn{height:48px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:12px}
-.msg{margin-top:12px;padding:10px;border-radius:10px;font-size:12px;display:none}
+.input{height:48px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:12px;font-size:13px}
+.btn{height:50px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:14px}
+.btn:disabled{opacity:.5}
+.msg{margin-top:12px;padding:12px;border-radius:10px;font-size:12px;display:none;line-height:1.4}
 .hidden{display:none!important}
 .link{color:#1D4ED8;text-decoration:none;font-weight:700;font-size:11px}
+.badge{font-size:9px;font-weight:800;padding:3px 8px;border-radius:999px;background:#DBEAFE;color:#1E40AF;margin-left:6px}
 </style>
 </head>
 <body>
 <div class="card">
-<div class="eyebrow">WASA.CHAT - PROGRAMA DE REFERIDOS 10%</div>
+<div class="eyebrow">WASA.CHAT - PROGRAMA DE REFERIDOS 10% <span class="badge">REF-XXXX</span></div>
 <div class="title">Gana dinero refiriendo</div>
-<div class="sub">Cualquiera puede registrarse. <b>NO necesitás comprar WASABLOCKS</b>. Compartís tu link <b>wasa.chat/founders.html?ref=TU_CODIGO</b> y cobrás 10% automático solo cuando tu referido CONCRETA compra validada on-chain. La wallet para cobrar la configurás adentro de tu panel.</div>
+<div class="sub">Cualquiera puede registrarse. <b>NO necesitás comprar WASABLOCKS</b>.<br>Tu link será <b>wasa.chat/founders.html?ref=REF-XXXXXX</b> (distinto a tu WASA ID). Cobrás 10% automático solo cuando tu referido CONCRETA compra validada on-chain.</div>
 
 <div class="tabs">
-<button class="tab active" id="tabReg" onclick="switchTab('reg')">REGISTRARME</button>
+<button class="tab active" id="tabReg" onclick="switchTab('reg')">REGISTRARME COMO REFERIDOR</button>
 <button class="tab" id="tabLogin" onclick="switchTab('login')">YA TENGO CUENTA</button>
 </div>
 
 <div id="viewReg">
-<input class="input" id="regEmail" type="email" placeholder="tu@email.com">
-<input class="input" id="regPass" type="password" placeholder="Contraseña (para tu panel de referidos)">
-<input class="input" id="regPass2" type="password" placeholder="Repetir contraseña">
-<button class="btn" id="btnReg" onclick="register()">CREAR CUENTA REFERIDOR</button>
+<input class="input" id="regEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+<input class="input" id="regPass" type="password" placeholder="Contraseña (mín 6 caracteres)" autocomplete="new-password">
+<input class="input" id="regPass2" type="password" placeholder="Repetir contraseña" autocomplete="new-password">
+<button class="btn" id="btnReg" onclick="register()">CREAR CUENTA REFERIDOR PURO</button>
+<div style="font-size:10px;opacity:.6;margin-top:8px;text-align:center">Si ya compraste Wasablocks, podés usar el mismo email. Se te creará tu REF- aparte de tu WASA-.</div>
 </div>
 
 <div id="viewLogin" class="hidden">
-<input class="input" id="loginEmail" type="email" placeholder="tu@email.com">
-<input class="input" id="loginPass" type="password" placeholder="Contraseña">
-<button class="btn" id="btnLogin" onclick="login()">ENTRAR A MI PANEL</button>
-<div style="text-align:center;margin-top:12px"><a href="/founders.html" class="link">← Volver a founders</a></div>
+<input class="input" id="loginEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+<input class="input" id="loginPass" type="password" placeholder="Contraseña" autocomplete="current-password">
+<button class="btn" id="btnLogin" onclick="login()">ENTRAR A MI PANEL DE REFERIDOS</button>
+<div style="text-align:center;margin-top:12px"><a href="/founders.html" class="link">← Volver a founders</a> | <a href="/dashboard.html" class="link">Panel Founders</a></div>
 </div>
 
 <div id="msg" class="msg"></div>
 
-<div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:10px;font-size:11px;line-height:1.4">
-<b>Importante:</b> No necesitás comprar nada para ser referidor. Tu código <b>REF-XXXX</b> se genera al instante al registrarte. Si después comprás WASABLOCKS, tu código pasa a ser tu WASA-CODE genesis y seguís usando el mismo login. Todo founder queda automáticamente en la hoja de posibles referidores.
+<div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:12px;font-size:11px;line-height:1.4">
+<b>Importante (fix migración Apps Script -> Cloudflare):</b><br>
+• No necesitás comprar nada para ser referidor. Tu código <b>REF-XXXXXX</b> se genera al instante, es <b>distinto</b> a tu WASA ID.<br>
+• Si ya sos founder (tenés WASA-XXXX), al registrarte con el mismo email se te crea tu REF- aparte. Usás el mismo login para dashboard y referidos.<br>
+• Si solo querés referir, usá este registro. Antes fallaba si no habías comprado, ahora ya funciona para cuentas puras.
 </div>
 <div style="text-align:center;margin-top:12px;font-size:11px"><a href="/founders.html" class="link">¿Qué es WASA? Ver founders</a></div>
 </div>
 
-<script src="/wasa-config.js"></script>
+<script src="/wasa-config.js?v=20260827"></script>
 <script>
 let currentTab='reg';
 function switchTab(t){
@@ -69,7 +75,8 @@ function showMsg(text,ok){
   m.style.display='block';
   m.style.background= ok ? '#F0FDF4' : '#FEF2F2';
   m.style.color= ok ? '#166534' : '#991B1B';
-  m.textContent=text;
+  m.style.border= ok ? '1px solid #BBF7D0' : '1px solid #FECACA';
+  m.innerHTML=text;
 }
 
 async function register(){
@@ -77,22 +84,30 @@ async function register(){
   let p1=document.getElementById('regPass').value.trim();
   let p2=document.getElementById('regPass2').value.trim();
   if(!email||!p1){ showMsg('Falta email y contraseña',false); return; }
+  if(!email.includes('@')){ showMsg('Email inválido',false); return; }
   if(p1.length<6){ showMsg('Contraseña mínima 6 caracteres',false); return; }
   if(p1!==p2){ showMsg('Contraseñas no coinciden',false); return; }
-  let btn=document.getElementById('btnReg'); btn.disabled=true; btn.textContent='Creando...';
+  let btn=document.getElementById('btnReg'); btn.disabled=true; btn.textContent='Creando REF-...';
   try{
-    let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'registerReferrer', email:email, password:p1})});
+    let payload={action:'registerReferrer', email:email, password:p1};
+    let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
     let j=await r.json();
     if(j.ok){
-      showMsg('Cuenta creada. Entrando a tu panel...',true);
+      showMsg(`✅ Cuenta creada.<br>Tu REF es <b>${j.codeId}</b> (distinto a WASA). Entrando...`,true);
       localStorage.setItem('wasa_token', j.token);
       localStorage.setItem('wasa_email', email);
-      setTimeout(()=>location.href='/referrals.html',800);
+      setTimeout(()=>location.href='/referrals.html',1000);
     } else {
-      showMsg('Error: '+j.error,false);
-      btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR';
+      if(j.error && j.error.includes('ya registrado')){
+        showMsg(`⚠️ ${j.error}<br>Probá en <b>YA TENGO CUENTA</b> con tu contraseña.`,false);
+        switchTab('login');
+        document.getElementById('loginEmail').value=email;
+      } else {
+        showMsg('❌ Error: '+j.error,false);
+      }
+      btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR PURO';
     }
-  }catch(e){ showMsg('Error: '+e.message,false); btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR'; }
+  }catch(e){ showMsg('❌ Error: '+e.message+'<br>Verificá que el worker esté deployado con registerReferrer',false); btn.disabled=false; btn.textContent='CREAR CUENTA REFERIDOR PURO'; }
 }
 
 async function login(){
@@ -104,24 +119,28 @@ async function login(){
     let r=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'login', email:email, password:pass})});
     let j=await r.json();
     if(j.ok){
-      showMsg('Login OK. Entrando...',true);
+      showMsg('✅ Login OK. Entrando a referrals...',true);
       localStorage.setItem('wasa_token', j.token);
       localStorage.setItem('wasa_email', email);
       setTimeout(()=>location.href='/referrals.html',600);
     } else {
-      showMsg('Error: '+j.error,false);
-      btn.disabled=false; btn.textContent='ENTRAR A MI PANEL';
+      showMsg('❌ Error: '+j.error,false);
+      btn.disabled=false; btn.textContent='ENTRAR A MI PANEL DE REFERIDOS';
     }
-  }catch(e){ showMsg('Error: '+e.message,false); btn.disabled=false; }
+  }catch(e){ showMsg('❌ Error: '+e.message,false); btn.disabled=false; btn.textContent='ENTRAR A MI PANEL DE REFERIDOS'; }
 }
 
-// auto-fill email from ?email=
 (function(){
   let p=new URLSearchParams(location.search);
   let e=p.get('email');
   if(e){
     document.getElementById('regEmail').value=e;
     document.getElementById('loginEmail').value=e;
+  }
+  // Si ya está logueado, ir directo
+  let tok=localStorage.getItem('wasa_token');
+  if(tok){
+    // No auto-redirect, solo sugerir
   }
 })();
 </script>
