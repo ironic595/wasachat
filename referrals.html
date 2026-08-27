@@ -31,12 +31,12 @@
 <nav class="nav"><div class="logo">wasa.chat/founders / referidos</div><div class="links"><span id="navEmail"></span> <a href="/dashboard.html">PANEL</a> <a href="/marketplace.html">MARKETPLACE</a> <a href="#" onclick="localStorage.clear();location.href='/refer-register.html'">SALIR</a></div></nav>
 <div class="wrap">
 <div class="card">
-<div class="eyebrow">CADA VEZ QUE ALGUIEN HAGA UNA COMPRA DESDE TU LINK, GANARÁS EL 10% DEL TOTAL DE LA COMPRA</div>
+<div class="eyebrow">PROGRAMA DE REFERIDOS - SOLO CON VENTA CONCRETADA - 10%</div>
 <div class="title" id="title">Tu link de referido</div>
-<div class="sub" id="sub">Comparte este link para obtener una ganancia del 10% automática.</div>
+<div class="sub" id="sub">No necesitás comprar WASABLOCKS. Solo cobrás si tu referido CONCRETA compra validada on-chain. Comisión 10% automática.</div>
 
 <div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:12px">
-<div style="font-size:11px;font-weight:800">TU ENLACE ÚNICO - https://wasa.chat/founders.html?ref=</div>
+<div style="font-size:11px;font-weight:800">TU ENLACE ÚNICO - REF CODE (no es tu WASA ID)</div>
 <input class="input" id="refLink" readonly value="Cargando link...">
 <div style="display:flex;gap:8px;margin-top:10px">
 <button class="btn" style="flex:1" onclick="copyLink()">COPIAR ENLACE</button>
@@ -47,8 +47,8 @@
 </div>
 
 <div style="margin-top:14px;background:white;border:1px solid #93B4FF;border-radius:12px;padding:12px">
-<div style="font-size:11px;font-weight:800;opacity:.7">ESCRIBE TU DIRECCION USDT PARA ENVIARTE LAS GANANCIAS. DEBE SER USDT DE LA RED BNB (BEP-20)</div>
-<div style="font-size:14px;opacity:.6;margin-top:4px">A esta dirección te enviaremos el dinero</div>
+<div style="font-size:11px;font-weight:800;opacity:.7">WALLET PARA COBRAR COMISIONES (USDT BSC) - CONFIGURÁS ACÁ DENTRO</div>
+<div style="font-size:11px;opacity:.6;margin-top:4px">Acá te pagamos el 10% manual el 15 de cada mes. Podés cambiarla cuando quieras.</div>
 <input class="input" id="walletInput" placeholder="0x..." style="background:white">
 <div style="display:flex;gap:8px;margin-top:8px">
 <button class="btn" style="height:36px;flex:1" onclick="saveWallet()">GUARDAR WALLET</button>
@@ -73,9 +73,9 @@
 <div class="card" style="background:#FEF9C3;border:1px dashed #EAB308">
 <div style="font-size:11px;font-weight:800">¿Cómo funciona?</div>
 <div style="font-size:11px;margin-top:6px;line-height:1.5">
-1. Cualquiera puede registrarse como referidor, <b>sin comprar WASABLOCKS</b>. Tu código REF-XXXX se genera al instante.<br>
-2. Si sos founder, tu link usa tu WASA-CODE genesis. No necesitás registrarte de nuevo, entrá con el mismo login del panel.<br>
-3. Todo founder se agrega automáticamente a la hoja de posibles referidores (unificación que pediste).<br>
+1. Cualquiera puede registrarse como referidor, <b>sin comprar WASABLOCKS</b>. Tu código <b>REF-XXXX</b> se genera al instante (distinto a tu WASA ID).<br>
+2. Si sos founder, tenés <b>dos IDs</b>: tu <b>WASA-XXXX</b> (tu NFT / holograma) y tu <b>REF-XXXX</b> (tu link de referidos). Usás el REF para referir.<br>
+3. Todo founder se agrega automáticamente como referidor con su REF-.<br>
 4. Si alguien entra con tu link y compra en founders.html, queda guardado.<br>
 5. Solo cuando paga USDT y la TX es validada on-chain, se genera comisión 10% automática en la hoja <b>referrals</b>.<br>
 6. Configurás tu wallet BSC <b>acá dentro</b> para cobrar.
@@ -114,12 +114,19 @@ async function load(){
       return; 
     }
     let d=j.data;
-    // FIX: mostrar link aunque no tenga slots, siempre que tenga codeId
-    if(d.codeId){
-      document.getElementById('refLink').value = 'https://wasa.chat/founders.html?ref='+d.codeId;
-      document.getElementById('title').textContent = d.hasMin ? 'Tu link activo (Founder + Referidor)' : 'Tu link activo como referidor';
-      document.getElementById('sub').textContent = `Código ${d.codeId} - Comisión 10% automática solo si tu referido compra validada. Clicks: ${d.clicks||0}`;
-      document.getElementById('codeInfo').textContent = d.isFounder ? '' : '';
+    // FIX SEPARADO: refCode = REF-XXXX, wasaCode = WASA-XXXX
+    let ref = d.refCode || d.codeId;
+    let wasa = d.wasaCode || '';
+    if(ref){
+      document.getElementById('refLink').value = 'https://wasa.chat/founders.html?ref='+ref;
+      document.getElementById('title').textContent = d.isFounder ? 'Tu link de referido (REF) - Sos Founder' : 'Tu link de referido (REF)';
+      document.getElementById('sub').textContent = `Tu REF: ${ref} - Comisión 10% automática solo si tu referido compra validada. Clicks: ${d.clicks||0}`;
+      if(d.isFounder && wasa){
+        document.getElementById('codeInfo').innerHTML = `Sos founder. Tu WASA ID es <b>${wasa}</b> (es tu NFT, no es tu link). Tu link de referidos es <b>${ref}</b> (formato REF-). Son dos IDs distintos a propósito.`;
+      } else {
+        document.getElementById('codeInfo').textContent = 'Sos referidor puro (sin WASABLOCKS). Tu link es '+ref+' (formato REF-). No necesitas comprar para cobrar.';
+      }
+    }
     } else {
       document.getElementById('refLink').value = '';
       document.getElementById('title').textContent = 'Generando tu código...';
@@ -133,7 +140,7 @@ async function load(){
 
     let rows = d.referrals||[];
     if(rows.length===0){
-      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aún no hay ventas con tu link. Compartí: https://wasa.chat/founders.html?ref='+(d.codeId||'')+'</td></tr>';
+      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aún no hay ventas con tu link. Compartí: https://wasa.chat/founders.html?ref='+(d.refCode||d.codeId||'')+'</td></tr>';
     } else {
       document.querySelector('#refTable tbody').innerHTML = rows.map(r=>`
         <tr>
