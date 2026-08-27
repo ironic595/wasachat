@@ -21,10 +21,10 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
     document.fonts.add(fontFace);
     await document.fonts.ready;
     // Forzar carga
-    await document.fonts.load(`700 10px FixedsysTTF`);
+    await document.fonts.load(`500 10px FixedsysTTF`);
   } catch(e) {
     console.warn('No se pudo cargar /fnts/Fixedsys.ttf, fallback a Courier New', e);
-    try { await document.fonts.load(`700 20px Fixedsys`); await document.fonts.ready; } catch {}
+    try { await document.fonts.load(`500 18px Fixedsys`); await document.fonts.ready; } catch {}
   }
 
   const canvas=document.createElement('canvas'); canvas.width=W; canvas.height=H;
@@ -34,14 +34,14 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
 
   // --- ESTILO COMO .fixedsys-card-text + Fixedsys ---
   const code = (codeId||'').toString().toUpperCase();
-  const fontSize = Math.floor(W * 0.039); // 3.2rem equivalente
+  const fontSize = Math.floor(W * 0.034); // 3.2rem equivalente
   const yPos = H - Math.floor(H * 0.072);
   const xPos = W/2;
 
   ctx.textAlign='center';
   ctx.textBaseline='middle';
   // Usamos FixedsysTTF primero, si no existe cae a Courier New (tu CSS pide Courier new)
-  ctx.font = `600 ${fontSize}px "FixedsysTTF", "Fixedsys", "Courier New", Courier, monospace`;
+  ctx.font = `500 ${fontSize}px "FixedsysTTF", "Fixedsys", "Courier New", Courier, monospace`;
   try { ctx.letterSpacing = '4px'; } catch {}
 
   // Relieve estilo tarjeta pixelada - tu CSS exacto
