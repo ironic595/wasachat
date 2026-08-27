@@ -5,147 +5,273 @@
 <title>Referidos - wasa.chat/founders</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',system-ui;background:#E6F0FF;color:#1E293B;min-height:100vh}
 .nav{height:64px;background:#1D4ED8;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:fixed;top:0;left:0;right:0;z-index:20;gap:16px}
-.nav .logo{color:white;font-weight:800;white-space:nowrap}
-.nav .links a{color:white;text-decoration:none;margin-left:12px;font-size:11px;font-weight:700}
-.wrap{max-width:900px;margin:0 auto;padding:84px 18px 40px}
-.card{background:white;border:2px solid #93B4FF;border-radius:20px;padding:20px;margin-bottom:14px}
+.nav .logo{color:white;font-weight:800;white-space:nowrap;font-size:14px}
+.nav .links a{color:white;text-decoration:none;margin-left:14px;font-size:11px;font-weight:700;opacity:.9}
+.nav .links a:hover{opacity:1;text-decoration:underline}
+.wrap{max-width:1180px;margin:0 auto;padding:84px 18px 40px}
+.grid{display:grid;grid-template-columns:1.15fr 0.85fr;gap:16px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:white;border:2px solid #93B4FF;border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 4px 14px rgba(29,78,216,.06)}
 .eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;opacity:.6;color:#1E3A8A;text-transform:uppercase}
 .title{font-size:20px;font-weight:800;margin-top:4px}
 .sub{font-size:11px;opacity:.6;margin-top:6px;line-height:1.5}
+.input{height:46px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:10px;font-family:monospace;font-size:12px;background:#E6F0FF}
+.input:focus{outline:none;border-color:#1D4ED8;box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+.btn{height:44px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;width:100%;transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-ghost{background:white;color:#1E293B;border:1px solid #93B4FF}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}
 .stat{background:#E6F0FF;border:1px solid #93B4FF;border-radius:14px;padding:14px}
-.stat .num{font-size:22px;font-weight:800}.stat .lbl{font-size:10px;opacity:.6;margin-top:4px;text-transform:uppercase}
-.input{height:46px;border-radius:12px;border:1px solid #93B4FF;padding:0 14px;width:100%;margin-top:10px;font-family:monospace;font-size:12px;background:#E6F0FF}
-.btn{height:44px;padding:0 18px;border-radius:12px;border:0;background:#0A101F;color:white;font-weight:800;cursor:pointer;font-size:12px;display:inline-flex;align-items:center;justify-content:center;width:100%}
+.stat .num{font-size:22px;font-weight:800}.stat .lbl{font-size:10px;opacity:.6;margin-top:4px;text-transform:uppercase;line-height:1.2}
 .table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
-.table th{font-size:10px;text-align:left;opacity:.6;padding:8px;border-bottom:1px solid #93B4FF;text-transform:uppercase}
-.table td{padding:10px 8px;border-bottom:1px solid #E6F0FF}
-.badge{font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px}
+.table th{font-size:10px;text-align:left;opacity:.6;padding:8px;border-bottom:1px solid #93B4FF;text-transform:uppercase;white-space:nowrap}
+.table td{padding:10px 8px;border-bottom:1px solid #E6F0FF;vertical-align:middle}
+.badge{font-size:10px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
 .badge-ok{background:#BBF7D0;color:#166534}.badge-pend{background:#FEF08A;color:#854D0E}
 .empty{padding:24px;text-align:center;opacity:.6;font-size:12px}
+
+/* Wallet selector card */
+.wallet-card{cursor:pointer;transition:.15s;border-style:dashed;background:#F8FBFF}
+.wallet-card:hover{border-color:#1D4ED8;background:#EEF4FF;transform:translateY(-1px)}
+.wallet-addr{font-family:monospace;font-size:12px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:10px;padding:10px 12px;margin-top:10px;word-break:break-all;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.wallet-addr span{opacity:.6;font-size:10px;font-family:'Plus Jakarta Sans',system-ui;text-transform:uppercase;font-weight:800}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,16,31,.55);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}
+.modal-overlay.show{display:flex}
+.modal{background:white;border-radius:20px;max-width:520px;width:100%;border:2px solid #93B4FF;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;animation:pop .2s ease}
+@keyframes pop{from{transform:scale(.96) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.modal-head{padding:18px 20px;border-bottom:1px solid #E6F0FF;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:14px;font-weight:800}
+.modal-close{width:32px;height:32px;border-radius:10px;border:1px solid #93B4FF;background:#E6F0FF;cursor:pointer;font-weight:800}
+.modal-body{padding:20px}
+.modal-foot{padding:14px 20px;background:#F8FBFF;border-top:1px solid #E6F0FF;display:flex;gap:10px}
+.hint{font-size:11px;opacity:.6;line-height:1.4;margin-top:8px}
+.link-box{background:#0A101F;color:#93B4FF;border-radius:12px;padding:12px;font-family:monospace;font-size:11px;word-break:break-all;margin-top:10px;border:1px solid #1E293B}
 </style>
 </head>
 <body>
-<nav class="nav"><div class="logo">wasa.chat/founders / referidos</div><div class="links"><span id="navEmail"></span> <a href="/dashboard.html">PANEL</a> <a href="/marketplace.html">MARKETPLACE</a> <a href="#" onclick="localStorage.clear();location.href='/refer-register.html'">SALIR</a></div></nav>
+<nav class="nav">
+<div class="logo">wasa.chat/founders / referidos</div>
+<div class="links"><span id="navEmail" style="opacity:.8;font-size:11px;margin-right:6px"></span> <a href="/dashboard.html">PANEL</a> <a href="/marketplace.html">MARKETPLACE</a> <a href="#" onclick="localStorage.clear();location.href='/refer-register.html'">SALIR</a></div>
+</nav>
+
 <div class="wrap">
-<div class="card">
-<div class="eyebrow">PROGRAMA DE REFERIDOS - SOLO CON VENTA CONCRETADA - 10%</div>
-<div class="title" id="title">Tu link de referido</div>
-<div class="sub" id="sub">No necesitás comprar WASABLOCKS. Solo cobrás si tu referido CONCRETA compra validada on-chain. Comisión 10% automática.</div>
+  <div class="grid">
+    <!-- COL IZQUIERDA -->
+    <div>
+      <div class="card">
+        <div class="eyebrow">Programa de referidos - Solo con venta concretada - 10%</div>
+        <div class="title" id="title">Tu link de referido (REF)</div>
+        <div class="sub" id="sub">Cargando tu REF-...</div>
 
-<div style="margin-top:14px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:12px;padding:12px">
-<div style="font-size:11px;font-weight:800">TU ENLACE ÚNICO - REF CODE (no es tu WASA ID)</div>
-<input class="input" id="refLink" readonly value="Cargando link...">
-<div style="display:flex;gap:8px;margin-top:10px">
-<button class="btn" style="flex:1" onclick="copyLink()">COPIAR ENLACE</button>
-<button class="btn" style="flex:1;background:white;color:#1E293B;border:1px solid #93B4FF" onclick="shareWpp()">COMPARTIR WHATSAPP</button>
-</div>
-<div id="msg" style="font-size:11px;margin-top:8px;display:none;padding:8px;border-radius:8px"></div>
-<div id="codeInfo" style="font-size:11px;margin-top:8px;opacity:.7"></div>
+        <div style="margin-top:16px;background:#E6F0FF;border:1px solid #93B4FF;border-radius:14px;padding:14px">
+          <div style="font-size:11px;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <span>TU ENLACE ÚNICO - REF CODE (no es tu WASA ID)</span>
+            <span id="clicksBadge" style="background:#1D4ED8;color:white;border-radius:999px;padding:3px 8px;font-size:9px;display:none">0 clicks</span>
+          </div>
+          <div class="link-box" id="refLinkDisplay">Cargando link...</div>
+          <input class="input" id="refLink" readonly value="Cargando link..." style="display:none">
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn" style="flex:1.2" onclick="copyLink()">COPIAR ENLACE</button>
+            <button class="btn btn-ghost" style="flex:1" onclick="shareWpp()">COMPARTIR WHATSAPP</button>
+          </div>
+          <div id="msg" style="font-size:11px;margin-top:8px;display:none;padding:8px;border-radius:8px"></div>
+          <div id="codeInfo" style="font-size:11px;margin-top:10px;opacity:.7;line-height:1.4"></div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat"><div class="num" id="statClicks">-</div><div class="lbl">Clicks en tu link<br>(ref_clicks)</div></div>
+          <div class="stat"><div class="num" id="statSales">-</div><div class="lbl">Ventas concretadas<br>(referrals)</div></div>
+          <div class="stat"><div class="num" id="statComm">$0</div><div class="lbl">Comisión total (10%)</div></div>
+        </div>
+      </div>
+
+      <div class="card" style="background:#FEF9C3;border:1px dashed #EAB308">
+        <div style="font-size:11px;font-weight:800">¿Cómo funciona? (D1 real)</div>
+        <div style="font-size:11px;margin-top:8px;line-height:1.6">
+          1. Te registrás en <b>ref_users</b> → REF-XXXXXX (distinto a tu WASA ID).<br>
+          2. Tu link siempre es <b>wasa.chat/founders.html?ref=REF-XXXXXX</b>.<br>
+          3. Clicks se guardan en <b>ref_clicks</b>, ventas en <b>referrals</b>.<br>
+          4. Cobrás el 10% en tu wallet de <b>ref_users</b> el 15 de cada mes.
+        </div>
+      </div>
+    </div>
+
+    <!-- COL DERECHA -->
+    <div>
+      <div class="card wallet-card" onclick="openWalletModal()">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <div>
+            <div class="eyebrow">Wallet para cobrar</div>
+            <div class="title" style="font-size:16px;margin-top:2px">Elegir dirección donde recibir el dinero</div>
+            <div class="sub" style="margin-top:4px">USDT BSC - Se guarda en ref_users - Click para cambiar</div>
+          </div>
+          <div style="background:#1D4ED8;color:white;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font-weight:800">↗</div>
+        </div>
+        <div class="wallet-addr" id="walletPreview">
+          <div style="flex:1;word-break:break-all" id="walletPreviewText">0x... no configurada</div>
+          <span>editar</span>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <div style="flex:1;background:#E6F0FF;border-radius:10px;padding:8px 10px;text-align:center">
+            <div style="font-size:10px;opacity:.6;text-transform:uppercase;font-weight:800">Estado</div>
+            <div id="walletStatus" style="font-size:12px;font-weight:800;margin-top:2px">Sin configurar</div>
+          </div>
+          <div style="flex:1;background:#E6F0FF;border-radius:10px;padding:8px 10px;text-align:center">
+            <div style="font-size:10px;opacity:.6;text-transform:uppercase;font-weight:800">Próximo pago</div>
+            <div style="font-size:12px;font-weight:800;margin-top:2px">15 de cada mes</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Resumen rápido</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#F8FBFF;border:1px solid #E6F0FF;border-radius:12px;padding:10px 12px">
+            <div><div style="font-size:11px;opacity:.6">Tu REF</div><div id="summaryRef" style="font-family:monospace;font-weight:800;font-size:13px">-</div></div>
+            <div style="font-size:10px;background:#DBEAFE;color:#1E40AF;padding:4px 8px;border-radius:999px;font-weight:800">REF_USERS</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#F8FBFF;border:1px solid #E6F0FF;border-radius:12px;padding:10px 12px">
+            <div><div style="font-size:11px;opacity:.6">Tu WASA ID</div><div id="summaryWasa" style="font-family:monospace;font-weight:700;font-size:12px">-</div></div>
+            <div style="font-size:10px;background:#FEF08A;color:#854D0E;padding:4px 8px;border-radius:999px;font-weight:800">WASA</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#F8FBFF;border:1px solid #E6F0FF;border-radius:12px;padding:10px 12px">
+            <div><div style="font-size:11px;opacity:.6">Email</div><div id="summaryEmail" style="font-weight:600;font-size:12px">-</div></div>
+            <div style="font-size:10px;background:#BBF7D0;color:#166534;padding:4px 8px;border-radius:999px;font-weight:800" id="founderBadge">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial full width -->
+  <div class="card">
+    <div class="eyebrow">Historial de referidos - Solo ventas validadas</div>
+    <div class="sub">Solo aparecen acá los que compraron y la TX fue validada en BSC. Comisión 10% automática - pago manual el 15. Tabla referrals.</div>
+    <div style="overflow:auto;margin-top:6px">
+      <table class="table" id="refTable"><thead><tr><th>Fecha</th><th>Referido</th><th>Slots</th><th>Total venta</th><th>Tu comisión 10%</th><th>Estado</th><th>Tx</th></tr></thead><tbody><tr><td colspan="7" class="empty">Cargando referidos...</td></tr></tbody></table>
+    </div>
+  </div>
 </div>
 
-<div style="margin-top:14px;background:white;border:1px solid #93B4FF;border-radius:12px;padding:12px">
-<div style="font-size:11px;font-weight:800;opacity:.7">WALLET PARA COBRAR COMISIONES (USDT BSC) - CONFIGURÁS ACÁ DENTRO</div>
-<div style="font-size:11px;opacity:.6;margin-top:4px">Acá te pagamos el 10% manual el 15 de cada mes. Podés cambiarla cuando quieras.</div>
-<input class="input" id="walletInput" placeholder="0x..." style="background:white">
-<div style="display:flex;gap:8px;margin-top:8px">
-<button class="btn" style="height:36px;flex:1" onclick="saveWallet()">GUARDAR WALLET</button>
-<button class="btn" style="height:36px;background:white;color:#1E293B;border:1px solid #93B4FF;flex:1" onclick="copyWallet()">COPIAR</button>
-</div>
-<div id="walletMsg" style="font-size:11px;margin-top:8px;display:none;padding:8px;border-radius:8px"></div>
-</div>
-
-<div class="stat-grid">
-<div class="stat"><div class="num" id="statClicks">0</div><div class="lbl">CLICKS EN TU LINK</div></div>
-<div class="stat"><div class="num" id="statSales">0</div><div class="lbl">VENTAS CONCRETADAS</div></div>
-<div class="stat"><div class="num" id="statComm">$0</div><div class="lbl">COMISIÓN TOTAL (10%)</div></div>
-</div>
-</div>
-
-<div class="card">
-<div class="eyebrow">HISTORIAL DE REFERIDOS - SOLO VENTAS VALIDADAS</div>
-<div class="sub">Solo aparecen acá los que compraron y la TX fue validada en BSC. Comisión 10% automática - pago manual el 15.</div>
-<table class="table" id="refTable"><thead><tr><th>Fecha</th><th>Referido</th><th>Slots</th><th>Total venta</th><th>Tu comisión 10%</th><th>Estado</th></tr></thead><tbody><tr><td colspan="6" class="empty">Cargando referidos...</td></tr></tbody></table>
-</div>
-
-<div class="card" style="background:#FEF9C3;border:1px dashed #EAB308">
-<div style="font-size:11px;font-weight:800">¿Cómo funciona?</div>
-<div style="font-size:11px;margin-top:6px;line-height:1.5">
-1. Cualquiera puede registrarse como referidor, <b>sin comprar WASABLOCKS</b>. Tu código <b>REF-XXXX</b> se genera al instante (distinto a tu WASA ID).<br>
-2. Si sos founder, tenés <b>dos IDs</b>: tu <b>WASA-XXXX</b> (tu NFT / holograma) y tu <b>REF-XXXX</b> (tu link de referidos). Usás el REF para referir.<br>
-3. Todo founder se agrega automáticamente como referidor con su REF-.<br>
-4. Si alguien entra con tu link y compra en founders.html, queda guardado.<br>
-5. Solo cuando paga USDT y la TX es validada on-chain, se genera comisión 10% automática en la hoja <b>referrals</b>.<br>
-6. Configurás tu wallet BSC <b>acá dentro</b> para cobrar.
-</div>
-</div>
+<!-- Modal Wallet -->
+<div class="modal-overlay" id="walletModal" onclick="if(event.target===this)closeWalletModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Elegir dirección donde recibir el dinero</h3>
+      <button class="modal-close" onclick="closeWalletModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="eyebrow">USDT BSC (BEP20)</div>
+      <div class="sub" style="margin-top:4px">Esta es la wallet donde te pagamos el 10% el 15 de cada mes. Se guarda en tu fila de <b>ref_users.wallet</b>. Podés cambiarla cuando quieras.</div>
+      <input class="input" id="walletInput" placeholder="0x..." style="background:white;margin-top:14px" autocomplete="off" spellcheck="false">
+      <div class="hint">Debe empezar con 0x y ser válida de BSC. Usá tu MetaMask / Trust / Binance Wallet. No uses exchange directo sin memo.</div>
+      <div id="walletMsg" style="font-size:11px;margin-top:10px;display:none;padding:10px;border-radius:10px"></div>
+      <div id="currentWalletBox" style="margin-top:12px;background:#F8FBFF;border:1px solid #E6F0FF;border-radius:12px;padding:10px;display:none">
+        <div style="font-size:10px;opacity:.6;font-weight:800;text-transform:uppercase">Wallet actual guardada</div>
+        <div id="currentWalletText" style="font-family:monospace;font-size:11px;margin-top:4px;word-break:break-all"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeWalletModal()">CANCELAR</button>
+      <button class="btn" style="flex:1.3" id="btnSaveWallet" onclick="saveWallet()">GUARDAR DIRECCIÓN</button>
+    </div>
+  </div>
 </div>
 
-<script src="/wasa-config.js"></script>
+<script src="/wasa-config.js?v=20260827d"></script>
 <script>
-function copyLink(){ let v=document.getElementById('refLink').value; if(!v||v.includes('Necesitás')){alert('Aún no tenés link');return;} navigator.clipboard.writeText(v); let m=document.getElementById('msg'); m.style.display='block'; m.style.background='#F0FDF4'; m.textContent='Copiado: '+v; setTimeout(()=>m.style.display='none',3000); }
-function shareWpp(){ let v=document.getElementById('refLink').value; if(!v||v.includes('Necesitás')){alert('Aún no tenés link');return;} let txt=encodeURIComponent('Comprá WASABLOCKS con mi link founder: '+v); window.open('https://wa.me/?text='+txt,'_blank'); }
-function copyWallet(){ let v=document.getElementById('walletInput').value; navigator.clipboard.writeText(v); alert('Copiado: '+v); }
+function copyLink(){ let v=document.getElementById('refLink').value; if(!v||v.includes('Cargando')||v.includes('Error')){alert('Aún no tenés link');return;} navigator.clipboard.writeText(v); let m=document.getElementById('msg'); m.style.display='block'; m.style.background='#F0FDF4'; m.style.color='#166534'; m.textContent='✅ Copiado: '+v; setTimeout(()=>m.style.display='none',3000); }
+function shareWpp(){ let v=document.getElementById('refLink').value; if(!v||v.includes('Cargando')){alert('Aún no tenés link');return;} let txt=encodeURIComponent('Comprá WASABLOCKS con mi link: '+v); window.open('https://wa.me/?text='+txt,'_blank'); }
+
+function openWalletModal(){
+  document.getElementById('walletModal').classList.add('show');
+  document.getElementById('walletInput').focus();
+  let cur=document.getElementById('walletInput').value||'';
+  if(cur){
+    document.getElementById('currentWalletBox').style.display='block';
+    document.getElementById('currentWalletText').textContent=cur;
+  }
+}
+function closeWalletModal(){ document.getElementById('walletModal').classList.remove('show'); }
 
 async function saveWallet(){
   let w=document.getElementById('walletInput').value.trim();
   if(!w.startsWith('0x')||w.length<20){ alert('Wallet BSC inválida 0x...'); return; }
-  let msg=document.getElementById('walletMsg'); msg.style.display='block'; msg.style.background='#E6F0FF'; msg.textContent='Guardando...';
+  let msg=document.getElementById('walletMsg'); let btn=document.getElementById('btnSaveWallet');
+  msg.style.display='block'; msg.style.background='#E6F0FF'; msg.style.color='#1E293B'; msg.textContent='Guardando en ref_users...'; btn.disabled=true; btn.textContent='Guardando...';
   try{
     let res=await fetch(WASA_WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateReferrerWallet', token:localStorage.getItem('wasa_token'), wallet:w})});
     let j=await res.json();
-    if(j.ok){ msg.style.background='#F0FDF4'; msg.style.color='#166534'; msg.textContent='Wallet guardada. Acá recibirás el 10% el 15 de cada mes.'; }
-    else { msg.style.background='#FEF2F2'; msg.textContent='Error: '+j.error; }
-  }catch(e){ msg.textContent='Error: '+e.message; }
+    if(j.ok){
+      msg.style.background='#F0FDF4'; msg.style.color='#166534'; msg.textContent='✅ Wallet guardada en ref_users.wallet. Acá recibirás el 10% el 15 de cada mes.';
+      document.getElementById('walletPreviewText').textContent=w;
+      document.getElementById('walletStatus').textContent='Configurada ✅';
+      document.getElementById('walletStatus').style.color='#166534';
+      setTimeout(()=>{ closeWalletModal(); },900);
+      load();
+    } else { msg.style.background='#FEF2F2'; msg.style.color='#991B1B'; msg.textContent='Error: '+j.error; }
+  }catch(e){ msg.style.background='#FEF2F2'; msg.textContent='Error: '+e.message; }
+  finally{ btn.disabled=false; btn.textContent='GUARDAR DIRECCIÓN'; }
 }
-
 
 async function load(){
   let token=localStorage.getItem('wasa_token');
+  let email=localStorage.getItem('wasa_email')||'';
   if(!token){ location.href='/refer-register.html'; return; }
-  document.getElementById('navEmail').textContent = localStorage.getItem('wasa_email')||'';
+  document.getElementById('navEmail').textContent=email;
+  document.getElementById('summaryEmail').textContent=email;
   try{
     let r=await fetch(WASA_WEBHOOK_URL+'?action=referralStats&token='+encodeURIComponent(token)+'&v='+Date.now());
     let j=await r.json();
-    console.log('referralStats response', j);
     if(!j.ok){ 
-      if((j.error||'').toLowerCase().includes('vencida')){ localStorage.clear(); location.href='/refer-register.html'; return; }
-      document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">${j.error}</td></tr>`;
+      if((j.error||'').toLowerCase().includes('vencida')||(j.error||'').toLowerCase().includes('sesion')){ localStorage.clear(); location.href='/refer-register.html'; return; }
       document.getElementById('refLink').value='Error: '+j.error;
+      document.getElementById('refLinkDisplay').textContent='Error: '+j.error;
+      document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="7" class="empty">${j.error}</td></tr>`;
       return; 
     }
     let d=j.data;
     let ref = d.refCode || d.codeId || '';
     let wasa = d.wasaCode || '';
-    console.log('parsed ref', ref, 'wasa', wasa, 'data', d);
     if(ref){
-      document.getElementById('refLink').value = 'https://wasa.chat/founders.html?ref='+ref;
-      document.getElementById('title').textContent = d.isFounder ? 'Tu link de referido (REF) - Sos Founder' : 'Tu link de referido (REF)';
-      document.getElementById('sub').textContent = `Tu REF: ${ref} - Comision 10% automatica. Clicks: ${d.clicks||0}`;
-      if(d.isFounder && wasa){
-        document.getElementById('codeInfo').innerHTML = `Sos founder. Tu WASA ID es <b>${wasa}</b> (NFT). Tu link de referidos es <b>${ref}</b> (REF-).`;
-      } else {
-        document.getElementById('codeInfo').textContent = 'Sos referidor puro (sin WASABLOCKS). Tu link es '+ref+' (formato REF-).';
-      }
-    } else {
-      document.getElementById('refLink').value = 'No se genero REF - recarga';
-      document.getElementById('title').textContent = 'Generando tu codigo...';
-      document.getElementById('sub').textContent = 'Si ves esto, recarga o contacta soporte. Tu REF deberia generarse.';
-      document.getElementById('codeInfo').textContent = JSON.stringify(d).slice(0,200);
+      let fullLink='https://wasa.chat/founders.html?ref='+ref;
+      document.getElementById('refLink').value=fullLink;
+      document.getElementById('refLinkDisplay').textContent=fullLink;
+      document.getElementById('title').textContent = d.isFounder ? 'Tu link de referido (REF) - Sos Founder' : 'Tu link de referido (REF) - Referidor puro';
+      document.getElementById('sub').textContent = `Tu REF: ${ref} ${wasa?'(WASA: '+wasa+')':''} - Comisión 10% automática.`;
+      document.getElementById('summaryRef').textContent=ref;
+      document.getElementById('summaryWasa').textContent=wasa||'—';
+      document.getElementById('founderBadge').textContent=d.isFounder?'Founder + Referidor':'Referidor puro';
+      document.getElementById('clicksBadge').style.display='inline-block';
+      document.getElementById('clicksBadge').textContent=(d.clicks||0)+' clicks';
+      document.getElementById('codeInfo').innerHTML = d.isFounder ? `Sos founder. Tu WASA <b>${wasa}</b> (panel_users/compras) y tu REF <b>${ref}</b> (ref_users).` : `Sos referidor puro en <b>ref_users</b>. Tu link es <b>${ref}</b> (REF-).`;
     }
-    
-    document.getElementById('statClicks').textContent = d.clicks||0;
-    document.getElementById('statSales').textContent = d.sales||0;
-    document.getElementById('statComm').textContent = '$'+(d.totalCommission||0).toFixed(2);
-    document.getElementById('walletInput').value = d.wallet||'';
-
-    let rows = d.referrals||[];
-    if(rows.length===0){
-      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="6" class="empty">Aun no hay ventas con tu link. Comparti: https://wasa.chat/founders.html?ref='+(ref||'')+'</td></tr>';
+    document.getElementById('statClicks').textContent=d.clicks||0;
+    document.getElementById('statSales').textContent=d.sales||0;
+    document.getElementById('statComm').textContent='$'+(d.totalCommission||0).toFixed(2);
+    document.getElementById('walletInput').value=d.wallet||'';
+    if(d.wallet){
+      document.getElementById('walletPreviewText').textContent=d.wallet;
+      document.getElementById('walletStatus').textContent='Configurada ✅';
+      document.getElementById('walletStatus').style.color='#166534';
+      document.getElementById('currentWalletBox').style.display='block';
+      document.getElementById('currentWalletText').textContent=d.wallet;
     } else {
-      document.querySelector('#refTable tbody').innerHTML = rows.map(r=>`
+      document.getElementById('walletPreviewText').textContent='0x... no configurada - Click para configurar';
+      document.getElementById('walletStatus').textContent='Sin configurar';
+      document.getElementById('walletStatus').style.color='#991B1B';
+    }
+    let rows=d.referrals||[];
+    if(rows.length===0){
+      document.querySelector('#refTable tbody').innerHTML='<tr><td colspan="7" class="empty">Aún no hay ventas con tu link. Compartí: https://wasa.chat/founders.html?ref='+(ref||'')+'</td></tr>';
+    } else {
+      document.querySelector('#refTable tbody').innerHTML=rows.map(r=>`
         <tr>
           <td>${(r.date||'').slice(0,10)}</td>
           <td>${(r.referredEmail||'').slice(0,3)}***</td>
@@ -153,17 +279,17 @@ async function load(){
           <td>$${(r.totalUsdt||0).toFixed(2)}</td>
           <td><b>$${(r.commission||0).toFixed(2)}</b></td>
           <td><span class="badge ${r.status==='pagado'?'badge-ok':'badge-pend'}">${r.status||'pendiente'}</span></td>
+          <td style="font-family:monospace;font-size:10px">${(r.tx_hash||'').slice(0,8)}...</td>
         </tr>
       `).join('');
     }
   }catch(e){
-    console.error('load error', e);
     document.getElementById('refLink').value='Error JS: '+e.message;
-    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="6" class="empty">Error: ${e.message} - F12 consola</td></tr>`;
+    document.getElementById('refLinkDisplay').textContent='Error JS: '+e.message;
+    document.querySelector('#refTable tbody').innerHTML=`<tr><td colspan="7" class="empty">Error: ${e.message}</td></tr>`;
   }
 }
 load();
-
 </script>
 </body>
 </html>
