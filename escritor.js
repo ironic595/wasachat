@@ -16,7 +16,7 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
   // Esta es la que está en tu screenshot
   try {
     // Intentar cargar como FontFace explicita (más confiable para canvas)
-    const fontFace = new FontFace('FixedsysTTF', 'url(/fnts/Fixedsys.ttf)', { weight: '700' });
+    const fontFace = new FontFace('FixedsysTTF', 'url(/fnts/Fixedsys.ttf)', { weight: '600' });
     await fontFace.load();
     document.fonts.add(fontFace);
     await document.fonts.ready;
@@ -34,14 +34,14 @@ async function editarYEnviarHolograma({slots, codeId, email, nombre, accessCode,
 
   // --- ESTILO COMO .fixedsys-card-text + Fixedsys ---
   const code = (codeId||'').toString().toUpperCase();
-  const fontSize = Math.floor(W * 0.045); // 3.2rem equivalente
+  const fontSize = Math.floor(W * 0.039); // 3.2rem equivalente
   const yPos = H - Math.floor(H * 0.072);
   const xPos = W/2;
 
   ctx.textAlign='center';
   ctx.textBaseline='middle';
   // Usamos FixedsysTTF primero, si no existe cae a Courier New (tu CSS pide Courier new)
-  ctx.font = `700 ${fontSize}px "FixedsysTTF", "Fixedsys", "Courier New", Courier, monospace`;
+  ctx.font = `600 ${fontSize}px "FixedsysTTF", "Fixedsys", "Courier New", Courier, monospace`;
   try { ctx.letterSpacing = '4px'; } catch {}
 
   // Relieve estilo tarjeta pixelada - tu CSS exacto
