@@ -1,86 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>wasa.chat - founders - 9 images kinetic</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{ background:#000; overflow:hidden; font-family: sans-serif; }
-
-  #hero{
-    position:relative;
-    width:100vw; height:100vh;
-  }
- .bg{
-    position:absolute; inset:0;
-    background-size:cover;
-    background-position:center;
-  }
-  /* PONE ACA TUS FOTOS */
-  #bg-dark{
-    background-image: url('ciudad-oscura.jpg');
-  }
-  #bg-future{
-    background-image: url('ciudad-futuro.jpg');
-    /* Esta es la que se revela con el mouse */
-    clip-path: circle(180px at 50% 50%);
-    transition: clip-path 0.05s linear;
-  }
-
-  /* LOGO EN EL MEDIO */
-  #logo-wrap{
-    position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    z-index:20;
-    pointer-events:none;
-  }
-  #logo-wasa{
-    width: 340px;
-    /* ESTO HACE LA MAGIA DEL CONTRASTE */
-    mix-blend-mode: difference;
-    filter: invert(1) brightness(1.2);
-  }
-  #subtitle{
-    color:white;
-    text-align:center;
-    margin-top:16px;
-    letter-spacing: 4px;
-    font-size:11px;
-    opacity:0.7;
-    mix-blend-mode: difference;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;overflow:hidden;font-family:Inter,system-ui;cursor:none}
+#hero{position:relative;width:100vw;height:100vh;isolation:isolate}
+#bg-future{position:absolute;inset:0;background:url('/mnt/data/resource/futuristic_white_cityscape.webp') center/cover no-repeat}
+#eraseCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;cursor:none}
+#logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:flex;align-items:flex-end;gap:6px;perspective:1000px;mix-blend-mode:difference;pointer-events:none}
+.letter{height:72px;width:auto;object-fit:contain;display:block;will-change:transform;transform-style:preserve-3d;transition:transform 0.8s cubic-bezier(0.68,-0.6,0.32,1.6);filter:brightness(0) invert(1); /* hace que cualquier png negro o blanco quede blanco para el difference */}
+#logo-wrap .letter.dot{height:18px;margin-bottom:12px}
+#subtitle{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:24px;white-space:nowrap;color:white;font-size:11px;letter-spacing:4px;opacity:0.8}
+#hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:20;color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:3px;mix-blend-mode:difference;pointer-events:none}
+#instructions{position:absolute;top:20px;left:20px;z-index:20;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);color:white;padding:12px 16px;border-radius:10px;font-size:11px;line-height:1.4;max-width:280px}
+#instructions code{font-size:10px;color:#9eff9e}
 </style>
 </head>
 <body>
-
 <div id="hero">
-  <div class="bg" id="bg-dark"></div>
-  <div class="bg" id="bg-future"></div>
-
+  <div id="bg-future"></div>
+  <canvas id="eraseCanvas"></canvas>
   <div id="logo-wrap">
-    <!-- PONE ACA TU LOGO -->
-    <img id="logo-wasa" src="logo-wasa.png" alt="wasa.chat" />
-    <div id="subtitle">WASA.CHAT — DIC 2026</div>
+    <!-- REEMPLAZA ESTOS 9 SRC POR TUS 9 WEBP -->
+    <img src="/mnt/data/wasa_letter_0.webp" class="letter" data-i="0" alt="w">
+    <img src="/mnt/data/wasa_letter_1.webp" class="letter" data-i="1" alt="a">
+    <img src="/mnt/data/wasa_letter_0.webp" class="letter" data-i="2" alt="s">
+    <img src="/mnt/data/wasa_letter_1.webp" class="letter" data-i="3" alt="a">
+    <img src="/mnt/data/wasa_letter_0.webp" class="letter dot" data-i="4" alt=".">
+    <img src="/mnt/data/wasa_letter_1.webp" class="letter" data-i="5" alt="c">
+    <img src="/mnt/data/wasa_letter_0.webp" class="letter" data-i="6" alt="h">
+    <img src="/mnt/data/wasa_letter_1.webp" class="letter" data-i="7" alt="a">
+    <img src="/mnt/data/wasa_letter_0.webp" class="letter" data-i="8" alt="t">
+    <div id="subtitle">WASA.CHAT — DIC 15 2026 — FOUNDERS</div>
   </div>
+  <div id="hint">MOVE TO PAINT • HOVER LOGO TO SHUFFLE</div>
+  <div id="instructions">Reemplaza los src:<br><code>w_2x.webp, a_2x.webp, s_2x.webp, a_2x.webp, dot_2x.webp, c_2x.webp, h_2x.webp, a_2x.webp, t_2x.webp</code><br><br>Exporta cada letra en 2x, WebP, fondo transparente.</div>
 </div>
 
 <script>
-  const future = document.getElementById('bg-future');
-  const hero = document.getElementById('hero');
+// ERASE CANVAS - permanente
+const darkImg = new Image(); darkImg.src = '/mnt/data/resource/futuristic_nyc_skyline.webp';
+const canvas = document.getElementById('eraseCanvas');
+const ctx = canvas.getContext('2d');
+let w,h,lx=0,ly=0;
+function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; if(darkImg.complete) draw(); }
+function draw(){ ctx.globalCompositeOperation='source-over'; ctx.drawImage(darkImg,0,0,w,h); }
+darkImg.onload=draw; window.addEventListener('resize',resize); resize();
+function erase(x,y){
+  ctx.globalCompositeOperation='destination-out';
+  const grad = ctx.createRadialGradient(x,y,0,x,y,75);
+  grad.addColorStop(0,'rgba(0,0,0,1)'); grad.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(x,y,75,0,Math.PI*2); ctx.fill();
+  if(lx){ const dx=x-lx, dy=y-ly, d=Math.hypot(dx,dy), s=Math.ceil(d/10); for(let i=0;i<s;i++){ ctx.beginPath(); ctx.arc(lx+dx*i/s, ly+dy*i/s,75,0,Math.PI*2); ctx.fill(); } }
+  lx=x; ly=y;
+}
+canvas.addEventListener('mousemove', e=>{ erase(e.clientX,e.clientY); scatter(e.clientX,e.clientY); });
+canvas.addEventListener('touchmove', e=>{ e.preventDefault(); const t=e.touches[0]; erase(t.clientX,t.clientY); scatter(t.clientX,t.clientY); }, {passive:false});
+canvas.addEventListener('mouseleave', ()=>{ lx=0; });
 
-  function update(e){
-    const x = e.clientX || e.touches?.[0]?.clientX;
-    const y = e.clientY || e.touches?.[0]?.clientY;
-    future.style.clipPath = circle(180px at ${x}px ${y}px);
-  }
+// KINETIC LOGO WITH IMAGES
+const letters = document.querySelectorAll('.letter');
+let reassembleTimer;
 
-  hero.addEventListener('mousemove', update);
-  hero.addEventListener('touchmove', update);
+function scatter(mx,my){
+  const wrap = document.getElementById('logo-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  const dist = Math.hypot(mx-cx, my-cy);
+  if(dist > 380) return;
+  const intensity = 1 - dist/380;
 
-  // Cuando sale el mouse, se cierra
-  hero.addEventListener('mouseleave', () => {
-    future.style.clipPath = circle(0px at 50% 50%);
+  letters.forEach((el,i)=>{
+    if(el._busy) return;
+    const rx = (Math.random()-0.5)*260*intensity;
+    const ry = (Math.random()-0.5)*180*intensity;
+    const rz = (Math.random()-0.5)*540*intensity;
+    const rX = (Math.random()-0.5)*180;
+    const rY = (Math.random()-0.5)*180;
+    const sc = 0.6 + Math.random()*0.8;
+    el.style.transform = `translate3d(${rx}px,${ry}px,80px) rotate(${rz}deg) rotateX(${rX}deg) rotateY(${rY}deg) scale(${sc})`;
+    el._busy = true;
+    setTimeout(()=> el._busy=false, 800);
   });
-</script>
 
+  clearTimeout(reassembleTimer);
+  reassembleTimer = setTimeout(reassemble, 750);
+}
+
+function reassemble(){
+  letters.forEach((el,i)=>{
+    setTimeout(()=>{
+      el.style.transform = 'translate3d(0,0,0) rotate(0) rotateX(0) rotateY(0) scale(1)';
+    }, i*55);
+  });
+}
+
+// idle shuffle cada 4s para demo
+setInterval(()=>{
+  if(Math.random()>0.6) scatter(innerWidth/2 + (Math.random()-0.5)*100, innerHeight/2);
+}, 4000);
+
+// allow pointer over logo to trigger stronger
+document.getElementById('logo-wrap').addEventListener('mouseenter', e=>{
+  letters.forEach(el=>{
+    el.style.transform = `translate3d(${(Math.random()-0.5)*300}px,${(Math.random()-0.5)*200}px,100px) rotate(${(Math.random()-0.5)*720}deg) rotateX(${(Math.random()-0.5)*360}deg)`;
+  });
+  setTimeout(reassemble, 900);
+});
+</script>
 </body>
 </html>
