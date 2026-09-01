@@ -45,28 +45,37 @@ body{
  .letter.dot{height:2.2vw!important;width:2.2vw!important;margin-bottom:3.2vw!important}
   #subtitle{font-size:2.6vw;letter-spacing:0.8vw;margin-top:8px}
 }
-  #cta{
-  margin-top:32px;
+
+/* BOTON CENTRADO ABAJO - PULSO SUAVE */
+#cta-wrap{
+  position:absolute;
+  bottom: clamp(24px, 6vh, 48px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:20;
+  width:90vw;
+  display:flex;
+  justify-content:center;
+}
+#cta{
   background: linear-gradient(180deg, #FFD60A 0%, #FFB000 100%);
-  color:#000; 
-  font-family: inherit;
-  font-weight:800; 
-  font-size:clamp(11px,2.8vw,14px);
-  letter-spacing:0.5px; 
+  color:#000;
+  font-weight:800;
+  font-size:clamp(12px,3vw,15px);
+  letter-spacing:0.5px;
   padding:18px 36px;
-  border-radius:14px; 
+  border-radius:14px;
   border:1px solid rgba(255,255,255,0.4);
   box-shadow:0 8px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.6);
   cursor:pointer;
-  animation: titilar 2s ease-in-out infinite;
-  transition: transform 0.2s;
-  display:block;
+  animation: pulseSuave 2.5s ease-in-out infinite;
+  white-space:nowrap;
 }
-#cta:hover{transform:scale(1.08)}
-@keyframes titilar{
-  0%,100%{transform:scale(1) rotate(-1deg); box-shadow:0 8px 24px rgba(0,0,0,0.3)}
-  50%{transform:scale(1.05) rotate(1deg); box-shadow:0 12px 32px rgba(0,0,0,0.4), 0 0 20px rgba(255,214,10,0.5)}
+@keyframes pulseSuave{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.06)}
 }
+#cta:hover{transform:scale(1.08); animation-play-state:paused}
 </style>
 </head>
 <body>
@@ -82,10 +91,12 @@ body{
     <img src="/assets/img/h.png" class="letter" alt="h">
     <img src="/assets/img/a3.png" class="letter" alt="a">
     <img src="/assets/img/t.png" class="letter" alt="t">
-    <div id="subtitle">WASA.CHAT — DIC 15 2026 — FOUNDERS</div><br>
+    <div id="subtitle">WASA.CHAT — DIC 15 2026 — FOUNDERS</div>
+  </div>
+
+  <div id="cta-wrap">
     <button id="cta">COMPRAR FOUNDER PASS 20% OFF</button>
   </div>
-  
 </div>
 
 <script>
@@ -122,8 +133,7 @@ function scatter(mx,my){
 }
 document.addEventListener('mousemove', e=>scatter(e.clientX,e.clientY));
 document.addEventListener('touchmove', e=>{const t=e.touches[0];scatter(t.clientX,t.clientY)},{passive:false});
-
-  document.getElementById('cta').onclick=()=>{window.location.href='https://founders.wasa.chat'};
+document.getElementById('cta').onclick=()=>{window.location.href='https://founders.wasa.chat'};
 </script>
 </body>
 </html>
