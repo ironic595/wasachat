@@ -6,13 +6,18 @@
 <title>wasa.chat - founders</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 70%), radial-gradient(ellipse at 100% 80%, rgba(245, 158, 11, 0.10) 0%, transparent 60%), linear-gradient(180deg, #21418f 0%, #332891 40%, #5e80e1 100%);overflow:hidden}
+body{
+  background: radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 70%),
+              radial-gradient(ellipse at 100% 80%, rgba(245, 158, 11, 0.10) 0%, transparent 60%),
+              linear-gradient(180deg, #21418f 0%, #332891 40%, #5e80e1 100%);
+  overflow:hidden
+}
 #hero{position:relative;width:100vw;height:100vh}
 #starCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
 #logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:flex;align-items:baseline;justify-content:center;gap:clamp(3px,1vw,10px);width:92vw;max-width:900px;perspective:1000px}
-.letter{height:clamp(36px,11vw,100px);width:auto;object-fit:contain;display:block;will-change:transform;transform-style:preserve-3d;transition:transform 0.8s cubic-bezier(0.68,-0.6,0.32,1.6);flex-shrink:1;filter:brightness(0)}
-#logo-wrap.letter.dot{height:clamp(8px,2.2vw,20px);width:clamp(8px,2.2vw,20px);margin-bottom:clamp(18px,5.5vw,42px);margin-left:2px;margin-right:2px}
-#subtitle{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:clamp(12px,2.5vw,24px);white-space:nowrap;color:#111;font-size:clamp(7px,1.6vw,11px);letter-spacing:clamp(2px,0.5vw,4px);opacity:0.7}
+.letter{height:clamp(36px,11vw,100px);width:auto;object-fit:contain;display:block;will-change:transform;transform-style:preserve-3d;transition:transform 0.8s cubic-bezier(0.68,-0.6,0.32,1.6);flex-shrink:1;filter:brightness(0) invert(1)}
+.letter.dot{height:clamp(8px,2.2vw,20px)!important;width:clamp(8px,2.2vw,20px)!important;margin-bottom:clamp(18px,5.5vw,42px)!important;margin-left:2px;margin-right:2px}
+#subtitle{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:clamp(12px,2.5vw,24px);white-space:nowrap;color:rgba(255,255,255,0.8);font-size:clamp(7px,1.6vw,11px);letter-spacing:clamp(2px,0.5vw,4px)}
 @media (max-width:480px){#logo-wrap{width:94vw;gap:3px}.letter{height:10.8vw}#logo-wrap.letter.dot{height:2.6vw;width:2.6vw;margin-bottom:4.2vw}}
 </style>
 </head>
@@ -34,7 +39,6 @@ body{background:radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.15) 0%, t
 </div>
 
 <script>
-// FONDO ESPACIO - SIEMPRE VISIBLE, SIN BORRAR
 const starCanvas=document.getElementById('starCanvas'), sCtx=starCanvas.getContext('2d');
 let stars=[];
 function initStars(){
@@ -52,14 +56,7 @@ function initStars(){
   }
 }
 function drawStars(){
-  // usa tu degradado de fondo
-  const grad = sCtx.createLinearGradient(0,0,0,starCanvas.height);
-  grad.addColorStop(0,'#EEF2FF');
-  grad.addColorStop(0.4,'#F6F8FE');
-  grad.addColorStop(1,'#FEF3C7');
-  sCtx.fillStyle=grad;
-  sCtx.fillRect(0,0,starCanvas.width,starCanvas.height);
-
+  sCtx.clearRect(0,0,starCanvas.width,starCanvas.height);
   stars.forEach(s=>{
     s.y -= s.speed;
     s.alpha += (Math.random()-0.5)*s.twinkle;
@@ -67,7 +64,7 @@ function drawStars(){
     if(s.y < -10){ s.y = starCanvas.height+10; s.x = Math.random()*starCanvas.width; }
     sCtx.beginPath();
     sCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-    sCtx.fillStyle=`rgba(17,17,17,${s.alpha})`; // estrellas oscuras sobre fondo claro
+    sCtx.fillStyle=`rgba(255,255,255,${s.alpha})`;
     sCtx.fill();
   });
   requestAnimationFrame(drawStars);
@@ -75,7 +72,6 @@ function drawStars(){
 initStars(); drawStars();
 addEventListener('resize', initStars);
 
-// KINETIC LOGO - solo cuando pasas el mouse cerca
 const letters=document.querySelectorAll('.letter'); let tmr;
 function scatter(mx,my){
   const r=document.getElementById('logo-wrap').getBoundingClientRect();
