@@ -6,67 +6,21 @@
 <title>wasa.chat - founders</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;overflow:hidden;font-family:Inter,system-ui;overscroll-behavior:none}
-#hero{position:relative;width:100vw;height:100vh;isolation:isolate}
-#bg-future{position:absolute;inset:0;background:url('ciudad-futuro.png') center/cover no-repeat}
-#eraseCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;touch-action:none}
-
-/* LOGO RESPONSIVE */
-#logo-wrap{
-  position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  z-index:10;
-  display:flex;
-  align-items:baseline;
-  justify-content:center;
-  gap: clamp(3px, 1vw, 10px);
-  width: 92vw;
-  max-width: 900px;
-  perspective:1000px;
-  mix-blend-mode:difference;
-}
-.letter{
-  height: clamp(36px, 11vw, 100px);
-  width: auto;
-  object-fit: contain;
-  display:block;
-  will-change:transform;
-  transform-style:preserve-3d;
-  transition:transform 0.8s cubic-bezier(0.68,-0.6,0.32,1.6);
-  flex-shrink:1;
-  min-width:0;
-}
-/* PUNTO CORREGIDO - mismo peso visual */
-#logo-wrap.letter.dot{
-  height: clamp(8px, 2.2vw, 20px);
-  width: clamp(8px, 2.2vw, 20px);
-  margin-bottom: clamp(18px, 5.5vw, 42px);
-  margin-left: 2px;
-  margin-right: 2px;
-}
-#subtitle{
-  position:absolute;
-  top:100%; left:50%;
-  transform:translateX(-50%);
-  margin-top: clamp(12px, 2.5vw, 24px);
-  white-space:nowrap;
-  color:white;
-  font-size: clamp(7px, 1.6vw, 11px);
-  letter-spacing: clamp(2px, 0.5vw, 4px);
-  opacity:0.8;
-  text-align:center;
-}
-@media (max-width:480px){
-  #logo-wrap{width:94vw; gap:3px}
- .letter{height:10.8vw}
-  #logo-wrap.letter.dot{height:2.6vw;width:2.6vw;margin-bottom:4.2vw}
-}
+body{background:#000;overflow:hidden}
+#hero{position:relative;width:100vw;height:100vh}
+#starCanvas, #eraseCanvas{position:absolute;inset:0;width:100%;height:100%}
+#starCanvas{z-index:1}
+#eraseCanvas{z-index:2;touch-action:none}
+#logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:flex;align-items:baseline;justify-content:center;gap:clamp(3px,1vw,10px);width:92vw;max-width:900px;perspective:1000px;mix-blend-mode:difference}
+.letter{height:clamp(36px,11vw,100px);width:auto;object-fit:contain;display:block;will-change:transform;transform-style:preserve-3d;transition:transform 0.8s cubic-bezier(0.68,-0.6,0.32,1.6);flex-shrink:1}
+#logo-wrap .letter.dot{height:clamp(8px,2.2vw,20px);width:clamp(8px,2.2vw,20px);margin-bottom:clamp(18px,5.5vw,42px);margin-left:2px;margin-right:2px}
+#subtitle{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:clamp(12px,2.5vw,24px);white-space:nowrap;color:white;font-size:clamp(7px,1.6vw,11px);letter-spacing:clamp(2px,0.5vw,4px);opacity:0.8}
+@media (max-width:480px){#logo-wrap{width:94vw;gap:3px}.letter{height:10.8vw}#logo-wrap .letter.dot{height:2.6vw;width:2.6vw;margin-bottom:4.2vw}}
 </style>
 </head>
 <body>
 <div id="hero">
-  <div id="bg-future"></div>
+  <canvas id="starCanvas"></canvas>
   <canvas id="eraseCanvas"></canvas>
   <div id="logo-wrap">
     <img src="/assets/img/w.png" class="letter" alt="w">
@@ -83,39 +37,75 @@ body{background:#000;overflow:hidden;font-family:Inter,system-ui;overscroll-beha
 </div>
 
 <script>
-const darkImg=new Image();darkImg.src='ciudad-oscura.png';
-const canvas=document.getElementById('eraseCanvas'),ctx=canvas.getContext('2d');
-let w,h,lx=0,ly=0;
-function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;if(darkImg.complete)draw()}
-function draw(){ctx.globalCompositeOperation='source-over';ctx.drawImage(darkImg,0,0,w,h)}
-darkImg.onload=draw;addEventListener('resize',resize);resize();
+// FONDO ESPACIO CON ESTRELLAS MOVIENDOSE
+const starCanvas=document.getElementById('starCanvas'), sCtx=starCanvas.getContext('2d');
+let stars=[];
+function initStars(){
+  starCanvas.width=innerWidth; starCanvas.height=innerHeight;
+  stars=[];
+  for(let i=0;i<400;i++){
+    stars.push({
+      x: Math.random()*starCanvas.width,
+      y: Math.random()*starCanvas.height,
+      r: Math.random()*1.5+0.2,
+      speed: Math.random()*0.6+0.1,
+      alpha: Math.random()*0.8+0.2,
+      twinkle: Math.random()*0.05
+    });
+  }
+}
+function drawStars(){
+  sCtx.fillStyle='#000';
+  sCtx.fillRect(0,0,starCanvas.width,starCanvas.height);
+  stars.forEach(s=>{
+    s.y -= s.speed;
+    s.alpha += (Math.random()-0.5)*s.twinkle;
+    s.alpha = Math.max(0.1, Math.min(1, s.alpha));
+    if(s.y < -10){ s.y = starCanvas.height+10; s.x = Math.random()*starCanvas.width; }
+    sCtx.beginPath();
+    sCtx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    sCtx.fillStyle=`rgba(255,255,255,${s.alpha})`;
+    sCtx.fill();
+    // brillo para estrellas grandes
+    if(s.r > 1.2){
+      sCtx.shadowBlur=8; sCtx.shadowColor='white'; sCtx.fill(); sCtx.shadowBlur=0;
+    }
+  });
+  requestAnimationFrame(drawStars);
+}
+initStars(); drawStars();
+addEventListener('resize', initStars);
+
+// CAPA OSCURA QUE SE BORRA (revela estrellas brillantes)
+const eraseCanvas=document.getElementById('eraseCanvas'), eCtx=eraseCanvas.getContext('2d');
+function resizeErase(){ eraseCanvas.width=innerWidth; eraseCanvas.height=innerHeight; eCtx.fillStyle='rgba(0,0,0,0.92)'; eCtx.fillRect(0,0,eraseCanvas.width,eraseCanvas.height); }
+resizeErase(); addEventListener('resize', resizeErase);
+let lx=0,ly=0;
 function erase(x,y){
-  ctx.globalCompositeOperation='destination-out';
-  const g=ctx.createRadialGradient(x,y,0,x,y,75);
-  g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,75,0,Math.PI*2);ctx.fill();
-  if(lx){const dx=x-lx,dy=y-ly,d=Math.hypot(dx,dy),s=Math.ceil(d/10);for(let i=0;i<s;i++){ctx.beginPath();ctx.arc(lx+dx*i/s,ly+dy*i/s,75,0,Math.PI*2);ctx.fill()}}
+  eCtx.globalCompositeOperation='destination-out';
+  const g=eCtx.createRadialGradient(x,y,0,x,y,90);
+  g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  eCtx.fillStyle=g; eCtx.beginPath(); eCtx.arc(x,y,90,0,Math.PI*2); eCtx.fill();
+  if(lx){const dx=x-lx,dy=y-ly,d=Math.hypot(dx,dy),s=Math.ceil(d/12);for(let i=0;i<s;i++){eCtx.beginPath();eCtx.arc(lx+dx*i/s,ly+dy*i/s,90,0,Math.PI*2);eCtx.fill()}}
   lx=x;ly=y;
 }
-canvas.addEventListener('mousemove',e=>{erase(e.clientX,e.clientY);scatter(e.clientX,e.clientY)});
-canvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];erase(t.clientX,t.clientY);scatter(t.clientX,t.clientY)},{passive:false});
-canvas.addEventListener('mouseleave',()=>{lx=0});
+eraseCanvas.addEventListener('mousemove',e=>{erase(e.clientX,e.clientY);scatter(e.clientX,e.clientY)});
+eraseCanvas.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];erase(t.clientX,t.clientY);scatter(t.clientX,t.clientY)},{passive:false});
+eraseCanvas.addEventListener('mouseleave',()=>{lx=0});
 
-const letters=document.querySelectorAll('.letter');
-let tmr;
+// KINETIC LOGO
+const letters=document.querySelectorAll('.letter'); let tmr;
 function scatter(mx,my){
   const r=document.getElementById('logo-wrap').getBoundingClientRect();
   const cx=r.left+r.width/2,cy=r.top+r.height/2;
-  if(Math.hypot(mx-cx,my-cy)>380)return;
-  const intensity=1-Math.hypot(mx-cx,my-cy)/380;
+  if(Math.hypot(mx-cx,my-cy)>400)return;
   letters.forEach(el=>{
     if(el._busy)return;
-    el.style.transform=`translate3d(${(Math.random()-0.5)*260*intensity}px,${(Math.random()-0.5)*180*intensity}px,80px) rotate(${(Math.random()-0.5)*540*intensity}deg) rotateX(${(Math.random()-0.5)*180}deg) rotateY(${(Math.random()-0.5)*180}deg) scale(${0.6+Math.random()*0.8})`;
-    el._busy=true;setTimeout(()=>el._busy=false,800);
+    el.style.transform=`translate3d(${(Math.random()-0.5)*280}px,${(Math.random()-0.5)*180}px,100px) rotate(${(Math.random()-0.5)*540}deg) rotateX(${(Math.random()-0.5)*180}deg) scale(${0.7+Math.random()*0.6})`;
+    el._busy=true;setTimeout(()=>el._busy=false,900);
   });
-  clearTimeout(tmr);tmr=setTimeout(()=>letters.forEach((el,i)=>setTimeout(()=>el.style.transform='none',i*55)),750);
+  clearTimeout(tmr);tmr=setTimeout(()=>letters.forEach((el,i)=>setTimeout(()=>el.style.transform='none',i*60)),800);
 }
-setInterval(()=>{if(Math.random()>0.6)scatter(innerWidth/2+(Math.random()-0.5)*100,innerHeight/2)},4000);
 </script>
 </body>
 </html>
