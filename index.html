@@ -1,282 +1,86 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>wasa.chat - Tu web lista en 72hs</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-*{font-family:"Instrument Sans",system-ui,sans-serif}
-.display{font-family:"Syne",sans-serif}
-html{scroll-behavior:smooth}
-@keyframes meshFloat1{0%,100%{transform:translate(-50%,-10%) scale(1)}50%{transform:translate(-48%,-12%) scale(1.08)}}
-@keyframes meshFloat2{0%,100%{transform:translate(10%,10%) scale(1)}50%{transform:translate(6%,14%) scale(1.15)}}
-@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.carousel-slide{transition:all 0.6s ease}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{ background:#000; overflow:hidden; font-family: sans-serif; }
+
+  #hero{
+    position:relative;
+    width:100vw; height:100vh;
+  }
+ .bg{
+    position:absolute; inset:0;
+    background-size:cover;
+    background-position:center;
+  }
+  /* PONE ACA TUS FOTOS */
+  #bg-dark{
+    background-image: url('ciudad-oscura.jpg');
+  }
+  #bg-future{
+    background-image: url('ciudad-futuro.jpg');
+    /* Esta es la que se revela con el mouse */
+    clip-path: circle(180px at 50% 50%);
+    transition: clip-path 0.05s linear;
+  }
+
+  /* LOGO EN EL MEDIO */
+  #logo-wrap{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    z-index:20;
+    pointer-events:none;
+  }
+  #logo-wasa{
+    width: 340px;
+    /* ESTO HACE LA MAGIA DEL CONTRASTE */
+    mix-blend-mode: difference;
+    filter: invert(1) brightness(1.2);
+  }
+  #subtitle{
+    color:white;
+    text-align:center;
+    margin-top:16px;
+    letter-spacing: 4px;
+    font-size:11px;
+    opacity:0.7;
+    mix-blend-mode: difference;
+  }
 </style>
 </head>
-<body class="bg-[#eef7ff] text-zinc-900 antialiased overflow-x-hidden">
-  <script>
-    window.location.href = "https://founders.wasa.chat";
-</script>
+<body>
 
+<div id="hero">
+  <div class="bg" id="bg-dark"></div>
+  <div class="bg" id="bg-future"></div>
 
-<!-- NAV -->
-<section class="relative flex flex-col isolate w-full overflow-hidden" style="background:linear-gradient(105deg,#0a1a3a 0%,#0f2550 18%,#123072 32%,#1e3a8a 58%,#1e40af 78%,#1d4ed8 100%)">
-  <div class="pointer-events-none absolute inset-0 overflow-hidden">
-    <div class="absolute inset-0 opacity-[0.65]" style="background:radial-gradient(65% 70% at 30% 0%, rgba(34,211,238,0.45) 0%, transparent 55%), radial-gradient(60% 60% at 80% 20%, rgba(6,182,212,0.40) 0%, transparent 60%)"></div>
-    <div class="absolute left-1/2 top-[-18%] h-[720px] w-[980px] -translate-x-1/2 rounded-full blur-[55px]" style="background:radial-gradient(circle at center, rgba(30,64,175,0.75) 0%, rgba(37,99,235,0.40) 28%, rgba(6,182,212,0.18) 52%, transparent 72%); animation:meshFloat1 9s ease-in-out infinite"></div>
-  </div>
-
-  <div class="relative z-20 flex items-center justify-between px-6 md:px-10 py-5 max-w-[1280px] mx-auto w-full gap-4">
-    <div class="flex items-center gap-3">
-      <div class="h-8 px-3.5 flex items-center justify-center rounded-lg border border-white/20 bg-white/10 backdrop-blur text-white text-[12px] font-bold tracking-[0.12em]">wasa.chat</div>
-    </div>
-    <nav class="hidden md:flex items-center gap-1 bg-white/10 border border-white/15 backdrop-blur-xl rounded-full p-1">
-      <a href="index.html" class="px-4 h-8 rounded-full text-[12px] font-semibold bg-white text-zinc-900 flex items-center">INICIO</a>
-      <a href="ejemplos.html" class="px-4 h-8 rounded-full text-[12px] font-semibold text-white/80 hover:text-white flex items-center">EJEMPLOS</a>
-      <a href="#faq" class="px-4 h-8 rounded-full text-[12px] font-semibold text-white/80 hover:text-white flex items-center">FAQ</a>
-      <a href="#contacto" class="px-4 h-8 rounded-full text-[12px] font-semibold text-white/70 hover:text-white flex items-center">CONTACTO</a>
-    </nav>
-    <div class="flex items-center gap-2">
-      <button onclick="openAuth('login')" class="h-9 px-4 rounded-full bg-white/10 border border-white/20 text-white text-[12px] font-bold">LOGIN</button>
-      <button onclick="openAuth('signup')" class="h-9 px-5 rounded-full bg-white text-[#0a1a3a] text-[12px] font-bold">COMENZAR</button>
-    </div>
-  </div>
-
-  <!-- HERO CON CARRUSEL -->
-  <div class="relative z-10 max-w-[1280px] mx-auto w-full px-6 md:px-10 pb-16 md:pb-24 pt-6 md:pt-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-    <div>
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white text-[#0a1a3a] text-[10px] font-bold tracking-[0.14em]"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> FASE 1 — ENTREGA EN 72HS</div>
-      <h1 class="display mt-6 text-[40px] md:text-[60px] font-extrabold leading-[0.9] text-white">Tu web lista en <span class="text-[#BBF7D0]">72hs</span></h1>
-      <p class="mt-5 text-[15px] leading-[1.6] text-white/70 max-w-[460px]">Hosting + dominio + base de datos por 1 año. <span class="text-white font-semibold">Sin vueltas.</span></p>
-      <div class="mt-7 flex gap-3">
-        <button onclick="openAuth('signup')" class="h-11 px-6 rounded-full bg-white text-[#0a1a3a] font-bold text-[14px]">Quiero mi Web →</button>
-        <a href="ejemplos.html" class="h-11 px-6 rounded-full bg-white/10 border border-white/20 text-white font-semibold text-[14px] flex items-center">Ver ejemplos</a>
-      </div>
-    </div>
-
-    <!-- CARRUSEL -->
-    <div class="relative">
-      <div id="carousel" class="relative rounded-[20px] border border-white/20 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.35)] overflow-hidden">
-        <div class="h-7 bg-zinc-100 border-b flex items-center gap-1.5 px-3">
-          <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span><span class="h-2.5 w-2.5 rounded-full bg-yellow-400"></span><span class="h-2.5 w-2.5 rounded-full bg-green-400"></span>
-          <div id="carousel-url" class="ml-4 h-5 w-[60%] rounded-full bg-white border text-[10px] flex items-center px-3 text-zinc-400">cafeteria-demo.com</div>
-        </div>
-        <img id="carousel-img" src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=500&fit=crop" class="w-full aspect-[16/10] object-cover carousel-slide" alt="ejemplo">
-      </div>
-      <div class="mt-4 flex justify-center gap-2">
-        <button onclick="setSlide(0)" class="carousel-dot h-2 w-6 rounded-full bg-white transition"></button>
-        <button onclick="setSlide(1)" class="carousel-dot h-2 w-2 rounded-full bg-white/40 transition"></button>
-        <button onclick="setSlide(2)" class="carousel-dot h-2 w-2 rounded-full bg-white/40 transition"></button>
-      </div>
-      <div class="absolute -bottom-2 left-4 bg-white rounded-full px-3 py-1.5 shadow flex items-center gap-2 text-[10px] font-bold"><span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> EN VIVO · 72HS ENTREGA</div>
-    </div>
-  </div>
-</section>
-
-<!-- PLANES SOLO CRIPTO -->
-<section id="planes" class="bg-[#eef7ff] py-14">
-<div class="max-w-[1280px] mx-auto px-6 md:px-10">
-  <div class="inline-flex px-3 py-1 rounded-full bg-[#0a1a3a] text-white text-[10px] font-bold tracking-[0.14em]">PLANES DISPONIBLES - SOLO CRIPTO</div>
-  <h2 class="display mt-4 text-[32px] md:text-[42px] font-extrabold">Elegí tu plan</h2>
-  <p class="mt-2 text-[14px] text-zinc-500">Pago solo USDT · TRC20 / BEP20 / ERC20 / Arbitrum · Activación por hash</p>
-
-  <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
-    <div class="rounded-[20px] bg-white border p-6 hover:shadow-lg transition">
-      <h3 class="font-bold">BÁSICO</h3><p class="mt-2 text-[28px] font-extrabold">$150 <span class="text-[14px] font-normal">USDT/año</span></p>
-      <ul class="mt-4 text-[13px] text-zinc-600 space-y-1"><li>✓ 1 página</li><li>✓ Hosting + dominio</li><li>✓ Entrega 72hs</li></ul>
-      <button onclick="selectPlan('basico')" class="mt-6 w-full h-11 rounded-full bg-[#0a1a3a] text-white font-bold text-[13px]">Elegir Básico →</button>
-    </div>
-    <div class="rounded-[20px] bg-[#0a1a3a] text-white border border-white/10 p-6 shadow-xl scale-[1.02]">
-      <h3 class="font-bold text-[#BBF7D0]">INTERMEDIO ★</h3><p class="mt-2 text-[28px] font-extrabold">$180 <span class="text-[14px] font-normal opacity-70">USDT/año</span></p>
-      <ul class="mt-4 text-[13px] text-white/70 space-y-1"><li>✓ Hasta 5 páginas</li><li>✓ Blog + artículos</li><li>✓ Hosting + dominio</li></ul>
-      <button onclick="selectPlan('intermedio')" class="mt-6 w-full h-11 rounded-full bg-white text-[#0a1a3a] font-bold text-[13px]">Elegir Intermedio →</button>
-    </div>
-    <div class="rounded-[20px] bg-white border p-6 hover:shadow-lg transition">
-      <h3 class="font-bold">PRO</h3><p class="mt-2 text-[28px] font-extrabold">Desde $600 <span class="text-[14px] font-normal">USDT/año</span></p>
-      <ul class="mt-4 text-[13px] text-zinc-600 space-y-1"><li>✓ A medida</li><li>✓ Ecommerce / reservas</li><li>✓ Soporte prio</li></ul>
-      <button onclick="selectPlan('pro')" class="mt-6 w-full h-11 rounded-full bg-white border border-zinc-200 text-zinc-900 font-bold text-[13px]">Consultar Pro →</button>
-    </div>
-  </div>
-</div>
-</section>
-
-<!-- CONSULTAS SOLO EMAIL -->
-<section id="contacto" class="bg-white py-14 border-t">
-<div class="max-w-[1280px] mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
-  <div>
-    <h2 class="display text-[32px] font-extrabold">Consultas por email</h2>
-    <p class="mt-3 text-[14px] text-zinc-500">Sin WhatsApp, sin comprobantes. Solo dejanos tu consulta y te respondemos en menos de 24hs.</p>
-    <div class="mt-6 rounded-[16px] bg-[#eef7ff] p-5">
-      <p class="text-[12px] font-bold tracking-wide">¿Ya pagaste en cripto?</p>
-      <p class="mt-1 text-[13px] text-zinc-600">Si ya tenés cuenta, hacé login para entrar al dashboard.</p>
-      <button onclick="openAuth('login')" class="mt-3 h-9 px-4 rounded-full bg-[#0a1a3a] text-white text-[12px] font-bold">Ir al Login →</button>
-    </div>
-  </div>
-
-  <div class="rounded-[24px] border bg-white p-6 shadow-sm">
-    <form id="consulta-form" class="space-y-4">
-      <div>
-        <label class="block text-[11px] font-bold tracking-[0.12em] text-zinc-400 mb-1 ml-1">TIPO DE CONSULTA</label>
-        <select id="tipo" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <option>Quiero mi web</option><option>Dudas sobre planes</option><option>Otro</option>
-        </select>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div><label class="block text-[11px] font-bold text-zinc-400 mb-1 ml-1">NOMBRE</label><input id="nombre" placeholder="Tu nombre" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]"></div>
-        <div><label class="block text-[11px] font-bold text-zinc-400 mb-1 ml-1">EMAIL</label><input id="email" placeholder="tu@email.com" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]"></div>
-      </div>
-      <div><label class="block text-[11px] font-bold text-zinc-400 mb-1 ml-1">MENSAJE</label><textarea id="mensaje" placeholder="Contame tu rubro..." class="w-full min-h-[120px] px-4 py-3 rounded-[18px] border border-zinc-200 bg-zinc-50 text-[13px] resize-none"></textarea></div>
-      <button type="submit" class="w-full md:w-auto h-12 px-8 rounded-full bg-[#0a1a3a] text-white font-bold text-[14px]">ENVIAR CONSULTA →</button>
-      <p class="text-[11px] text-zinc-400">Solo consultas por email · Plan: <span id="plan-label" class="font-bold text-zinc-700">ninguno</span></p>
-    </form>
-  </div>
-</div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" class="bg-[#eef7ff] py-12">
-<div class="max-w-[800px] mx-auto px-6">
-  <h3 class="display text-[28px] font-extrabold text-center">Preguntas frecuentes</h3>
-  <div class="mt-8 space-y-3">
-    <div class="rounded-[16px] bg-white border p-5"><button onclick="toggleFaq(this)" class="w-full text-left font-semibold text-[14px] flex justify-between">¿Cómo funciona el pago cripto? <span>+</span></button><div class="hidden mt-3 text-[13px] text-zinc-600">Pagás en USDT por TRC20/BEP20/ERC20/Arbitrum. Nuestro Worker verifica el hash en blockchain y activa tu cuenta automático.</div></div>
-    <div class="rounded-[16px] bg-white border p-5"><button onclick="toggleFaq(this)" class="w-full text-left font-semibold text-[14px] flex justify-between">¿Qué pasa después de pagar? <span>+</span></button><div class="hidden mt-3 text-[13px] text-zinc-600">Se crea tu cuenta, elegís plantilla, editás tu contenido en el dashboard y publicás. Todo sin código.</div></div>
-  </div>
-</div>
-</section>
-
-<footer class="bg-[#0a1a3a] text-white py-10"><div class="max-w-[1280px] mx-auto px-6 md:px-10 text-[12px] text-white/50 flex justify-between"><span>© 2025 wasa.chat</span><span>Hecho simple, sin vueltas</span></div></footer>
-
-<!-- POPUP AUTH -->
-<div id="auth-modal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeAuth()"></div>
-  <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-[440px] rounded-[24px] bg-white shadow-2xl p-7">
-      <div class="flex justify-between items-center">
-        <div class="flex bg-zinc-100 rounded-full p-1">
-          <button id="tab-login" onclick="setAuthMode('login')" class="h-8 px-4 rounded-full text-[12px] font-bold bg-white shadow">Ya tengo cuenta</button>
-          <button id="tab-signup" onclick="setAuthMode('signup')" class="h-8 px-4 rounded-full text-[12px] font-bold text-zinc-500">Crear cuenta</button>
-        </div>
-        <button onclick="closeAuth()" class="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center">✕</button>
-      </div>
-
-      <div id="auth-badge" class="mt-5 hidden"><div class="inline-flex px-3 py-1 rounded-full bg-[#BBF7D0] text-[11px] font-bold">Plan seleccionado: <span id="auth-plan" class="ml-1">Básico</span></div></div>
-
-      <!-- LOGIN FORM -->
-      <div id="form-login" class="mt-6">
-        <h3 class="display text-[22px] font-extrabold">Iniciar sesión</h3>
-        <div class="mt-5 space-y-3">
-          <input id="login-email" placeholder="tu@email.com" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <input id="login-pass" type="password" placeholder="Contraseña" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <button onclick="doLogin()" class="w-full h-11 rounded-full bg-[#0a1a3a] text-white font-bold text-[13px]">Entrar al Dashboard →</button>
-          <p class="text-center text-[12px] text-zinc-500"><a href="#" class="underline">Olvidé mi contraseña</a> · <button onclick="setAuthMode('signup')" class="underline">Crear cuenta</button></p>
-        </div>
-      </div>
-
-      <!-- SIGNUP FORM -->
-      <div id="form-signup" class="mt-6 hidden">
-        <h3 class="display text-[22px] font-extrabold">Crear cuenta</h3>
-        <p class="mt-1 text-[12px] text-zinc-500">Primero creás cuenta, luego pagás en USDT y se activa.</p>
-        <div class="mt-5 space-y-3">
-          <input id="signup-name" placeholder="Tu nombre" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <input id="signup-email" placeholder="tu@email.com" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <input id="signup-pass" type="password" placeholder="Contraseña" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <input id="signup-pass2" type="password" placeholder="Repetir contraseña" class="w-full h-11 px-4 rounded-full border border-zinc-200 bg-zinc-50 text-[13px]">
-          <label class="flex gap-2 text-[11px] text-zinc-500"><input type="checkbox" checked> Acepto términos</label>
-          <button onclick="doSignup()" class="w-full h-11 rounded-full bg-[#0a1a3a] text-white font-bold text-[13px]">Crear cuenta →</button>
-          <p class="text-center text-[12px] text-zinc-500">¿Ya tenés cuenta? <button onclick="setAuthMode('login')" class="underline">Iniciar sesión</button></p>
-        </div>
-      </div>
-
-    </div>
+  <div id="logo-wrap">
+    <!-- PONE ACA TU LOGO -->
+    <img id="logo-wasa" src="logo-wasa.png" alt="wasa.chat" />
+    <div id="subtitle">WASA.CHAT — DIC 2026</div>
   </div>
 </div>
 
 <script>
-// Legible JS - sin frameworks
-let currentPlan = null;
-let currentSlide = 0;
-const slides = [
-  {img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=500&fit=crop", url:"cafeteria-demo.com"},
-  {img:"https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop", url:"negocio-demo.com"},
-  {img:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop", url:"resto-demo.com"}
-];
+  const future = document.getElementById('bg-future');
+  const hero = document.getElementById('hero');
 
-function setSlide(i){
-  currentSlide=i;
-  document.getElementById('carousel-img').src=slides[i].img;
-  document.getElementById('carousel-url').innerText=slides[i].url;
-  document.querySelectorAll('.carousel-dot').forEach((d,idx)=>{
-    d.className = idx===i ? 'carousel-dot h-2 w-6 rounded-full bg-white transition' : 'carousel-dot h-2 w-2 rounded-full bg-white/40 transition';
-  });
-}
-setInterval(()=>{ setSlide((currentSlide+1)%3); }, 4000);
-
-function selectPlan(p){
-  currentPlan=p;
-  document.getElementById('plan-label').innerText=p;
-  document.getElementById('auth-plan').innerText=p;
-  document.getElementById('auth-badge').classList.remove('hidden');
-  openAuth('signup');
-  document.getElementById('contacto').scrollIntoView({behavior:'smooth'});
-}
-
-function toggleFaq(btn){
-  const c=btn.nextElementSibling;
-  c.classList.toggle('hidden');
-}
-
-// AUTH POPUP
-function openAuth(mode){
-  document.getElementById('auth-modal').classList.remove('hidden');
-  setAuthMode(mode);
-}
-function closeAuth(){
-  document.getElementById('auth-modal').classList.add('hidden');
-}
-function setAuthMode(mode){
-  const loginForm=document.getElementById('form-login');
-  const signupForm=document.getElementById('form-signup');
-  const tabLogin=document.getElementById('tab-login');
-  const tabSignup=document.getElementById('tab-signup');
-  if(mode==='login'){
-    loginForm.classList.remove('hidden'); signupForm.classList.add('hidden');
-    tabLogin.className='h-8 px-4 rounded-full text-[12px] font-bold bg-white shadow';
-    tabSignup.className='h-8 px-4 rounded-full text-[12px] font-bold text-zinc-500';
-  }else{
-    loginForm.classList.add('hidden'); signupForm.classList.remove('hidden');
-    tabSignup.className='h-8 px-4 rounded-full text-[12px] font-bold bg-white shadow';
-    tabLogin.className='h-8 px-4 rounded-full text-[12px] font-bold text-zinc-500';
+  function update(e){
+    const x = e.clientX || e.touches?.[0]?.clientX;
+    const y = e.clientY || e.touches?.[0]?.clientY;
+    future.style.clipPath = circle(180px at ${x}px ${y}px);
   }
-}
-function doLogin(){
-  const email=document.getElementById('login-email').value;
-  alert('Login simulado para '+email+'\n→ Verificando en D1...\nSi tiene suscripción activa → /dashboard\nSi no → /checkout cripto');
-  closeAuth();
-}
-function doSignup(){
-  const email=document.getElementById('signup-email').value;
-  alert('Cuenta creada para '+email+'\n→ Guardado en D1 + R2 bucket preparado\n→ Ahora ir a /checkout para pagar '+currentPlan);
-  closeAuth();
-}
 
-document.getElementById('consulta-form').addEventListener('submit',async(e)=>{
-  e.preventDefault();
-  const data={
-    tipo:document.getElementById('tipo').value,
-    nombre:document.getElementById('nombre').value,
-    email:document.getElementById('email').value,
-    mensaje:document.getElementById('mensaje').value,
-    plan:currentPlan
-  };
-  try{
-    const r=await fetch("https://script.google.com/macros/s/TU_ID_AQUI/exec",{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(data)});
-    if(r.ok){alert('Consulta enviada ✅'); e.target.reset();}
-    else{alert('Error: '+await r.text());}
-  }catch(err){alert('Error red: '+err.message);}
-});
+  hero.addEventListener('mousemove', update);
+  hero.addEventListener('touchmove', update);
+
+  // Cuando sale el mouse, se cierra
+  hero.addEventListener('mouseleave', () => {
+    future.style.clipPath = circle(0px at 50% 50%);
+  });
 </script>
+
 </body>
 </html>
