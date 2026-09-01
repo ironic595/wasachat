@@ -86,47 +86,65 @@ function shuffleLetters(){
   if(isAnimating) return;
   isAnimating=true;
 
-  // 1. Guardar posiciones actuales (FLIP - First)
-  const firstPos = letters.map(el => el.getBoundingClientRect());
+  const dot = wrap.querySelector('.dot');
+  const allLetters = Array.from(wrap.querySelectorAll('.letter'));
+  const otherLetters = allLetters.filter(el => !el.classList.contains('dot'));
 
-  // 2. Cambiar orden al azar
-  const shuffled = [...letters].sort(()=>Math.random()-0.5);
-  shuffled.forEach(el => wrap.appendChild(el));
+  // 1. Guardar posiciones actuales
+  const firstPos = new Map();
+  allLetters.forEach(el => firstPos.set(el, el.getBoundingClientRect()));
 
-  // 3. Guardar nuevas posiciones (Last)
-  const lastPos = shuffled.map(el => el.getBoundingClientRect());
+  // 2. Mezclar solo las letras, NO el punto
+  const shuffledOthers = [...otherLetters].sort(()=>Math.random()-0.5);
+  
+  // 3. Reconstruir: 4 letras + punto + 4 letras
+  const newOrder = [
+    ...shuffledOthers.slice(0,4),
+    dot,
+    ...shuffledOthers.slice(4)
+  ];
+  
+  newOrder.forEach(el => wrap.appendChild(el));
 
-  // 4. Invertir - moverlas de vuelta a donde estaban
-  shuffled.forEach((el,i)=>{
-    const dx = firstPos[letters.indexOf(el)].left - lastPos[i].left;
-    const dy = firstPos[letters.indexOf(el)].top - lastPos[i].top;
+  // 4. Animar FLIP
+  const lastPos = new Map();
+  newOrder.forEach(el => lastPos.set(el, el.getBoundingClientRect()));
+
+  newOrder.forEach(el=>{
+    const first = firstPos.get(el);
+    const last = lastPos.get(el);
+    const dx = first.left - last.left;
+    const dy = first.top - last.top;
     el.style.transition='none';
     el.style.transform=`translate(${dx}px, ${dy}px)`;
   });
 
-  // 5. Play - animar a 0 con transición suave
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
-      shuffled.forEach(el=>{
+      newOrder.forEach(el=>{
         el.style.transition='transform 0.7s cubic-bezier(0.34,1.56,0.64,1)';
         el.style.transform='translate(0,0)';
       });
     });
   });
 
-  // 6. Volver al orden original después de 1.2s
+  // 5. Volver al orden original
   clearTimeout(returnTimeout);
   returnTimeout=setTimeout(()=>{
-    const firstReturn = shuffled.map(el=>el.getBoundingClientRect());
-    // ordenar por data-original
-    const ordered = [...shuffled].sort((a,b)=>a.dataset.original - b.dataset.original);
+    const firstReturn = new Map();
+    newOrder.forEach(el=>firstReturn.set(el, el.getBoundingClientRect()));
+
+    const ordered = [...allLetters].sort((a,b)=>a.dataset.original - b.dataset.original);
     ordered.forEach(el=>wrap.appendChild(el));
-    const lastReturn = ordered.map(el=>el.getBoundingClientRect());
-    
-    ordered.forEach((el,i)=>{
-      const origIndex = shuffled.indexOf(el);
-      const dx = firstReturn[origIndex].left - lastReturn[i].left;
-      const dy = firstReturn[origIndex].top - lastReturn[i].top;
+
+    const lastReturn = new Map();
+    ordered.forEach(el=>lastReturn.set(el, el.getBoundingClientRect()));
+
+    ordered.forEach(el=>{
+      const first = firstReturn.get(el);
+      const last = lastReturn.get(el);
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
       el.style.transition='none';
       el.style.transform=`translate(${dx}px, ${dy}px)`;
     });
@@ -139,9 +157,8 @@ function shuffleLetters(){
         setTimeout(()=>{isAnimating=false;},700);
       });
     });
-  },1200);
+  },1300);
 }
-
 wrap.addEventListener('mouseenter', shuffleLetters);
 wrap.addEventListener('mousemove', (e)=>{
   // solo dispara si te moves mucho, para no spamear
