@@ -12,7 +12,7 @@ body{background:#000;overflow:hidden;font-family:Inter,system-ui;}
 #eraseCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;}
 #logo-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;display:flex;align-items:flex-end;gap:6px;perspective:1000px;mix-blend-mode:difference;pointer-events:none}
 .letter{height:100px;width:auto;object-fit:contain;display:block;will-change:transform;transform-style:preserve-3d;transition:transform 0.8s cubic-bezier(0.68,-0.6,0.32,1.6);filter:brightness(0) invert(1); /* hace que cualquier png negro o blanco quede blanco para el difference */}
-#logo-wrap .letter.dot{height:18px;margin-bottom:12px}
+#logo-wrap .letter.dot{height:60px;margin-bottom:12px}
 #subtitle{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:24px;white-space:nowrap;color:white;font-size:11px;letter-spacing:4px;opacity:0.8}
 #hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:20;color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:3px;mix-blend-mode:difference;pointer-events:none}
 #instructions{position:absolute;top:20px;left:20px;z-index:20;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);color:white;padding:12px 16px;border-radius:10px;font-size:11px;line-height:1.4;max-width:280px}
