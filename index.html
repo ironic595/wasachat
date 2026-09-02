@@ -6,36 +6,94 @@
 <title>wasa.chat - 100 Niveles - FINAL COMPLETO</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="text/javascript">
+   window._gm_log = function(msg){
+     console.log(msg);
+     const el=document.getElementById('gm-debug-log');
+     if(el){
+       const d=document.createElement('div');
+       d.textContent = new Date().toLocaleTimeString() + ' ' + msg;
+       el.appendChild(d);
+       el.scrollTop = el.scrollHeight;
+     }
+   };
+
    window.SDK_OPTIONS = {
       gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
       onEvent: function (a) {
-         switch (a.name) {
-            case "SDK_GAME_PAUSE":
-               console.log('[GM] PAUSE - anuncio iniciado');
-               window._gm_isAdPlaying = true;
-               break;
-            case "SDK_GAME_START":
-               console.log('[GM] START - anuncio terminado');
-               window._gm_isAdPlaying = false;
-               if(window._gm_onAdFinished) window._gm_onAdFinished();
-               break;
-            case "SDK_READY":
-               console.log('[GM] SDK READY');
-               window._gm_sdk_ready = true;
-               break;
-            case "SDK_ERROR":
-               console.log('[GM] ERROR, cerrando');
-               window._gm_isAdPlaying = false;
-               if(window._gm_onAdFinished) window._gm_onAdFinished();
-               break;
+         window._gm_log('[SDK EVENT] name=' + a.name + ' data=' + JSON.stringify(a));
+         window._gm_lastEvent = a.name;
+         
+         if(a.name==='SDK_GAME_PAUSE') window._gm_isAdPlaying = true;
+         if(a.name==='SDK_GAME_START' || a.name==='SDK_ERROR' || a.name==='SDK_GDPR_TRACKING' || a.name==='SDK_READY'){
+            if(a.name==='SDK_GAME_START' || a.name==='SDK_ERROR'){
+              window._gm_log(' -> Cierre detectado, mostrando recompensa en 500ms');
+              window._gm_isAdPlaying = false;
+              setTimeout(()=>{ if(window._gm_onAdFinished) window._gm_onAdFinished(); },500);
+            }
+            if(a.name==='SDK_READY') window._gm_sdk_ready = true;
          }
       }
    };
-   window._gm_isAdPlaying = false;
    (function (a, b, c) {
       var d = a.getElementsByTagName(b)[0];
       a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
    })(document, "script", "gamemonetize-sdk");
+   window._gm_isAdPlaying = false;
+   window._gm_sdk_ready = false;
+   
+   // Escuchar postMessage de todos los iframes (GameMonetize a veces manda por ahi)
+   window.addEventListener('message', function(e){
+     try{
+       const data = e.data;
+       if(typeof data==='string' && data.length<500){
+         if(data.toLowerCase().includes('gamemonetize') || data.toLowerCase().includes('ad') || data.toLowerCase().includes('close') || data.toLowerCase().includes('complete')){
+           window._gm_log('[postMessage] ' + data.substring(0,200));
+         }
+       }
+       if(typeof data==='object' && data!==null){
+         const s=JSON.stringify(data).substring(0,300);
+         if(s.toLowerCase().includes('ad') || s.toLowerCase().includes('close') || s.toLowerCase().includes('reward')){
+           window._gm_log('[postMessage obj] ' + s);
+           if(s.toLowerCase().includes('close') || s.toLowerCase().includes('complete') || s.toLowerCase().includes('finished')){
+             window._gm_log(' -> postMessage indica cierre, recompensa!');
+             window._gm_isAdPlaying = false;
+             if(window._gm_onAdFinished) window._gm_onAdFinished();
+           }
+         }
+       }
+     }catch(err){}
+   });
+   
+   // Detectar cuando el overlay de GM se cierra via MutationObserver
+   window.addEventListener('load', ()=>{
+     const obs = new MutationObserver((muts)=>{
+       muts.forEach(m=>{
+         m.removedNodes.forEach(n=>{
+           if(n.id && n.id.toString().toLowerCase().includes('gamemonetize')) window._gm_log('[DOM] nodo GM removido: ' + n.id);
+           if(n.className && n.className.toString().toLowerCase().includes('gamemonetize')) window._gm_log('[DOM] clase GM removida');
+         });
+         m.addedNodes.forEach(n=>{
+           if(n.tagName==='IFRAME' && n.src && n.src.includes('gamemonetize')) window._gm_log('[DOM] iframe GM agregado: ' + n.src.substring(0,100));
+         });
+       });
+       // Si habia anuncio jugando y ya no hay iframes de GM, asumir cerrado
+       if(window._gm_isAdPlaying){
+         const hasGM = document.querySelector('iframe[src*="gamemonetize"], div[id*="gamemonetize"]');
+         if(!hasGM){
+           // esperar 1s y verificar de nuevo para no falsos positivos
+           setTimeout(()=>{
+             const still = document.querySelector('iframe[src*="gamemonetize"], div[id*="gamemonetize"]');
+             if(!still && window._gm_isAdPlaying){
+               window._gm_log('[DOM] No hay overlay GM, asumiendo cierre');
+               window._gm_isAdPlaying = false;
+               if(window._gm_onAdFinished) window._gm_onAdFinished();
+             }
+           },800);
+         }
+       }
+     });
+     obs.observe(document.body, {childList:true, subtree:true});
+   });
 </script>
 <style>
 body{margin:0;background:#21418f;overflow:hidden;font-family:Inter,system-ui,sans-serif}
@@ -299,33 +357,34 @@ function renderUI(){
     </div></div>`;
   }
 
-  if(ad.type){
-    // Solo se muestra si GameMonetize tarda más de 1.2s en abrir
-    h+=`<div class="absolute inset-0 z-[50] bg-black/80 backdrop-blur-md flex items-center justify-center pointer-events-auto">
-      <div class="bg-[#1a1a1a] border border-white/10 rounded-2xl p-5 text-center max-w-[280px]">
-        <div class="w-10 h-10 mx-auto border-2 border-[#ffde59] border-t-transparent rounded-full animate-spin"></div>
-        <div class="mt-3 text-white font-black text-[11px]">CARGANDO ANUNCIO...</div>
-        <div class="mt-1 text-white/30 text-[9px]">Si no abre en 5s se desbloquea solo</div>
-        <button onclick="forceReward()" class="mt-4 px-3 py-2 rounded-full bg-white/5 border border-white/10 text-[9px] text-white/40">Forzar recompensa</button>
+  if(ad.type && state!=='reward_modal'){
+    h+=`<div class="absolute inset-0 z-[50] bg-black/90 flex flex-col pointer-events-auto p-3">
+      <div class="flex-1 flex items-center justify-center">
+        <div class="bg-[#1a1a1a] border border-white/10 rounded-2xl p-5 text-center max-w-[320px] w-full">
+          <div class="w-10 h-10 mx-auto border-2 border-[#ffde59] border-t-transparent rounded-full animate-spin"></div>
+          <div class="mt-3 text-white font-black text-[11px]">ABRIENDO ANUNCIO GM...</div>
+          <div class="mt-1 text-white/30 text-[9px]">Tipo: ${ad.type}</div>
+          <button onclick="forceReward()" class="mt-3 px-3 py-1.5 rounded-full bg-white/10 text-[9px] text-white/50">Forzar recompensa</button>
+        </div>
+      </div>
+      <div class="bg-black border border-white/10 rounded-xl p-2 max-h-[140px] overflow-y-auto">
+        <div class="text-[8px] text-white/50 font-bold mb-1">DEBUG LOG (eventos del SDK):</div>
+        <div id="gm-debug-log" class="text-[7px] text-green-300 font-mono leading-[1.3]"></div>
       </div>
     </div>`;
   }
   if(state==='reward_modal' && _rewardPending){
     const title = _rewardPending==='lives'?'¡+3 TIROS EXTRA!':_rewardPending==='double'?'¡RECOMPENSA DUPLICADA!':'¡CONTINUAS JUGANDO!';
-    const desc = _rewardPending==='lives'?'Viste el anuncio completo. Tenés 3 intentos más para este nivel.':_rewardPending==='double'?`Duplicaste puntos y monedas de nivel ${game.level}. Ganaste ${tempPoints} PTS y ${tempCoins} 💰 x2`:`Viste el anuncio. Continuás desde el nivel ${maxLevel} desbloqueado.`;
+    const desc = _rewardPending==='lives'?'Viste el anuncio completo. Tenés 3 intentos más.':_rewardPending==='double'?`Duplicaste ${tempPoints} PTS y ${tempCoins} 💰 x2`:`Continuás desde nivel ${maxLevel}`;
     const icon = _rewardPending==='lives'?'🎯':_rewardPending==='double'?'💰':'🚀';
-    const btnText = _rewardPending==='lives'?'CONTINUAR CON +3 TIROS':_rewardPending==='double'?'RECLAMAR x2 Y SEGUIR':'CONTINUAR JUGANDO';
-    h+=`<div class="absolute inset-0 z-[60] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 pointer-events-auto">
-      <div class="w-full max-w-[380px] bg-gradient-to-br from-[#1e1e1e] to-[#0f0f0f] border border-[#ffde59]/30 rounded-[24px] p-6 text-center shadow-[0_0_50px_rgba(255,222,89,0.2)]">
-        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[36px] shadow-[0_0_30px_#ffde59] animate-bounce">${icon}</div>
-        <div class="mt-4 text-[#ffde59] font-black text-[18px] tracking-wide">${title}</div>
-        <div class="mt-2 text-white/70 text-[13px] leading-[1.4]">${desc}</div>
-        <div class="mt-5 bg-black/50 border border-white/10 rounded-xl p-3 flex items-center justify-center gap-2">
-          <span class="text-[10px] text-white/40">RECOMPENSA</span>
-          <span class="text-[#ffde59] font-black text-[14px]">${_rewardPending==='lives'?'+3 TIROS':_rewardPending==='double'?`+${tempPoints} PTS +${tempCoins} 💰`:'NIVEL '+maxLevel}</span>
-        </div>
-        <button onclick="claimReward()" class="mt-5 w-full py-4 rounded-full bg-[#ffde59] text-black font-black text-[14px] tracking-[0.05em] border-[2.5px] border-black shadow-[0_5px_0_#000] active:translate-y-[3px] active:shadow-[0_2px_0_#000]">${btnText} →</button>
-        <div class="mt-3 text-[9px] text-white/20">Gracias por ver el anuncio ❤️</div>
+    const btnText = _rewardPending==='lives'?'CONTINUAR +3 TIROS':_rewardPending==='double'?'RECLAMAR x2':'CONTINUAR';
+    h+=`<div class="absolute inset-0 z-[70] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 pointer-events-auto">
+      <div class="w-full max-w-[380px] bg-gradient-to-br from-[#1e1e1e] to-[#0f0f0f] border border-[#ffde59]/30 rounded-[24px] p-6 text-center">
+        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[36px]">${icon}</div>
+        <div class="mt-4 text-[#ffde59] font-black text-[18px]">${title}</div>
+        <div class="mt-2 text-white/70 text-[12px]">${desc}</div>
+        <div class="mt-2 text-[8px] text-white/20">Último evento: ${window._gm_lastEvent||'ninguno'}</div>
+        <button onclick="claimReward()" class="mt-5 w-full py-4 rounded-full bg-[#ffde59] text-black font-black text-[14px] border-[2.5px] border-black">${btnText} →</button>
       </div>
     </div>`;
   }
@@ -379,62 +438,80 @@ function buySub(id){
   }
 }
 let _pendingAdType=null;
+let _rewardPending=null;
+let _gmTimer=null;
 
-window._gm_onAdComplete = function(){
-  console.log('[GM] Anuncio visto completo, entregando recompensa:', _pendingAdType);
-  const type = _pendingAdType;
-  _pendingAdType=null;
-  if(!type) return;
-  
-  if(type==='lives'){
-    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;ad={type:null};adUses++;state='playing';
-  }else if(type==='double'){
-    game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
-    maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
-    ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
-    ad={type:null};game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';
-  }else if(type==='checkpoint'){
-    ad={type:null};startGame(maxLevel);
-  }
+window._gm_onAdFinished = function(){
+  window._gm_log('>>> _gm_onAdFinished LLAMADO - mostrando reward modal');
+  if(_gmTimer) clearTimeout(_gmTimer);
+  window._gm_isAdPlaying = false;
+  let type = _pendingAdType || (ad && ad.type ? ad.type : null) || _rewardPending;
+  if(!type){ window._gm_log('Sin tipo pendiente'); ad={type:null}; renderUI(); return; }
+  _rewardPending = type;
+  _pendingAdType = null;
+  ad={type:null};
+  state='reward_modal';
   renderUI();
 };
 
 function openAd(type){
-  console.log('[GM] openAd llamado:', type);
+  window._gm_log('openAd() llamado tipo=' + type);
   _pendingAdType=type;
-  ad={type:type,timer:0,unlocked:false};
-  renderUI(); // muestra loader chiquito
-
-  // Intentar mostrar anuncio INMEDIATO, sin pantalla intermedia
+  _rewardPending=null;
+  window._gm_isAdPlaying = true;
+  ad={type:type};
+  renderUI();
+  
   setTimeout(()=>{
+    window._gm_log('Intentando sdk.showBanner() - sdk=' + (typeof sdk) + ' ready=' + window._gm_sdk_ready);
+    ad={type:null};
+    renderUI();
     if(typeof sdk !== 'undefined' && sdk.showBanner){
-      console.log('[GM] Mostrando banner directo');
-      try{
-        sdk.showBanner();
-        // si el usuario cierra antes, no damos recompensa hasta SDK_GAME_START
-        return;
-      }catch(e){
-        console.log('[GM] Error showBanner', e);
-      }
+      try{ 
+        sdk.showBanner(); 
+        window._gm_log('showBanner() ejecutado, esperando eventos...');
+      }catch(e){ window._gm_log('Error showBanner: ' + e.message); }
+    } else {
+      window._gm_log('SDK no disponible, sdk=' + typeof sdk);
     }
-    // Fallback si SDK no está listo: esperar 500ms y reintentar, o dar recompensa directa si no hay ads
-    console.log('[GM] SDK no listo, reintentando en 800ms');
-    setTimeout(()=>{
-      if(typeof sdk !== 'undefined' && sdk.showBanner){
-        try{ sdk.showBanner(); return; }catch(e){}
+    if(_gmTimer) clearTimeout(_gmTimer);
+    _gmTimer = setTimeout(()=>{
+      window._gm_log('TIMEOUT 25s - forzando recompensa aunque no llego evento');
+      window._gm_onAdFinished();
+    },25000);
+    
+    // Detectar foco
+    const onVis = () => {
+      if(!document.hidden){
+        window._gm_log('visibilitychange: pagina visible de nuevo');
+        setTimeout(()=>{ if(window._gm_isAdPlaying) window._gm_onAdFinished(); },800);
       }
-      // Si aún no hay SDK, dar recompensa fallback (para testing sin ads)
-      console.log('[GM] Fallback - sin SDK, dando recompensa directa');
-      window._gm_onAdComplete();
-    },800);
-  },50);
+    };
+    document.addEventListener('visibilitychange', onVis);
+    setTimeout(()=>document.removeEventListener('visibilitychange', onVis),30000);
+  },500);
 }
 
-function claimAd(){
-  // claimAd ya no se usa directo, ahora lo maneja _gm_onAdComplete
-  // pero lo dejamos por compatibilidad
-  window._gm_onAdComplete();
+function claimReward(){
+  const type=_rewardPending;
+  window._gm_log('claimReward ' + type);
+  _rewardPending=null;
+  if(_gmTimer) clearTimeout(_gmTimer);
+  window._gm_isAdPlaying=false;
+  if(type==='lives'){
+    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;adUses++;state='playing';
+  }else if(type==='double'){
+    game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
+    maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
+    ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
+    game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';
+  }else if(type==='checkpoint'){
+    startGame(maxLevel);state='playing';
+  }
+  renderUI();
 }
+function claimAd(){ claimReward(); }
+function forceReward(){ window._gm_log('Forzado manual'); window._gm_onAdFinished(); }
 
 function togglePower(){if(state!=='playing')return;if(game.power.state==='moving'){game.power.state='locked';game.power.locked=Math.round(game.power.v||65);}else{game.power.state='moving';}renderUI();}
 function handleShoot(){
@@ -447,14 +524,16 @@ function handleShoot(){
 }
 
 function loop(now){
-  // Si hay anuncio reproduciéndose, no actualizar juego
-  if(typeof window._gm_isAdPlaying !== 'undefined' && window._gm_isAdPlaying){
-    requestAnimationFrame(loop);
-    return;
-  }
-  if(ad.type!==null || state==='reward_modal'){
-    requestAnimationFrame(loop);
-    return;
+  if(window._gm_isAdPlaying || state==='reward_modal' || (ad && ad.type!==null)){
+    // Pausado por anuncio - no actualizar juego pero seguir loop
+    if(state==='reward_modal'){
+      requestAnimationFrame(loop);
+      return;
+    }
+    if(window._gm_isAdPlaying || (ad && ad.type!==null)){
+      requestAnimationFrame(loop);
+      return;
+    }
   }
 
   const dt=Math.min((now-last)/1000,0.033);last=now;
