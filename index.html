@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>wasa.chat - 100 Niveles - FINAL COMPLETO</title>
+<title>wasa.chat - Wasa Space - Shooter Game Online</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 body{margin:0;background:#21418f;overflow:hidden;font-family:Inter,system-ui,sans-serif}
@@ -14,6 +14,8 @@ canvas{display:block}
 </head>
 <body>
 <canvas id="c"></canvas>
+<!-- GAMEMONETIZE VIDEO CONTAINER PERMANENTE - debe existir al cargar la página -->
+<div id="gamemonetize-video" style="display:none;"></div>
 <div id="ui" class="absolute inset-0 pointer-events-none font-sans"></div>
 <script>
 // === WASA.CHAT - 100 NIVELES + 10 NAVES + CHECKPOINTS (BASE ORIGINAL INTACTA) ===
@@ -275,7 +277,7 @@ function renderUI(){
       
       <div class="flex-1 flex flex-col items-center justify-center p-3 bg-gradient-to-br from-[#1a1a1a] to-black overflow-y-auto">
         <div class="w-full max-w-[520px] bg-[#111] rounded-[16px] border border-white/10 overflow-hidden">
-          <div id="gamemonetize-video" style="width:100%; min-height:360px; background:#000; display:flex; align-items:center; justify-content:center;">
+          <div id="gamemonetize-video-ad" style="width:100%; min-height:400px; background:#000; display:flex; align-items:center; justify-content:center;">
             <div class="text-center p-6">
               <div class="w-16 h-16 mx-auto rounded-2xl bg-[#3f007e] flex items-center justify-center text-[28px] animate-pulse">▶</div>
               <div class="mt-3 text-white font-black text-[13px]">CARGANDO VIDEO RECOMPENSADO...</div>
@@ -345,10 +347,20 @@ function buySub(id){
 }
 let gmInterval=null, gmFallback=null;
 function loadGameMonetizeVideo(){
-  // limpiar anterior
-  const container = document.getElementById('gamemonetize-video');
-  if(!container) return;
-  // configurar opciones GameMonetize
+  const adContainer = document.getElementById('gamemonetize-video-ad');
+  const permanent = document.getElementById('gamemonetize-video');
+  if(!permanent) return;
+  
+  // mover el contenedor permanente dentro del ad overlay si existe
+  if(adContainer){
+    adContainer.innerHTML='';
+    adContainer.appendChild(permanent);
+    permanent.style.display='block';
+    permanent.style.width='100%';
+    permanent.style.minHeight='400px';
+    permanent.style.background='#000';
+  }
+  
   window.VIDEO_OPTIONS = {
        gameid : "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
        width  : "100%",
@@ -356,27 +368,48 @@ function loadGameMonetizeVideo(){
        color  : "#3f007e",
        getads  : "true"
   };
-  // cargar script si no existe
+  
+  console.log('[GM] VIDEO_OPTIONS seteadas', window.VIDEO_OPTIONS);
+  console.log('[GM] Dominio actual:', window.location.hostname, ' - Debe estar whitelisteado en GameMonetize y tener app-ads.txt');
+  
   if(!document.getElementById('gamemonetize-video-api')){
     const s=document.createElement('script');
     s.id='gamemonetize-video-api';
     s.src='https://api.gamemonetize.com/video.js';
-    s.onload=()=>{ console.log('GameMonetize video.js cargado'); initGMEvents(); };
-    s.onerror=()=>{ console.log('Error cargando GameMonetize, fallback'); enableGMFallback(); };
+    s.onload=()=>{
+      console.log('[GM] video.js cargado OK');
+      // GameMonetize expone funcion para iniciar video
+      setTimeout(()=>{
+        try{
+          if(typeof window.showVideoAd === 'function') window.showVideoAd();
+          if(typeof window.gamemonetizeVideo === 'function') window.gamemonetizeVideo();
+          // algunos usan GM_API
+          if(window.GM_API && window.GM_API.showVideo) window.GM_API.showVideo();
+        }catch(e){ console.log('[GM] error iniciando video', e); }
+        initGMEvents();
+      },500);
+    };
+    s.onerror=()=>{
+      console.log('[GM] ERROR cargando video.js - posible bloqueo adblock o dominio no whitelisteado');
+      document.getElementById('gamemonetize-video').innerHTML = '<div class="p-4 text-center text-white/60 text-[11px]">⚠️ No se pudo cargar video.js<br>Posibles causas:<br>1. AdBlock activo<br>2. Dominio no whitelisteado en GameMonetize<br>3. Sin app-ads.txt en wasa.chat/app-ads.txt<br><br>Usando fallback de 5s</div>';
+      enableGMFallback();
+    };
     document.head.appendChild(s);
   }else{
-    // si ya existe, intentar reiniciar
-    if(window.gamemonetizeVideo) {
-      try{ window.gamemonetizeVideo(); }catch(e){}
-    }
+    console.log('[GM] video.js ya cargado, reiniciando');
+    permanent.innerHTML=''; // limpiar
+    try{
+      if(typeof window.showVideoAd === 'function') window.showVideoAd();
+      if(typeof window.gamemonetizeVideo === 'function') window.gamemonetizeVideo();
+    }catch(e){}
     initGMEvents();
   }
-  // animar barra de carga
+  
   let loadPct=0;
   const barInt=setInterval(()=>{
-    loadPct+=10; const bar=document.getElementById('gm-load-bar'); if(bar) bar.style.width=loadPct+'%';
-    if(loadPct>=90) clearInterval(barInt);
-  },200);
+    loadPct+=8; const bar=document.getElementById('gm-load-bar'); if(bar) bar.style.width=loadPct+'%';
+    if(loadPct>=85) clearInterval(barInt);
+  },250);
 }
 function initGMEvents(){
   // Callbacks que expone GameMonetize (varian por versión)
@@ -425,10 +458,13 @@ function unlockGMReward(isFallback=false){
 function closeGameMonetizeAd(){
   if(gmInterval) clearInterval(gmInterval);
   if(gmFallback) clearInterval(gmFallback);
+  const perm=document.getElementById('gamemonetize-video');
+  if(perm){
+    perm.style.display='none';
+    perm.innerHTML='';
+    document.body.appendChild(perm); // devolver al body
+  }
   ad={type:null,timer:5,unlocked:false};
-  // limpiar video container
-  const oldScript=document.getElementById('gamemonetize-video-api');
-  // no removemos el script para no recargar cada vez
   renderUI();
 }
 
