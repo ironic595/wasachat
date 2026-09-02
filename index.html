@@ -5,36 +5,23 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>wasa.chat - 100 Niveles - FINAL COMPLETO</title>
 <script src="https://cdn.tailwindcss.com"></script>
+
 <script type="text/javascript">
    window._gm_isAdPlaying = false;
    window._gm_sdk_ready = false;
-   window._gm_adShown = false;
    window._gm_hasAd = false;
-   
+   window._gm_adShown = false;
    window.SDK_OPTIONS = {
       gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
       onEvent: function (a) {
-         console.log('[GM SDK]', a.name, a);
-         if(a.name==='SDK_GAME_PAUSE'){
-           window._gm_isAdPlaying = true;
-           window._gm_adShown = true;
-           window._gm_hasAd = true;
-         }
+         if(a.name==='SDK_GAME_PAUSE'){ window._gm_isAdPlaying = true; window._gm_hasAd = true; window._gm_adShown = true; }
          if(a.name==='SDK_GAME_START' || a.name==='SDK_ERROR'){
            window._gm_isAdPlaying = false;
-           if(window._gm_hasAd){
-             if(window._gm_onAdFinished) window._gm_onAdFinished();
-           } else {
-             console.log('[GM] Sin anuncio - mostrando TU ANUNCIO PROPIO');
-             if(window._gm_showCustomAd) window._gm_showCustomAd();
-           }
-           window._gm_adShown = false;
-           window._gm_hasAd = false;
+           if(window._gm_hasAd){ if(window._gm_onAdFinished) window._gm_onAdFinished(); }
+           else { if(window._gm_showCustomAd) window._gm_showCustomAd(); }
+           window._gm_hasAd=false; window._gm_adShown=false;
          }
          if(a.name==='SDK_READY') window._gm_sdk_ready = true;
-         if(a.name==='SDK_NO_AD' || (a.name==='SDK_ERROR' && a.message && a.message.toLowerCase().includes('no ad'))){
-           window._gm_hasAd = false;
-         }
       }
    };
    (function (a, b, c) {
@@ -42,6 +29,14 @@
       a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
    })(document, "script", "gamemonetize-sdk");
 </script>
+<link rel="preload" href="./banner-bch.webp" as="image">
+<style>
+@media (max-width: 768px){
+  .power-bar-wrap{ width:62px !important; }
+  .power-bar-wrap #power-container{ width:36px !important; height:135px !important; }
+  .bottom-stats{ font-size:9px !important; padding:6px 8px !important; left:4px !important; right:4px !important; bottom:4px !important; max-width:calc(100vw - 8px) !important; }
+}
+</style>
 
 <style>
 body{margin:0;background:#21418f;overflow:hidden;font-family:Inter,system-ui,sans-serif}
@@ -49,7 +44,6 @@ canvas{display:block}
 @keyframes load{0%{width:0%}100%{width:100%}}
 @keyframes pulse{0%,100%{box-shadow:0 6px 0 #000}50%{box-shadow:0 6px 0 #000,0 0 0 12px rgba(255,222,89,0)}}
 </style>
-<link rel="preload" href="./banner-bch.webp" as="image">
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -146,7 +140,27 @@ function drawShip(s){
   if(s.type===9){
     ctx.fillStyle="#ff0000";ctx.shadowColor="#ff0000";ctx.shadowBlur=12;ctx.fillRect(-s.w*0.4, -s.h*0.5, s.w*0.8, 4);
   }
+  // VIDA ARRIBA DE CADA NAVE - sigue a la nave
   ctx.restore();
+  // HP bar sobre nave
+  const hpPct = Math.max(0, s.hp / s.maxHp);
+  const barW = Math.max(36, s.w * 0.7);
+  const barH = 5;
+  const barX = s.x - barW/2;
+  const barY = s.y - s.h*0.9 - 18;
+  ctx.fillStyle='rgba(0,0,0,0.55)';
+  ctx.beginPath();
+  ctx.roundRect(barX-1, barY-1, barW+2, barH+2, 3);
+  ctx.fill();
+  ctx.fillStyle = hpPct>0.5 ? '#4ade80' : hpPct>0.25 ? '#facc15' : '#ef4444';
+  ctx.beginPath();
+  ctx.roundRect(barX, barY, barW*hpPct, barH, 2);
+  ctx.fill();
+  ctx.fillStyle='#fff';
+  ctx.font='900 9px monospace';
+  ctx.textAlign='center';
+  ctx.fillText(`${s.hp}/${s.maxHp}`, s.x, barY-3);
+  
   ctx.globalAlpha=1;
 }
 
@@ -170,17 +184,17 @@ function renderUI(){
     ${state==='playing'?`<button onclick="openPause()" class="ml-3 w-7 h-7 rounded-full bg-white/10 border border-white/20 text-white text-[12px] flex items-center justify-center hover:bg-white/20">⏸</button>`:''}
     </div>
     <div class="flex gap-2 mt-3"><div class="bg-black/35 backdrop-blur px-3.5 py-1.5 rounded-full text-white text-[11px] font-black border border-white/10">NIVEL ${game.level}</div><div class="bg-black/35 backdrop-blur px-3.5 py-1.5 rounded-full text-white text-[11px] font-black border border-white/10">${game.points} PTS</div><div class="bg-[#ffde59] text-black px-3 py-1.5 rounded-full text-[11px] font-black border-2 border-black">💰 ${coins}</div></div></div>
-    <div class="flex flex-col items-end gap-2"><div class="flex items-center gap-2 bg-black/30 backdrop-blur px-3 py-1.5 rounded-full border border-white/10"><span class="text-[9px] text-white/60 font-bold tracking-widest">TIROS</span><div class="flex gap-1.5">${Array.from({length:5}).map((_,i)=>`<div class="w-2.5 h-2.5 rounded-full ${i<5-game.misses?'bg-[#ffde59] shadow-[0_0_10px_#ffde59]':'bg-white/15'}"></div>`).join('')}</div></div><div class="flex flex-col gap-1.5 items-end">${game.ships.map(s=>`<div class="bg-black/50 backdrop-blur border border-white/15 rounded-full pl-1 pr-3 py-1 flex items-center gap-2"><div class="w-[56px] h-[6px] bg-black/40 rounded-full p-[1px]"><div class="h-full rounded-full" style="width:${Math.max(0,s.hp/s.maxHp*100)}%;background:${s.hp/s.maxHp>0.5?'linear-gradient(90deg,#4ade80,#22c55e)':'linear-gradient(90deg,#facc15,#f59e0b)'}"></div></div><span class="text-[11px] font-black ${s.hp/s.maxHp<0.3?'text-red-300':'text-white'}">${s.hp}</span><span class="text-[8px] text-white/40">/ ${s.maxHp}</span></div>`).join('')}</div>${state==='playing'?`<button onclick="openPause()" class="mt-1 text-[9px] text-white/50 border border-white/10 rounded-full px-2 py-1 bg-black/20 hover:bg-white/10">MENU • PAUSA</button>`:''}</div>
+    <div class="flex flex-col items-end gap-2"><div class="flex items-center gap-2 bg-black/30 backdrop-blur px-3 py-1.5 rounded-full border border-white/10"><span class="text-[9px] text-white/60 font-bold tracking-widest">TIROS</span><div class="flex gap-1.5">${Array.from({length:5}).map((_,i)=>`<div class="w-2.5 h-2.5 rounded-full ${i<5-game.misses?'bg-[#ffde59] shadow-[0_0_10px_#ffde59]':'bg-white/15'}"></div>`).join('')}</div></div>${state==='playing'?`<button onclick="openPause()" class="mt-1 text-[9px] text-white/50 border border-white/10 rounded-full px-2 py-1 bg-black/20 hover:bg-white/10">MENU • PAUSA</button>`:''}</div>
   </div>`;
 
   if(state==='playing'){
-    h+=`<div class="absolute top-[92px] left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center gap-1">
-      ${game.power.state==='moving'?`<div class="bg-[#ffde59] text-black font-black text-[10px] tracking-[0.14em] px-4 py-2 rounded-full border-2 border-black shadow-[0_4px_0_#000] animate-pulse">1° CLICK: FIJAR POTENCIA → 2° CLICK: DISPARAR</div>`:`<div class="bg-white text-black font-black text-[11px] tracking-[0.14em] px-5 py-2 rounded-full border-2 border-black">POTENCIA ${Math.round(game.power.locked)}% FIJADA • ¡DISPARA! 🎯</div>`}
-      <div class="text-[8px] text-white/50 font-mono bg-black/20 px-2 py-1 rounded-full mt-1">${cfg.name} • ${game.ships.length} nave(s)</div>
+    h+=`<div class="absolute ${game.power.state==='moving' ? 'top-[92px] left-1/2 -translate-x-1/2' : 'bottom-[105px] left-[88px] md:bottom-[108px] md:left-[110px]'} pointer-events-none flex flex-col ${game.power.state==='moving'?'items-center':'items-start'} gap-1 z-[20]">
+      ${game.power.state==='moving'?`<div class="bg-[#ffde59] text-black font-black text-[9px] md:text-[10px] tracking-[0.12em] px-3 py-1.5 md:px-4 md:py-2 rounded-full border-2 border-black shadow-[0_3px_0_#000] animate-pulse whitespace-nowrap">1° CLICK: FIJAR → 2°: DISPARAR</div>`:`<div class="bg-white text-black font-black text-[10px] md:text-[11px] tracking-[0.1em] px-3.5 py-1.5 rounded-full border-2 border-black shadow-[0_2px_0_#000] whitespace-nowrap">POTENCIA ${Math.round(game.power.locked)}% • ¡DISPARA! 🎯</div>`}
+      ${game.power.state==='moving'?`<div class="text-[7px] text-white/50 font-mono bg-black/30 px-2 py-0.5 rounded-full mt-1">${cfg.name} • ${game.ships.length} nave(s)</div>`:''}
     </div>
-    <div class="absolute bottom-0 left-0 right-0 p-2 md:p-4 flex justify-between items-end pointer-events-none gap-2">
+    <div class="absolute bottom-0 left-0 right-0 p-2 pb-[max(8px,env(safe-area-inset-bottom))] md:p-4 flex justify-between items-end pointer-events-none gap-2 max-w-[100vw] overflow-hidden">
       <!-- IZQUIERDA: BARRA POTENCIA CON ANCHO FIJO -->
-      <div class="pointer-events-auto flex flex-col items-center gap-2 w-[90px] shrink-0"><div id="power-label" class="text-[9px] font-black tracking-[0.22em] text-white/80 w-[90px] text-center whitespace-nowrap">POTENCIA ${Math.round(game.power.v)}%</div>
+      <div class="pointer-events-auto flex flex-col items-center gap-2 w-[72px] md:w-[90px] shrink-0 power-bar-wrap"><div id="power-label" class="text-[9px] font-black tracking-[0.22em] text-white/80 w-[90px] text-center whitespace-nowrap">POTENCIA ${Math.round(game.power.v)}%</div>
       <div id="power-container" class="relative w-[40px] h-[160px] md:h-[180px] backdrop-blur-xl rounded-[18px] border p-1.5 flex flex-col justify-end overflow-hidden ${game.power.state==='locked'?'bg-[#ffde59]/15 border-[#ffde59]/60':'bg-black/45 border-white/15'}"><div id="power-fill" class="w-full rounded-[12px]" style="height:${game.power.state==='locked'?game.power.locked:game.power.v}%;background:${game.power.state==='locked'?'linear-gradient(180deg,#fffe8a,#ffde59 50%,#ff8a2a)':'linear-gradient(180deg,#fff7a0,#ffde59 60%,#ff6a2a)'}"></div><div id="power-line" class="absolute left-0 right-0 h-[3px] bg-white shadow-[0_0_12px_white]" style="bottom:${game.power.state==='locked'?game.power.locked:game.power.v}%"></div></div>
       <button id="power-btn" onclick="togglePower()" class="pointer-events-auto w-[90px] px-1 py-2 rounded-full font-black text-[8px] tracking-[0.08em] border text-center whitespace-nowrap ${game.power.state==='locked'?'bg-[#ffde59] text-black border-black shadow-[0_3px_0_#000]':'bg-white/10 text-white border-white/20'}">${game.power.state==='locked'?Math.round(game.power.locked)+'% DESBLOQ':'FIJAR'}</button></div>
       
@@ -306,56 +320,39 @@ function renderUI(){
     </div></div>`;
   }
 
+
   if(state==='custom_ad'){
-    // TU ANUNCIO PROPIO - cuando GameMonetize no tiene anuncio
-    const rewardText = _pendingAdType==='lives'?'+3 TIROS EXTRA':_pendingAdType==='double'?'x2 PUNTOS Y MONEDAS':'CONTINUAR NIVEL '+maxLevel;
+    const rewardText = _pendingAdType==='lives'?'+3 TIROS':_pendingAdType==='double'?'x2 PUNTOS':'CONTINUAR NIVEL '+maxLevel;
     h+=`<div class="absolute inset-0 z-[80] bg-black flex flex-col pointer-events-auto">
-      <div class="h-10 flex items-center justify-between px-4 bg-[#0f0f0f] border-b border-white/10">
-        <span class="text-[10px] font-black px-2 py-1 rounded bg-[#ffde59] text-black">ANUNCIO PATROCINADO</span>
-        <span class="text-[10px] text-white/50">Recompensa: ${rewardText}</span>
-      </div>
-      <div class="flex-1 overflow-y-auto p-4 flex items-center justify-center bg-gradient-to-br from-[#1a1a1a] to-black">
-        <div class="w-full max-w-[360px] bg-[#202020] border border-white/10 rounded-[24px] p-5 text-center">
-          <a href="https://bitcoinaliens.com/?ref=5281116&game=7&pf=2" target="_blank" onclick="window._gm_customAdClicked=true" class="block">
-            <img src="./banner-bch.webp" alt="Gana Bitcoin Cash Gratis" class="w-full rounded-[20px] border border-white/10 shadow-[0_0_30px_rgba(0,255,136,0.3)] max-h-[460px] object-contain mx-auto bg-black" />
+      <div class="h-9 flex items-center justify-between px-3 bg-[#0f0f0f] border-b border-white/10"><span class="text-[9px] font-black px-2 py-0.5 rounded bg-[#00ff88] text-black">PATROCINADO</span><span class="text-[9px] text-white/40">Recompensa: ${rewardText}</span></div>
+      <div class="flex-1 overflow-y-auto p-3 flex items-center justify-center bg-gradient-to-br from-[#0a1f14] to-black">
+        <div class="w-full max-w-[340px]">
+          <a href="https://bitcoinaliens.com/?ref=5281116&game=7&pf=2" target="_blank" onclick="window._gm_customAdClicked=true">
+            <img src="./banner-bch.webp" alt="Gana BCH Gratis" class="w-full rounded-[18px] border border-white/10 shadow-[0_0_25px_rgba(0,255,136,0.25)] object-contain max-h-[62vh]" loading="lazy" />
           </a>
-          <div class="mt-3 bg-[#0a4a2a]/50 rounded-xl border border-[#00ff88]/20 p-2.5 text-center">
-            <div class="text-[#00ff88] font-black text-[11px]">✓ Yo la uso - Es real y paga BCH</div>
-            <div class="text-white/50 text-[10px] mt-1">Ref: 5281116 - Ambos ganamos bonus</div>
-          </div>
-          <a href="https://bitcoinaliens.com/?ref=5281116&game=7&pf=2" target="_blank" onclick="window._gm_customAdClicked=true" class="mt-3 block w-full py-3.5 rounded-full bg-gradient-to-r from-[#00d4ff] to-[#00ff88] text-black font-black text-[13px] border-[2px] border-black shadow-[0_3px_0_#000]">📲 GANAR BCH GRATIS AHORA</a>
-          
-          <div class="mt-3 text-[9px] text-white/30">Al hacer click me ayudás a mantener wasa.chat gratis ❤️</div>
+          <div class="mt-3 bg-black/60 rounded-xl border border-[#00ff88]/20 p-2 text-center"><div class="text-[#00ff88] font-black text-[10px]">✓ Yo la uso - Paga BCH real</div><div class="text-white/40 text-[8px] mt-0.5">Ref 5281116 • Vos y yo ganamos bonus</div></div>
+          <a href="https://bitcoinaliens.com/?ref=5281116&game=7&pf=2" target="_blank" onclick="window._gm_customAdClicked=true" class="mt-3 block w-full py-3 rounded-full bg-[#00ff88] text-black font-black text-[12px] text-center border-2 border-black">📲 GANAR BCH GRATIS →</a>
         </div>
       </div>
-      <div class="p-4 bg-[#0f0f0f] border-t border-white/10">
-        <div class="flex gap-2">
-          <button onclick="claimCustomAd()" class="flex-1 py-3.5 rounded-full bg-[#ffde59] text-black font-black text-[12px] border-[2px] border-black">RECLAMAR ${rewardText} →</button>
-        </div>
-        <div class="mt-2 text-center text-[9px] text-white/20">Anuncio propio - GameMonetize no tenía anuncio para mostrar</div>
-      </div>
-      <div class="h-[3px] w-full bg-white/10"><div class="h-full bg-[#00d4ff]" style="width:${customAdTimer/5*100}%"></div></div>
+      <div class="p-3 bg-[#0f0f0f] border-t border-white/10"><button onclick="claimCustomAd()" class="w-full py-3 rounded-full bg-[#ffde59] text-black font-black text-[11px] border-2 border-black">RECLAMAR ${rewardText} →</button><div class="mt-1.5 text-center text-[7px] text-white/20">Anuncio propio - GM sin fill</div></div>
     </div>`;
   }
   if(state==='reward_modal' && _rewardPending){
     const cfg = {
       lives: {title:'¡+3 TIROS EXTRA!', desc:'Viste el anuncio. Tenés 3 intentos más.', icon:'🎯', btn:'CONTINUAR CON +3 TIROS', reward:'+3 TIROS'},
-      double: {title:'¡RECOMPENSA DUPLICADA!', desc:`Duplicaste ${tempPoints} PTS y ${tempCoins} 💰 x2`, icon:'💰', btn:'RECLAMAR x2 Y SEGUIR', reward:`+${tempPoints} PTS +${tempCoins} 💰`},
-      checkpoint: {title:'¡CONTINUAS JUGANDO!', desc:`Continuás desde nivel ${maxLevel}`, icon:'🚀', btn:'CONTINUAR JUGANDO', reward:'NIVEL '+maxLevel}
+      double: {title:'¡RECOMPENSA x2!', desc:`Duplicaste ${tempPoints} PTS y ${tempCoins} 💰`, icon:'💰', btn:'RECLAMAR x2 Y SEGUIR', reward:`+${tempPoints} PTS +${tempCoins} 💰`},
+      checkpoint: {title:'¡CONTINUAS!', desc:`Continuás desde nivel ${maxLevel}`, icon:'🚀', btn:'CONTINUAR JUGANDO', reward:'NIVEL '+maxLevel}
     };
     const c = cfg[_rewardPending] || cfg.lives;
-    h+=`<div class="absolute inset-0 z-[70] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 pointer-events-auto">
-      <div class="w-full max-w-[380px] bg-gradient-to-br from-[#1e1e1e] to-[#0f0f0f] border border-[#ffde59]/30 rounded-[24px] p-6 text-center">
-        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[36px]">${c.icon}</div>
-        <div class="mt-4 text-[#ffde59] font-black text-[18px]">${c.title}</div>
-        <div class="mt-2 text-white/70 text-[13px]">${c.desc}</div>
-        <button onclick="claimReward()" class="mt-5 w-full py-4 rounded-full bg-[#ffde59] text-black font-black text-[14px] border-[2.5px] border-black">${c.btn} →</button>
-      </div>
-    </div>`;
+    h+=`<div class="absolute inset-0 z-[70] bg-black/85 backdrop-blur flex items-center justify-center p-4 pointer-events-auto"><div class="w-full max-w-[340px] bg-[#1e1e1e] border border-[#ffde59]/30 rounded-[20px] p-5 text-center"><div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[28px]">${c.icon}</div><div class="mt-3 text-[#ffde59] font-black text-[16px]">${c.title}</div><div class="mt-1 text-white/60 text-[11px]">${c.desc}</div><button onclick="claimReward()" class="mt-4 w-full py-3 rounded-full bg-[#ffde59] text-black font-black text-[12px] border-2 border-black">${c.btn} →</button></div></div>`;
   }
-  if(ad.type && state!=='reward_modal' && state!=='custom_ad'){
-    h+=`<div class="absolute inset-0 z-[50] bg-black/90 flex items-center justify-center pointer-events-auto">
-      <div class="text-center"><div class="w-10 h-10 mx-auto border-2 border-[#ffde59] border-t-transparent rounded-full animate-spin"></div><div class="mt-3 text-white font-black text-[11px]">CARGANDO ANUNCIO...</div></div>
+
+  if(ad.type){
+    h+=`<div class="absolute inset-0 z-[50] bg-black flex flex-col pointer-events-auto">
+      <div class="h-12 flex items-center justify-between px-4 bg-[#0f0f0f] border-b border-white/10"><div class="flex items-center gap-3"><span class="text-[10px] font-black px-2.5 py-1 rounded bg-white/10 border border-white/15 text-white/70">Anuncio</span><span class="text-white/80 font-bold text-[12px]">${ad.type}</span></div><button onclick="if(ad.unlocked){ad.type=null;renderUI()}" class="w-8 h-8 rounded-full border flex items-center justify-center font-black ${ad.unlocked?'bg-white text-black':'bg-white/10 text-white/20'}">${ad.unlocked?'✕':ad.timer}</button></div>
+      <div class="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-[#1a1a1a] to-black"><div class="w-full max-w-[420px] rounded-[24px] bg-[#202020] border border-white/10 p-6 text-center"><div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[32px]">🚀</div><div class="mt-4 text-white font-black text-[18px]">wasa.chat PRO</div><div class="mt-6 w-full bg-black/50 rounded-2xl border border-white/10 p-3 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">🎁</div><div class="text-left"><div class="text-white font-black text-[11px]">TU RECOMPENSA</div><div class="text-[#ffde59] font-black text-[14px]">${ad.type==='lives'?'+3 tiros':ad.type==='double'?'x2 PUNTOS':'CONTINUAR NIVEL '+maxLevel}</div></div></div></div></div>
+      <div class="p-4 bg-[#0f0f0f] border-t border-white/10 flex gap-3"><button onclick="claimAd()" ${!ad.unlocked?'disabled':''} class="flex-1 py-3.5 rounded-full font-black text-[12px] border-[2px] border-black ${ad.unlocked?'bg-[#ffde59] text-black':'bg-white/10 text-white/20'}">${ad.unlocked?'✨ RECLAMAR':'ESPERA '+ad.timer+'s'}</button></div>
+      <div class="h-[3px] w-full bg-white/10"><div class="h-full bg-[#ffde59]" style="width:${(5-ad.timer)/5*100}%"></div></div>
     </div>`;
   }
 
@@ -412,7 +409,6 @@ let _rewardPending=null;
 let _gmTimer=null;
 let _gmNoAdTimer=null;
 let customAdTimer=0;
-let customAdInterval=null;
 window._gm_customAdClicked=false;
 
 window._gm_onAdFinished = function(){
@@ -427,106 +423,63 @@ window._gm_onAdFinished = function(){
   state='reward_modal';
   renderUI();
 };
-
 window._gm_showCustomAd = function(){
-  console.log('[GM] Mostrando TU anuncio propio con referidos');
   if(_gmTimer) clearTimeout(_gmTimer);
   if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
   window._gm_isAdPlaying=false;
   if(!_pendingAdType) return;
-  
-  customAdTimer=0;
   state='custom_ad';
   ad={type:null};
   renderUI();
-  
-  if(customAdInterval) clearInterval(customAdInterval);
-  customAdInterval = setInterval(()=>{
-    customAdTimer+=0.1;
-    if(customAdTimer>=5){
-      clearInterval(customAdInterval);
-      customAdTimer=5;
-    }
-    renderUI();
-  },100);
 };
-
 function openAd(type){
-  console.log('[GM] openAd', type);
   _pendingAdType=type;
   _rewardPending=null;
   window._gm_isAdPlaying=true;
   window._gm_hasAd=false;
-  window._gm_adShown=false;
   ad={type:type};
   renderUI();
-  
   setTimeout(()=>{
-    ad={type:null};
-    renderUI();
-    
-    let adAttempted=false;
-    
-    if(typeof sdk !== 'undefined' && sdk.showBanner){
-      try{
-        console.log('[GM] Intentando sdk.showBanner() real');
-        adAttempted=true;
-        sdk.showBanner();
-      }catch(e){ console.log('[GM] error', e); }
-    }
-    
-    // DETECTOR DE SIN ANUNCIO: si en 2.5 segundos no llego SDK_GAME_PAUSE, no hay anuncio
+    ad={type:null}; renderUI();
+    let attempted=false;
+    if(typeof sdk!=='undefined' && sdk.showBanner){ try{ sdk.showBanner(); attempted=true; }catch(e){} }
     if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
-    _gmNoAdTimer = setTimeout(()=>{
-      if(!window._gm_hasAd && _pendingAdType){
-        console.log('[GM] DETECTADO: No hay anuncio de GM - mostrando TU anuncio de referidos');
-        window._gm_showCustomAd();
-      }
-    },2500);
-    
+    _gmNoAdTimer=setTimeout(()=>{ if(!window._gm_hasAd && _pendingAdType) window._gm_showCustomAd(); },2500);
     if(_gmTimer) clearTimeout(_gmTimer);
-    _gmTimer = setTimeout(()=>{ 
-      if(_pendingAdType) window._gm_showCustomAd(); 
-    },8000);
-    
-    if(!adAttempted){
-      setTimeout(()=>{ window._gm_showCustomAd(); },800);
-    }
+    _gmTimer=setTimeout(()=>{ if(_pendingAdType) window._gm_showCustomAd(); },8000);
+    if(!attempted) setTimeout(()=>window._gm_showCustomAd(),600);
   },200);
 }
-
-function claimCustomAd(){
-  if(customAdInterval) clearInterval(customAdInterval);
-  if(window._gm_customAdClicked){
-    console.log('Usuario clickeo tu link de referidos! - dando bonus extra');
-  }
-  _rewardPending=_pendingAdType;
-  _pendingAdType=null;
-  state='reward_modal';
-  renderUI();
-}
-
+function claimCustomAd(){ _rewardPending=_pendingAdType; _pendingAdType=null; state='reward_modal'; renderUI(); }
 function claimReward(){
-  const type=_rewardPending;
-  _rewardPending=null;
+  const type=_rewardPending; _rewardPending=null;
   if(_gmTimer) clearTimeout(_gmTimer);
   if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
-  if(customAdInterval) clearInterval(customAdInterval);
   window._gm_isAdPlaying=false;
-  if(type==='lives'){
-    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;adUses++;state='playing';
-  }else if(type==='double'){
-    game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
-    maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
-    ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
-    game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';
-  }else if(type==='checkpoint'){
-    startGame(maxLevel);state='playing';
-  }
+  if(type==='lives'){ game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;adUses++;state='playing'; }
+  else if(type==='double'){ game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins); maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel); ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking)); game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing'; }
+  else if(type==='checkpoint'){ startGame(maxLevel);state='playing'; }
   renderUI();
 }
 function claimAd(){ claimReward(); }
-
+function openAd_old(type){
+  ad={type,timer:5,unlocked:false};renderUI();
+  const int=setInterval(()=>{ad.timer--;if(ad.timer<=0){ad.unlocked=true;clearInterval(int);}renderUI();},1000);
+}
+function claimAd(){
+  if(!ad.unlocked)return;
+  if(ad.type==='lives'){
+    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;ad={type:null};adUses++;state='playing';
+  }else if(ad.type==='double'){
+    game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
+    maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
+    ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
+    ad={type:null};game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);state='playing';
+  }else if(ad.type==='checkpoint'){
+    ad={type:null};startGame(maxLevel);renderUI();
+  }
+  renderUI();
+}
 function togglePower(){if(state!=='playing')return;if(game.power.state==='moving'){game.power.state='locked';game.power.locked=Math.round(game.power.v||65);}else{game.power.state='moving';}renderUI();}
 function handleShoot(){
   if(state!=='playing')return;
@@ -537,12 +490,7 @@ function handleShoot(){
   game.bullets.push({x:cx,y:cy,vx,vy,trail:[]});
 }
 
-function loop(now){
-  if(window._gm_isAdPlaying || state==='reward_modal' || state==='custom_ad' || (ad && ad.type!==null)){
-    requestAnimationFrame(loop);
-    return;
-  }
-
+function loop(now){ if(window._gm_isAdPlaying || state==="reward_modal" || state==="custom_ad"){ requestAnimationFrame(loop); return; }
   const dt=Math.min((now-last)/1000,0.033);last=now;
   if(state==='playing'){
     for(let s of game.ships){
