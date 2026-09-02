@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>wasa.chat - Shooter Space Game Online Free</title>
+<title>wasa.chat - 100 Niveles - FINAL COMPLETO</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script type="text/javascript">
    window.SDK_OPTIONS = {
@@ -11,21 +11,15 @@
       onEvent: function (a) {
          switch (a.name) {
             case "SDK_GAME_PAUSE":
-               console.log('[GM] PAUSE');
-               if(window._gm_pauseGame) window._gm_pauseGame();
+               console.log('[GM] PAUSE - anuncio iniciado, juego pausado');
                break;
             case "SDK_GAME_START":
-               console.log('[GM] START - anuncio visto');
-               if(window._gm_resumeGame) window._gm_resumeGame();
+               console.log('[GM] START - anuncio terminado, dando recompensa');
+               if(window._gm_onAdComplete) window._gm_onAdComplete();
                break;
             case "SDK_READY":
-               console.log('[GM] READY');
+               console.log('[GM] SDK READY');
                window._gm_sdk_ready = true;
-               const dot=document.getElementById('gm-status-dot');
-               if(dot){ dot.className='w-2 h-2 rounded-full bg-green-400 animate-pulse'; }
-               break;
-            case "SDK_ERROR":
-               console.log('[GM] ERROR', a);
                break;
          }
       }
@@ -298,40 +292,14 @@ function renderUI(){
   }
 
   if(ad.type){
-    const rewardText = ad.type==='lives'?'+3 TIROS':ad.type==='double'?'x2 PUNTOS Y MONEDAS':'CONTINUAR NIVEL '+maxLevel;
-    const isReady = typeof window._gm_sdk_ready !== 'undefined' && window._gm_sdk_ready;
-    h+=`<div class="absolute inset-0 z-[50] bg-black flex flex-col pointer-events-auto">
-      <div class="h-12 flex items-center justify-between px-4 bg-[#0f0f0f] border-b border-white/10">
-        <div class="flex items-center gap-2">
-          <span class="text-[9px] font-black px-2 py-1 rounded bg-[#3f007e] border border-white/15 text-white">GameMonetize SDK</span>
-          <div id="gm-status-dot" class="w-2 h-2 rounded-full ${isReady?'bg-green-400 animate-pulse':'bg-yellow-400 animate-pulse'}"></div>
-          <span class="text-white/60 text-[10px]">${isReady?'SDK LISTO':'CARGANDO SDK...'}</span>
-        </div>
-        <button onclick="closeGMAd()" class="w-8 h-8 rounded-full bg-white/10 text-white flex items-center justify-center">✕</button>
+    // NO mostramos pantalla intermedia - el anuncio de GM se abre directo encima
+    // Solo mostramos un loader chiquito mientras carga el SDK
+    h+=`<div class="absolute inset-0 z-[50] bg-black/80 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
+      <div class="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 text-center">
+        <div class="w-12 h-12 mx-auto border-2 border-[#ffde59] border-t-transparent rounded-full animate-spin"></div>
+        <div class="mt-3 text-white font-black text-[12px]">CARGANDO ANUNCIO...</div>
+        <div class="mt-1 text-white/40 text-[10px]">${ad.type==='lives'?'+3 TIROS':ad.type==='double'?'x2 PUNTOS Y MONEDAS':'CONTINUAR'}</div>
       </div>
-      
-      <div class="flex-1 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#1a1a1a] to-black">
-        <div class="w-full max-w-[420px] rounded-[24px] bg-[#202020] border border-white/10 p-6 text-center">
-          <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-[#3f007e] to-[#7a2bff] flex items-center justify-center text-[32px] shadow-[0_0_30px_rgba(63,0,126,0.5)]">▶</div>
-          <div class="mt-4 text-white font-black text-[18px]">ANUNCIO RECOMPENSADO</div>
-          <div class="mt-1 text-white/40 text-[11px]">GameID: 4kci7og3klgj0ivy2wz3gdvd9dth5e7n</div>
-          <div class="mt-6 w-full bg-black/50 rounded-2xl border border-white/10 p-3 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-[#ffde59]/20 flex items-center justify-center">🎁</div>
-            <div class="text-left"><div class="text-white/50 font-bold text-[10px]">RECOMPENSA</div><div class="text-[#ffde59] font-black text-[15px]">${rewardText}</div></div>
-          </div>
-          <div class="mt-4 text-[10px] text-white/30">El video se abre en overlay de GameMonetize.<br>Debes verlo completo para reclamar.</div>
-          <div class="mt-3 flex items-center justify-center gap-2 text-[9px] text-white/20">
-            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-            SDK: ${isReady?'Conectado a api.gamemonetize.com/sdk.js':'Conectando...'}
-          </div>
-        </div>
-      </div>
-      
-      <div class="p-4 bg-[#0f0f0f] border-t border-white/10 flex gap-3">
-        <button onclick="closeGMAd()" class="px-5 py-3.5 rounded-full font-black text-[11px] bg-white/10 text-white/60 border border-white/10">CERRAR SIN RECOMPENSA</button>
-        <button id="gm-show-btn" onclick="showGMAd()" class="flex-1 py-3.5 rounded-full font-black text-[12px] border-[2.5px] border-black ${isReady?'bg-[#ffde59] text-black shadow-[0_4px_0_#000]':'bg-white/10 text-white/20'}">${isReady?'▶ VER ANUNCIO Y RECLAMAR':'⏳ CARGANDO SDK...'}</button>
-      </div>
-      <div class="px-4 pb-3 text-[8px] text-white/20 text-center">Si el botón no abre video, es porque tu dominio wasa.chat no está whitelisteado aún. Contacta a info@gamemonetize.com para self-hosted. Mientras tanto usa fallback de 5s.</div>
     </div>`;
   }
 
@@ -383,76 +351,64 @@ function buySub(id){
     buyingLock=false;
   }
 }
-let gmFallbackTimer=null;
-window._gm_pauseGame = function(){ console.log('Juego pausado por anuncio'); };
-window._gm_resumeGame = function(){
-  console.log('Anuncio terminado - dando recompensa');
-  // el usuario vio el anuncio completo
-  ad.unlocked=true;
-  claimAd();
-};
+let _pendingAdType=null;
 
-function showGMAd(){
-  // intenta mostrar anuncio via SDK
-  if(typeof sdk !== 'undefined' && sdk.showBanner){
-    try{
-      sdk.showBanner();
-      // cambiar boton a esperando
-      const btn=document.getElementById('gm-show-btn');
-      if(btn){ btn.textContent='⏳ VIENDO ANUNCIO...'; btn.disabled=true; btn.className='flex-1 py-3.5 rounded-full font-black text-[12px] border-[2px] border-black bg-white/10 text-white/30'; }
-      // fallback: si en 30s no hay evento START, igual dar recompensa
-      if(gmFallbackTimer) clearTimeout(gmFallbackTimer);
-      gmFallbackTimer=setTimeout(()=>{
-        console.log('[GM] Fallback timeout - forzando recompensa');
-        ad.unlocked=true;
-        claimAd();
-      },35000);
-      return;
-    }catch(e){
-      console.log('Error showBanner', e);
-    }
-  }
-  // si no hay SDK, fallback directo
-  console.log('SDK no disponible, fallback 3s');
-  const btn=document.getElementById('gm-show-btn');
-  if(btn){ btn.textContent='⏳ CARGANDO... (FALLBACK 3s)'; }
-  setTimeout(()=>{ ad.unlocked=true; claimAd(); },3000);
-}
-
-function openAd(type){
-  ad={type,timer:5,unlocked:false};
-  // para gamemonetize recompensado, desbloqueamos solo cuando termina video
-  // pero para testing, dejamos unlocked=false hasta que SDK dispare GAME_START
-  renderUI();
-}
-
-function closeGMAd(){
-  if(gmFallbackTimer) clearTimeout(gmFallbackTimer);
-  ad={type:null,unlocked:false};
-  renderUI();
-}
-
-function claimAd(){
-  // si viene de SDK, ya está unlocked. Si es fallback manual, check
-  if(ad.type===null) return;
-  // si no está unlocked pero es fallback por tiempo, permitir igual
-  if(!ad.unlocked){
-    // permitir si pasaron 2 seg desde openAd (para testing)
-    ad.unlocked=true;
-  }
-  if(gmFallbackTimer) clearTimeout(gmFallbackTimer);
-  if(ad.type==='lives'){
+window._gm_onAdComplete = function(){
+  console.log('[GM] Anuncio visto completo, entregando recompensa:', _pendingAdType);
+  const type = _pendingAdType;
+  _pendingAdType=null;
+  if(!type) return;
+  
+  if(type==='lives'){
     game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;ad={type:null};adUses++;state='playing';
-  }else if(ad.type==='double'){
+  }else if(type==='double'){
     game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
     maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
     ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
     ad={type:null};game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';
-  }else if(ad.type==='checkpoint'){
-    ad={type:null};startGame(maxLevel);renderUI();
+  }else if(type==='checkpoint'){
+    ad={type:null};startGame(maxLevel);
   }
   renderUI();
+};
+
+function openAd(type){
+  console.log('[GM] openAd llamado:', type);
+  _pendingAdType=type;
+  ad={type:type,timer:0,unlocked:false};
+  renderUI(); // muestra loader chiquito
+
+  // Intentar mostrar anuncio INMEDIATO, sin pantalla intermedia
+  setTimeout(()=>{
+    if(typeof sdk !== 'undefined' && sdk.showBanner){
+      console.log('[GM] Mostrando banner directo');
+      try{
+        sdk.showBanner();
+        // si el usuario cierra antes, no damos recompensa hasta SDK_GAME_START
+        return;
+      }catch(e){
+        console.log('[GM] Error showBanner', e);
+      }
+    }
+    // Fallback si SDK no está listo: esperar 500ms y reintentar, o dar recompensa directa si no hay ads
+    console.log('[GM] SDK no listo, reintentando en 800ms');
+    setTimeout(()=>{
+      if(typeof sdk !== 'undefined' && sdk.showBanner){
+        try{ sdk.showBanner(); return; }catch(e){}
+      }
+      // Si aún no hay SDK, dar recompensa fallback (para testing sin ads)
+      console.log('[GM] Fallback - sin SDK, dando recompensa directa');
+      window._gm_onAdComplete();
+    },800);
+  },50);
 }
+
+function claimAd(){
+  // claimAd ya no se usa directo, ahora lo maneja _gm_onAdComplete
+  // pero lo dejamos por compatibilidad
+  window._gm_onAdComplete();
+}
+
 function togglePower(){if(state!=='playing')return;if(game.power.state==='moving'){game.power.state='locked';game.power.locked=Math.round(game.power.v||65);}else{game.power.state='moving';}renderUI();}
 function handleShoot(){
   if(state!=='playing')return;
