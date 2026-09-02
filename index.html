@@ -1,25 +1,35 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wasa Shooter - Space Game Online Free</title>
+<title>wasa.chat - 100 Niveles - FINAL COMPLETO</title>
 <script src="https://cdn.tailwindcss.com"></script>
-
+<!-- SDK Oficial + fallback video.js para que SIEMPRE muestre anuncio -->
 <script type="text/javascript">
    window._gm_isAdPlaying = false;
    window._gm_sdk_ready = false;
-   window._gm_hasAd = false;
    window._gm_adShown = false;
+   
    window.SDK_OPTIONS = {
       gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
       onEvent: function (a) {
-         if(a.name==='SDK_GAME_PAUSE'){ window._gm_isAdPlaying = true; window._gm_hasAd = true; window._gm_adShown = true; }
+         console.log('[GM SDK]', a.name);
+         if(a.name==='SDK_GAME_PAUSE'){
+           window._gm_isAdPlaying = true;
+           window._gm_adShown = true;
+         }
          if(a.name==='SDK_GAME_START' || a.name==='SDK_ERROR'){
            window._gm_isAdPlaying = false;
-           if(window._gm_hasAd){ if(window._gm_onAdFinished) window._gm_onAdFinished(); }
-           else { if(window._gm_showCustomAd) window._gm_showCustomAd(); }
-           window._gm_hasAd=false; window._gm_adShown=false;
+           if(window._gm_adShown){
+             if(window._gm_onAdFinished) window._gm_onAdFinished();
+           } else {
+             console.log('[GM] SDK no mostro anuncio (sin fill), probando video.js fallback');
+             if(window._gm_tryVideoFallback) window._gm_tryVideoFallback();
+             else if(window._gm_onAdFinished) window._gm_onAdFinished();
+           }
+           window._gm_adShown = false;
          }
          if(a.name==='SDK_READY') window._gm_sdk_ready = true;
       }
@@ -28,15 +38,21 @@
       var d = a.getElementsByTagName(b)[0];
       a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
    })(document, "script", "gamemonetize-sdk");
+   
+   // Precargar video.js tambien como fallback
+   (function(){
+     var s=document.createElement('script');
+     s.src='https://api.gamemonetize.com/video.js?gameid=4kci7og3klgj0ivy2wz3gdvd9dth5e7n';
+     s.async=true;
+     s.onload=function(){ console.log('[GM] video.js cargado fallback listo'); };
+     document.head.appendChild(s);
+   })();
 </script>
-<link rel="preload" href="./banner-bch.webp" as="image">
 <style>
-@media (max-width: 768px){
-  .power-bar-wrap{ width:62px !important; }
-  .power-bar-wrap #power-container{ width:36px !important; height:135px !important; }
-  .bottom-stats{ font-size:9px !important; padding:6px 8px !important; left:4px !important; right:4px !important; bottom:4px !important; max-width:calc(100vw - 8px) !important; }
-}
+  #gamemonetize-video{position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;background:#000!important;display:none;}
+  #gamemonetize-video.active{display:block!important;}
 </style>
+<div id="gamemonetize-video"></div>
 
 <style>
 body{margin:0;background:#21418f;overflow:hidden;font-family:Inter,system-ui,sans-serif}
@@ -140,27 +156,7 @@ function drawShip(s){
   if(s.type===9){
     ctx.fillStyle="#ff0000";ctx.shadowColor="#ff0000";ctx.shadowBlur=12;ctx.fillRect(-s.w*0.4, -s.h*0.5, s.w*0.8, 4);
   }
-  // VIDA ARRIBA DE CADA NAVE - sigue a la nave
   ctx.restore();
-  // HP bar sobre nave
-  const hpPct = Math.max(0, s.hp / s.maxHp);
-  const barW = Math.max(36, s.w * 0.7);
-  const barH = 5;
-  const barX = s.x - barW/2;
-  const barY = s.y - s.h*0.9 - 18;
-  ctx.fillStyle='rgba(0,0,0,0.55)';
-  ctx.beginPath();
-  ctx.roundRect(barX-1, barY-1, barW+2, barH+2, 3);
-  ctx.fill();
-  ctx.fillStyle = hpPct>0.5 ? '#4ade80' : hpPct>0.25 ? '#facc15' : '#ef4444';
-  ctx.beginPath();
-  ctx.roundRect(barX, barY, barW*hpPct, barH, 2);
-  ctx.fill();
-  ctx.fillStyle='#fff';
-  ctx.font='900 9px monospace';
-  ctx.textAlign='center';
-  ctx.fillText(`${s.hp}/${s.maxHp}`, s.x, barY-3);
-  
   ctx.globalAlpha=1;
 }
 
@@ -184,17 +180,17 @@ function renderUI(){
     ${state==='playing'?`<button onclick="openPause()" class="ml-3 w-7 h-7 rounded-full bg-white/10 border border-white/20 text-white text-[12px] flex items-center justify-center hover:bg-white/20">⏸</button>`:''}
     </div>
     <div class="flex gap-2 mt-3"><div class="bg-black/35 backdrop-blur px-3.5 py-1.5 rounded-full text-white text-[11px] font-black border border-white/10">NIVEL ${game.level}</div><div class="bg-black/35 backdrop-blur px-3.5 py-1.5 rounded-full text-white text-[11px] font-black border border-white/10">${game.points} PTS</div><div class="bg-[#ffde59] text-black px-3 py-1.5 rounded-full text-[11px] font-black border-2 border-black">💰 ${coins}</div></div></div>
-    <div class="flex flex-col items-end gap-2"><div class="flex items-center gap-2 bg-black/30 backdrop-blur px-3 py-1.5 rounded-full border border-white/10"><span class="text-[9px] text-white/60 font-bold tracking-widest">TIROS</span><div class="flex gap-1.5">${Array.from({length:5}).map((_,i)=>`<div class="w-2.5 h-2.5 rounded-full ${i<5-game.misses?'bg-[#ffde59] shadow-[0_0_10px_#ffde59]':'bg-white/15'}"></div>`).join('')}</div></div>${state==='playing'?`<button onclick="openPause()" class="mt-1 text-[9px] text-white/50 border border-white/10 rounded-full px-2 py-1 bg-black/20 hover:bg-white/10">MENU • PAUSA</button>`:''}</div>
+    <div class="flex flex-col items-end gap-2"><div class="flex items-center gap-2 bg-black/30 backdrop-blur px-3 py-1.5 rounded-full border border-white/10"><span class="text-[9px] text-white/60 font-bold tracking-widest">TIROS</span><div class="flex gap-1.5">${Array.from({length:5}).map((_,i)=>`<div class="w-2.5 h-2.5 rounded-full ${i<5-game.misses?'bg-[#ffde59] shadow-[0_0_10px_#ffde59]':'bg-white/15'}"></div>`).join('')}</div></div><div class="flex flex-col gap-1.5 items-end">${game.ships.map(s=>`<div class="bg-black/50 backdrop-blur border border-white/15 rounded-full pl-1 pr-3 py-1 flex items-center gap-2"><div class="w-[56px] h-[6px] bg-black/40 rounded-full p-[1px]"><div class="h-full rounded-full" style="width:${Math.max(0,s.hp/s.maxHp*100)}%;background:${s.hp/s.maxHp>0.5?'linear-gradient(90deg,#4ade80,#22c55e)':'linear-gradient(90deg,#facc15,#f59e0b)'}"></div></div><span class="text-[11px] font-black ${s.hp/s.maxHp<0.3?'text-red-300':'text-white'}">${s.hp}</span><span class="text-[8px] text-white/40">/ ${s.maxHp}</span></div>`).join('')}</div>${state==='playing'?`<button onclick="openPause()" class="mt-1 text-[9px] text-white/50 border border-white/10 rounded-full px-2 py-1 bg-black/20 hover:bg-white/10">MENU • PAUSA</button>`:''}</div>
   </div>`;
 
   if(state==='playing'){
-    h+=`<div class="absolute ${game.power.state==='moving' ? 'top-[92px] left-1/2 -translate-x-1/2' : 'bottom-[105px] left-[88px] md:bottom-[108px] md:left-[110px]'} pointer-events-none flex flex-col ${game.power.state==='moving'?'items-center':'items-start'} gap-1 z-[20]">
-      ${game.power.state==='moving'?`<div class="bg-[#ffde59] text-black font-black text-[9px] md:text-[10px] tracking-[0.12em] px-3 py-1.5 md:px-4 md:py-2 rounded-full border-2 border-black shadow-[0_3px_0_#000] animate-pulse whitespace-nowrap">1° CLICK: FIJAR → 2°: DISPARAR</div>`:`<div class="bg-white text-black font-black text-[10px] md:text-[11px] tracking-[0.1em] px-3.5 py-1.5 rounded-full border-2 border-black shadow-[0_2px_0_#000] whitespace-nowrap">POTENCIA ${Math.round(game.power.locked)}% • ¡DISPARA! 🎯</div>`}
-      ${game.power.state==='moving'?`<div class="text-[7px] text-white/50 font-mono bg-black/30 px-2 py-0.5 rounded-full mt-1">${cfg.name} • ${game.ships.length} nave(s)</div>`:''}
+    h+=`<div class="absolute top-[92px] left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center gap-1">
+      ${game.power.state==='moving'?`<div class="bg-[#ffde59] text-black font-black text-[10px] tracking-[0.14em] px-4 py-2 rounded-full border-2 border-black shadow-[0_4px_0_#000] animate-pulse">1° CLICK: FIJAR POTENCIA → 2° CLICK: DISPARAR</div>`:`<div class="bg-white text-black font-black text-[11px] tracking-[0.14em] px-5 py-2 rounded-full border-2 border-black">POTENCIA ${Math.round(game.power.locked)}% FIJADA • ¡DISPARA! 🎯</div>`}
+      <div class="text-[8px] text-white/50 font-mono bg-black/20 px-2 py-1 rounded-full mt-1">${cfg.name} • ${game.ships.length} nave(s)</div>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 p-2 pb-[max(8px,env(safe-area-inset-bottom))] md:p-4 flex justify-between items-end pointer-events-none gap-2 max-w-[100vw] overflow-hidden">
+    <div class="absolute bottom-0 left-0 right-0 p-2 md:p-4 flex justify-between items-end pointer-events-none gap-2">
       <!-- IZQUIERDA: BARRA POTENCIA CON ANCHO FIJO -->
-      <div class="pointer-events-auto flex flex-col items-center gap-2 w-[72px] md:w-[90px] shrink-0 power-bar-wrap"><div id="power-label" class="text-[9px] font-black tracking-[0.22em] text-white/80 w-[90px] text-center whitespace-nowrap">POTENCIA ${Math.round(game.power.v)}%</div>
+      <div class="pointer-events-auto flex flex-col items-center gap-2 w-[90px] shrink-0"><div id="power-label" class="text-[9px] font-black tracking-[0.22em] text-white/80 w-[90px] text-center whitespace-nowrap">POTENCIA ${Math.round(game.power.v)}%</div>
       <div id="power-container" class="relative w-[40px] h-[160px] md:h-[180px] backdrop-blur-xl rounded-[18px] border p-1.5 flex flex-col justify-end overflow-hidden ${game.power.state==='locked'?'bg-[#ffde59]/15 border-[#ffde59]/60':'bg-black/45 border-white/15'}"><div id="power-fill" class="w-full rounded-[12px]" style="height:${game.power.state==='locked'?game.power.locked:game.power.v}%;background:${game.power.state==='locked'?'linear-gradient(180deg,#fffe8a,#ffde59 50%,#ff8a2a)':'linear-gradient(180deg,#fff7a0,#ffde59 60%,#ff6a2a)'}"></div><div id="power-line" class="absolute left-0 right-0 h-[3px] bg-white shadow-[0_0_12px_white]" style="bottom:${game.power.state==='locked'?game.power.locked:game.power.v}%"></div></div>
       <button id="power-btn" onclick="togglePower()" class="pointer-events-auto w-[90px] px-1 py-2 rounded-full font-black text-[8px] tracking-[0.08em] border text-center whitespace-nowrap ${game.power.state==='locked'?'bg-[#ffde59] text-black border-black shadow-[0_3px_0_#000]':'bg-white/10 text-white border-white/20'}">${game.power.state==='locked'?Math.round(game.power.locked)+'% DESBLOQ':'FIJAR'}</button></div>
       
@@ -320,39 +316,33 @@ function renderUI(){
     </div></div>`;
   }
 
-
-  if(state==='custom_ad'){
-    const rewardText = _pendingAdType==='lives'?'+3 TIROS':_pendingAdType==='double'?'x2 PUNTOS':'CONTINUAR NIVEL '+maxLevel;
-    h+=`<div class="absolute inset-0 z-[80] bg-black flex flex-col pointer-events-auto">
-      <div class="h-9 flex items-center justify-between px-3 bg-[#0f0f0f] border-b border-white/10"><span class="text-[9px] font-black px-2 py-0.5 rounded bg-[#00ff88] text-black">PATROCINADO</span><span class="text-[9px] text-white/40">Recompensa: ${rewardText}</span></div>
-      <div class="flex-1 overflow-y-auto p-3 flex items-center justify-center bg-gradient-to-br from-[#0a1f14] to-black">
-        <div class="w-full max-w-[340px]">
-          <a href="https://bitcoinaliens.com/?ref=5281116&game=7&pf=2" target="_blank" onclick="window._gm_customAdClicked=true">
-            <img src="./banner-bch.webp" alt="Gana BCH Gratis" class="w-full rounded-[18px] border border-white/10 shadow-[0_0_25px_rgba(0,255,136,0.25)] object-contain max-h-[62vh]" loading="lazy" />
-          </a>
-          <div class="mt-3 bg-black/60 rounded-xl border border-[#00ff88]/20 p-2 text-center"><div class="text-[#00ff88] font-black text-[10px]">✓ Yo la uso - Paga BCH real</div><div class="text-white/40 text-[8px] mt-0.5">Ref 5281116 • Vos y yo ganamos bonus</div></div>
-          <a href="https://bitcoinaliens.com/?ref=5281116&game=7&pf=2" target="_blank" onclick="window._gm_customAdClicked=true" class="mt-3 block w-full py-3 rounded-full bg-[#00ff88] text-black font-black text-[12px] text-center border-2 border-black">📲 GANAR BCH GRATIS →</a>
-        </div>
-      </div>
-      <div class="p-3 bg-[#0f0f0f] border-t border-white/10"><button onclick="claimCustomAd()" class="w-full py-3 rounded-full bg-[#ffde59] text-black font-black text-[11px] border-2 border-black">RECLAMAR ${rewardText} →</button><div class="mt-1.5 text-center text-[7px] text-white/20">Anuncio propio - GM sin fill</div></div>
-    </div>`;
-  }
   if(state==='reward_modal' && _rewardPending){
     const cfg = {
-      lives: {title:'¡+3 TIROS EXTRA!', desc:'Viste el anuncio. Tenés 3 intentos más.', icon:'🎯', btn:'CONTINUAR CON +3 TIROS', reward:'+3 TIROS'},
-      double: {title:'¡RECOMPENSA x2!', desc:`Duplicaste ${tempPoints} PTS y ${tempCoins} 💰`, icon:'💰', btn:'RECLAMAR x2 Y SEGUIR', reward:`+${tempPoints} PTS +${tempCoins} 💰`},
-      checkpoint: {title:'¡CONTINUAS!', desc:`Continuás desde nivel ${maxLevel}`, icon:'🚀', btn:'CONTINUAR JUGANDO', reward:'NIVEL '+maxLevel}
+      lives: {title:'¡+3 TIROS EXTRA!', desc:'Viste el anuncio completo. Tenés 3 intentos más.', icon:'🎯', btn:'CONTINUAR CON +3 TIROS', reward:'+3 TIROS'},
+      double: {title:'¡RECOMPENSA DUPLICADA!', desc:`Duplicaste ${tempPoints} PTS y ${tempCoins} 💰 x2 del nivel ${game.level}`, icon:'💰', btn:'RECLAMAR x2 Y SEGUIR', reward:`+${tempPoints} PTS +${tempCoins} 💰`},
+      checkpoint: {title:'¡CONTINUAS JUGANDO!', desc:`Continuás desde el nivel ${maxLevel} desbloqueado`, icon:'🚀', btn:'CONTINUAR JUGANDO', reward:'NIVEL '+maxLevel}
     };
     const c = cfg[_rewardPending] || cfg.lives;
-    h+=`<div class="absolute inset-0 z-[70] bg-black/85 backdrop-blur flex items-center justify-center p-4 pointer-events-auto"><div class="w-full max-w-[340px] bg-[#1e1e1e] border border-[#ffde59]/30 rounded-[20px] p-5 text-center"><div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[28px]">${c.icon}</div><div class="mt-3 text-[#ffde59] font-black text-[16px]">${c.title}</div><div class="mt-1 text-white/60 text-[11px]">${c.desc}</div><button onclick="claimReward()" class="mt-4 w-full py-3 rounded-full bg-[#ffde59] text-black font-black text-[12px] border-2 border-black">${c.btn} →</button></div></div>`;
+    h+=`<div class="absolute inset-0 z-[70] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 pointer-events-auto">
+      <div class="w-full max-w-[380px] bg-gradient-to-br from-[#1e1e1e] to-[#0f0f0f] border border-[#ffde59]/30 rounded-[24px] p-6 text-center">
+        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[36px]">${c.icon}</div>
+        <div class="mt-4 text-[#ffde59] font-black text-[18px]">${c.title}</div>
+        <div class="mt-2 text-white/70 text-[13px]">${c.desc}</div>
+        <div class="mt-5 bg-black/50 border border-white/10 rounded-xl p-3 flex items-center justify-center gap-2">
+          <span class="text-[10px] text-white/40">RECOMPENSA</span>
+          <span class="text-[#ffde59] font-black text-[14px]">${c.reward}</span>
+        </div>
+        <button onclick="claimReward()" class="mt-5 w-full py-4 rounded-full bg-[#ffde59] text-black font-black text-[14px] border-[2.5px] border-black">${c.btn} →</button>
+      </div>
+    </div>`;
   }
-
-  if(ad.type){
-    h+=`<div class="absolute inset-0 z-[50] bg-black flex flex-col pointer-events-auto">
-      <div class="h-12 flex items-center justify-between px-4 bg-[#0f0f0f] border-b border-white/10"><div class="flex items-center gap-3"><span class="text-[10px] font-black px-2.5 py-1 rounded bg-white/10 border border-white/15 text-white/70">Anuncio</span><span class="text-white/80 font-bold text-[12px]">${ad.type}</span></div><button onclick="if(ad.unlocked){ad.type=null;renderUI()}" class="w-8 h-8 rounded-full border flex items-center justify-center font-black ${ad.unlocked?'bg-white text-black':'bg-white/10 text-white/20'}">${ad.unlocked?'✕':ad.timer}</button></div>
-      <div class="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-[#1a1a1a] to-black"><div class="w-full max-w-[420px] rounded-[24px] bg-[#202020] border border-white/10 p-6 text-center"><div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[32px]">🚀</div><div class="mt-4 text-white font-black text-[18px]">wasa.chat PRO</div><div class="mt-6 w-full bg-black/50 rounded-2xl border border-white/10 p-3 flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">🎁</div><div class="text-left"><div class="text-white font-black text-[11px]">TU RECOMPENSA</div><div class="text-[#ffde59] font-black text-[14px]">${ad.type==='lives'?'+3 tiros':ad.type==='double'?'x2 PUNTOS':'CONTINUAR NIVEL '+maxLevel}</div></div></div></div></div>
-      <div class="p-4 bg-[#0f0f0f] border-t border-white/10 flex gap-3"><button onclick="claimAd()" ${!ad.unlocked?'disabled':''} class="flex-1 py-3.5 rounded-full font-black text-[12px] border-[2px] border-black ${ad.unlocked?'bg-[#ffde59] text-black':'bg-white/10 text-white/20'}">${ad.unlocked?'✨ RECLAMAR':'ESPERA '+ad.timer+'s'}</button></div>
-      <div class="h-[3px] w-full bg-white/10"><div class="h-full bg-[#ffde59]" style="width:${(5-ad.timer)/5*100}%"></div></div>
+  if(ad.type && state!=='reward_modal'){
+    h+=`<div class="absolute inset-0 z-[50] bg-black/95 flex items-center justify-center pointer-events-auto">
+      <div class="text-center">
+        <div class="w-14 h-14 mx-auto border-3 border-[#ffde59] border-t-transparent rounded-full animate-spin"></div>
+        <div class="mt-4 text-white font-black text-[13px]">CARGANDO ANUNCIO REAL...</div>
+        <div class="mt-1 text-white/30 text-[10px]">${ad.type}</div>
+      </div>
     </div>`;
   }
 
@@ -407,14 +397,14 @@ function buySub(id){
 let _pendingAdType=null;
 let _rewardPending=null;
 let _gmTimer=null;
-let _gmNoAdTimer=null;
-let customAdTimer=0;
-window._gm_customAdClicked=false;
 
 window._gm_onAdFinished = function(){
+  console.log('[GM] onAdFinished -> reward modal');
   if(_gmTimer) clearTimeout(_gmTimer);
-  if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
   window._gm_isAdPlaying=false;
+  document.getElementById('gamemonetize-video').classList.remove('active');
+  document.getElementById('gamemonetize-video').innerHTML='';
+  document.getElementById('gamemonetize-video').style.display='none';
   let type = _pendingAdType || _rewardPending || (ad && ad.type ? ad.type : null);
   if(!type) return;
   _rewardPending=type;
@@ -423,63 +413,99 @@ window._gm_onAdFinished = function(){
   state='reward_modal';
   renderUI();
 };
-window._gm_showCustomAd = function(){
+
+window._gm_tryVideoFallback = function(){
+  console.log('[GM] Fallback a video.js - intentando mostrar anuncio real');
+  const container = document.getElementById('gamemonetize-video');
+  container.style.display='block';
+  container.classList.add('active');
+  container.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif"><div style="text-align:center"><div style="width:40px;height:40px;border:3px solid #ffde59;border-top-color:transparent;border-radius:50%;margin:0 auto 12px;animation:spin 1s linear infinite"></div><div>CARGANDO VIDEO REAL...</div><div style="font-size:10px;opacity:0.5;margin-top:6px">GameMonetize video.js</div></div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
+  
+  // Intentar disparar el anuncio via video.js si existe
+  setTimeout(()=>{
+    // video.js normalmente crea su propio overlay, si no lo hace en 3s, dar recompensa igual
+    if(typeof window.showVideoAd !== 'undefined'){
+      try{ window.showVideoAd(); }catch(e){ console.log(e); }
+    }
+    // Si video.js tampoco muestra nada en 5s, forzar reward (sin anuncio disponible)
+    setTimeout(()=>{
+      if(window._gm_isAdPlaying || document.getElementById('gamemonetize-video').classList.contains('active')){
+        console.log('[GM] video.js no mostro anuncio, forzando recompensa');
+        window._gm_onAdFinished();
+      }
+    },5000);
+  },500);
+  
+  // Timeout final 30s
   if(_gmTimer) clearTimeout(_gmTimer);
-  if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
-  window._gm_isAdPlaying=false;
-  if(!_pendingAdType) return;
-  state='custom_ad';
-  ad={type:null};
-  renderUI();
+  _gmTimer = setTimeout(()=>{ window._gm_onAdFinished(); },30000);
 };
+
 function openAd(type){
+  console.log('[GM] openAd real', type);
   _pendingAdType=type;
   _rewardPending=null;
   window._gm_isAdPlaying=true;
-  window._gm_hasAd=false;
+  window._gm_adShown=false;
   ad={type:type};
   renderUI();
+  
   setTimeout(()=>{
-    ad={type:null}; renderUI();
-    let attempted=false;
-    if(typeof sdk!=='undefined' && sdk.showBanner){ try{ sdk.showBanner(); attempted=true; }catch(e){} }
-    if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
-    _gmNoAdTimer=setTimeout(()=>{ if(!window._gm_hasAd && _pendingAdType) window._gm_showCustomAd(); },2500);
+    // Ocultar nuestro loader y mostrar anuncio real de GM
+    ad={type:null};
+    renderUI();
+    
+    if(typeof sdk !== 'undefined' && sdk.showBanner){
+      try{
+        console.log('[GM] sdk.showBanner()');
+        const result = sdk.showBanner();
+        console.log('[GM] showBanner result', result);
+        // Si no muestra nada en 2.5s, probar fallback video
+        setTimeout(()=>{
+          if(!window._gm_adShown && !window._gm_isAdPlaying){
+            console.log('[GM] SDK no mostro anuncio tras 2.5s, usando fallback video');
+            window._gm_tryVideoFallback();
+          }
+        },2500);
+      }catch(e){ 
+        console.log('[GM] error showBanner', e); 
+        window._gm_tryVideoFallback();
+      }
+    } else {
+      console.log('[GM] SDK no listo, directo a video fallback');
+      window._gm_tryVideoFallback();
+    }
+    
     if(_gmTimer) clearTimeout(_gmTimer);
-    _gmTimer=setTimeout(()=>{ if(_pendingAdType) window._gm_showCustomAd(); },8000);
-    if(!attempted) setTimeout(()=>window._gm_showCustomAd(),600);
-  },200);
+    _gmTimer = setTimeout(()=>{ 
+      console.log('[GM] timeout 30s forzado');
+      window._gm_onAdFinished(); 
+    },30000);
+  },300);
 }
-function claimCustomAd(){ _rewardPending=_pendingAdType; _pendingAdType=null; state='reward_modal'; renderUI(); }
+
 function claimReward(){
-  const type=_rewardPending; _rewardPending=null;
+  const type=_rewardPending;
+  _rewardPending=null;
   if(_gmTimer) clearTimeout(_gmTimer);
-  if(_gmNoAdTimer) clearTimeout(_gmNoAdTimer);
   window._gm_isAdPlaying=false;
-  if(type==='lives'){ game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;adUses++;state='playing'; }
-  else if(type==='double'){ game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins); maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel); ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking)); game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing'; }
-  else if(type==='checkpoint'){ startGame(maxLevel);state='playing'; }
-  renderUI();
-}
-function claimAd(){ claimReward(); }
-function openAd_old(type){
-  ad={type,timer:5,unlocked:false};renderUI();
-  const int=setInterval(()=>{ad.timer--;if(ad.timer<=0){ad.unlocked=true;clearInterval(int);}renderUI();},1000);
-}
-function claimAd(){
-  if(!ad.unlocked)return;
-  if(ad.type==='lives'){
-    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;ad={type:null};adUses++;state='playing';
-  }else if(ad.type==='double'){
+  window._gm_adShown=false;
+  document.getElementById('gamemonetize-video').classList.remove('active');
+  document.getElementById('gamemonetize-video').style.display='none';
+  if(type==='lives'){
+    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;adUses++;state='playing';
+  }else if(type==='double'){
     game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
     maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
     ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
-    ad={type:null};game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);state='playing';
-  }else if(ad.type==='checkpoint'){
-    ad={type:null};startGame(maxLevel);renderUI();
+    game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';
+  }else if(type==='checkpoint'){
+    startGame(maxLevel);state='playing';
   }
   renderUI();
 }
+function claimAd(){ claimReward(); }
+
 function togglePower(){if(state!=='playing')return;if(game.power.state==='moving'){game.power.state='locked';game.power.locked=Math.round(game.power.v||65);}else{game.power.state='moving';}renderUI();}
 function handleShoot(){
   if(state!=='playing')return;
@@ -490,7 +516,12 @@ function handleShoot(){
   game.bullets.push({x:cx,y:cy,vx,vy,trail:[]});
 }
 
-function loop(now){ if(window._gm_isAdPlaying || state==="reward_modal" || state==="custom_ad"){ requestAnimationFrame(loop); return; }
+function loop(now){
+  if(window._gm_isAdPlaying || state==='reward_modal' || (ad && ad.type!==null)){
+    requestAnimationFrame(loop);
+    return;
+  }
+
   const dt=Math.min((now-last)/1000,0.033);last=now;
   if(state==='playing'){
     for(let s of game.ships){
