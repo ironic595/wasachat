@@ -1,620 +1,179 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Play Space Shooter - Wasa.chat </title>
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- SDK Oficial + fallback video.js para que SIEMPRE muestre anuncio -->
-<script type="text/javascript">
-   window._gm_isAdPlaying = false;
-   window._gm_sdk_ready = false;
-   window._gm_adShown = false;
-   
-   window.SDK_OPTIONS = {
-      gameId: "4kci7og3klgj0ivy2wz3gdvd9dth5e7n",
-      onEvent: function (a) {
-         console.log('[GM SDK]', a.name);
-         if(a.name==='SDK_GAME_PAUSE'){
-           window._gm_isAdPlaying = true;
-           window._gm_adShown = true;
-         }
-         if(a.name==='SDK_GAME_START' || a.name==='SDK_ERROR'){
-           window._gm_isAdPlaying = false;
-           if(window._gm_adShown){
-             if(window._gm_onAdFinished) window._gm_onAdFinished();
-           } else {
-             console.log('[GM] SDK no mostro anuncio (sin fill), probando video.js fallback');
-             if(window._gm_tryVideoFallback) window._gm_tryVideoFallback();
-             else if(window._gm_onAdFinished) window._gm_onAdFinished();
-           }
-           window._gm_adShown = false;
-         }
-         if(a.name==='SDK_READY') window._gm_sdk_ready = true;
-      }
-   };
-   (function (a, b, c) {
-      var d = a.getElementsByTagName(b)[0];
-      a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
-   })(document, "script", "gamemonetize-sdk");
-   
-   // Precargar video.js tambien como fallback
-   (function(){
-     var s=document.createElement('script');
-     s.src='https://api.gamemonetize.com/video.js?gameid=4kci7og3klgj0ivy2wz3gdvd9dth5e7n';
-     s.async=true;
-     s.onload=function(){ console.log('[GM] video.js cargado fallback listo'); };
-     document.head.appendChild(s);
-   })();
-</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>wasa.chat - founders</title>
 <style>
-  #gamemonetize-video{position:fixed!important;top:0!important;left:0!important;width:100vw!important;height:100vh!important;z-index:99999!important;background:#000!important;display:none;}
-  #gamemonetize-video.active{display:block!important;}
-</style>
-<div id="gamemonetize-video"></div>
-
-<style>
-body{margin:0;background:#21418f;overflow:hidden;font-family:Inter,system-ui,sans-serif}
-canvas{display:block}
-@keyframes load{0%{width:0%}100%{width:100%}}
-@keyframes pulse{0%,100%{box-shadow:0 6px 0 #000}50%{box-shadow:0 6px 0 #000,0 0 0 12px rgba(255,222,89,0)}}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;overflow-x:hidden}
+body{
+  background: radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 70%),
+              radial-gradient(ellipse at 100% 80%, rgba(245, 158, 11, 0.10) 0%, transparent 60%),
+              linear-gradient(180deg, #21418f 0%, #332891 40%, #5e80e1 100%);
+  overflow:hidden
+}
+#hero{position:relative;width:100vw;height:100vh;overflow:hidden}
+#starCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+#logo-wrap{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:10;display:flex;align-items:baseline;justify-content:center;
+  gap:clamp(2px,0.8vw,8px);width:92vw;max-width:900px;
+  flex-wrap:nowrap;
+}
+.letter{
+  height:clamp(32px,9vw,100px);width:auto;
+  object-fit:contain;display:block;
+  flex-shrink:1;min-width:0;
+  filter:brightness(0) invert(1);
+  transition: transform 0.6s cubic-bezier(0.34,1.56,0.64,1), filter 0.3s;
+  will-change: transform;
+}
+.letter.dot{
+  height:clamp(6px,1.8vw,18px)!important;
+  width:clamp(6px,1.8vw,18px)!important;
+  margin-bottom:clamp(14px,4.5vw,38px)!important;
+  margin-left:1px;margin-right:1px
+}
+#subtitle{
+  position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  margin-top:12px;white-space:nowrap;color:rgba(255,255,255,0.8);
+  font-size:clamp(6px,1.5vw,11px);letter-spacing:clamp(1px,0.4vw,4px)
+}
+@media (max-width:480px){
+  #logo-wrap{width:90vw;gap:1px}
+ .letter{height:8.5vw}
+ .letter.dot{height:2.2vw!important;width:2.2vw!important;margin-bottom:3.2vw!important}
+  #subtitle{font-size:2.6vw;letter-spacing:0.8vw;margin-top:8px}
+}
+#cta-wrap{position:absolute;bottom:clamp(24px,6vh,48px);left:50%;transform:translateX(-50%);z-index:20;width:90vw;display:flex;justify-content:center}
+#cta{background:linear-gradient(180deg,#FFD60A 0%,#FFB000 100%);color:#000;font-weight:800;font-size:clamp(12px,3vw,15px);padding:18px 36px;border-radius:14px;border:1px solid rgba(255,255,255,0.4);box-shadow:0 8px 24px rgba(0,0,0,0.3);cursor:pointer;animation:pulseSuave 2.5s ease-in-out infinite;white-space:nowrap}
+@keyframes pulseSuave{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div id="ui" class="absolute inset-0 pointer-events-none font-sans"></div>
+<div id="hero">
+  <canvas id="starCanvas"></canvas>
+  <div id="logo-wrap">
+    <img src="/assets/img/w.png" class="letter" data-original="0" alt="w">
+    <img src="/assets/img/a.png" class="letter" data-original="1" alt="a">
+    <img src="/assets/img/s.png" class="letter" data-original="2" alt="s">
+    <img src="/assets/img/a2.png" class="letter" data-original="3" alt="a">
+    <img src="/assets/img/punto.png" class="letter dot" data-original="4" alt=".">
+    <img src="/assets/img/c.png" class="letter" data-original="5" alt="c">
+    <img src="/assets/img/h.png" class="letter" data-original="6" alt="h">
+    <img src="/assets/img/a3.png" class="letter" data-original="7" alt="a">
+    <img src="/assets/img/t.png" class="letter" data-original="8" alt="t">
+    
+  </div>
+  <div id="cta-wrap"><button id="cta">WASA GAMES</button></div>
+  <div id="cta-wrap"><button id="ctminer">WASA MINER</button></div>
+</div>
+
 <script>
-// === WASA.CHAT - 100 NIVELES + 10 NAVES + CHECKPOINTS (BASE ORIGINAL INTACTA) ===
-let W=innerWidth,H=innerHeight;
-const canvas=document.getElementById('c');
-const ctx=canvas.getContext('2d');
-function resize(){W=innerWidth;H=innerHeight;const dpr=devicePixelRatio||1;canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0);}
-resize(); addEventListener('resize',resize);
+// FONDO ESTRELLAS
+const c=document.getElementById('starCanvas'),ctx=c.getContext('2d');let stars=[];
+function init(){c.width=innerWidth;c.height=innerHeight;stars=[];for(let i=0;i<250;i++)stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.3+0.2,speed:Math.random()*0.4+0.1,a:Math.random()*0.6+0.3})}
+function draw(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(s=>{s.y-=s.speed;if(s.y<-5){s.y=c.height+5;s.x=Math.random()*c.width}ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${s.a})`;ctx.fill()});requestAnimationFrame(draw)}
+init();draw();addEventListener('resize',init);
 
-let ups=JSON.parse(localStorage.getItem('wasa_upgrades_final')||'{"d":{"main":0,"sub":0},"c":{"main":0,"sub":0},"p":{"main":0,"sub":0}}');
-let coins=parseInt(localStorage.getItem('wasa_coins_final')||'0');
-let ranking=JSON.parse(localStorage.getItem('wasa_ranking_final')||'[]');
-let maxLevel=parseInt(localStorage.getItem('wasa_max_level')||'1');
+// EFECTO CAMBIO DE ORDEN AL AZAR
+const wrap=document.getElementById('logo-wrap');
+const letters=Array.from(wrap.querySelectorAll('.letter'));
+let isAnimating=false;
+let returnTimeout=null;
 
-let game={ships:[],cross:{x:W/2,y:H*0.62,dir:1,speed:420},power:{v:0,dir:1,speed:82,state:'moving',locked:50},bullets:[],parts:[],stars:[],level:1,points:0,misses:0,levelStart:0};
-let state='menu';
-let ad={type:null,timer:5,unlocked:false};
-let adUses=0, tempCoins=0, tempPoints=0, last=performance.now();
-let levelUpInfo={level:2,points:0};
-let pauseBeforeState=null;
+function shuffleLetters(){
+  if(isAnimating) return;
+  isAnimating=true;
 
-for(let i=0;i<140;i++) game.stars.push({x:Math.random()*W,y:Math.random()*H*0.85,size:Math.random()*1.8+0.3,tw:Math.random()*2+0.5,off:Math.random()*6});
+  const dot = wrap.querySelector('.dot');
+  const allLetters = Array.from(wrap.querySelectorAll('.letter'));
+  const otherLetters = allLetters.filter(el => !el.classList.contains('dot'));
 
-function getShipConfig(level){
-  const tier = Math.min(Math.floor((level-1)/10),9);
-  const configs = [
-    {name:'SCOUT', colors:{body:'#cfe0ff', belly:'#5a7bd6', cockpit:['#ffffff','#9ef0ff','#3a6bff'], lights:['#ffde59','#ff6b6b']}, w:78, h:26, hp:20, speed:90, behavior:'normal'},
-    {name:'RAIDER ROJO', colors:{body:'#ffcfe0', belly:'#d65a7b', cockpit:['#ffffff','#ff9eb0','#ff3a5a'], lights:['#ffde59','#ff4444']}, w:82, h:28, hp:28, speed:110, behavior:'normal'},
-    {name:'DUO', colors:{body:'#cfe0ff', belly:'#5a7bd6', cockpit:['#ffffff','#9ef0ff','#3a6bff'], lights:['#ffde59','#ff6b6b']}, w:78, h:26, hp:22, speed:100, behavior:'duo', count:2},
-    {name:'ACORAZADO', colors:{body:'#e0cfff', belly:'#7b5ad6', cockpit:['#ffffff','#c99eff','#7b3aff'], lights:['#a0ff59','#ff6bff']}, w:120, h:34, hp:45, speed:70, behavior:'zigzag'},
-    {name:'FANTASMA', colors:{body:'#cffff0', belly:'#5ad6b0', cockpit:['#ffffff','#9effdd','#3affaa'], lights:['#59ffde','#6bff8a']}, w:75, h:24, hp:30, speed:130, behavior:'ghost'},
-    {name:'ZIGZAG', colors:{body:'#ffefcf', belly:'#d6a05a', cockpit:['#ffffff','#ffe09e','#ffaa3a'], lights:['#ffde59','#ff8a2a']}, w:80, h:26, hp:35, speed:95, behavior:'zigzag_fast'},
-    {name:'AVISPA', colors:{body:'#d0ffc0', belly:'#6bd65a', cockpit:['#ffffff','#b0ff9e','#5aff3a'], lights:['#ffde59','#a0ff00']}, w:48, h:18, hp:18, speed:180, behavior:'tiny_fast', count:2},
-    {name:'BOMBER', colors:{body:'#ffcfa0', belly:'#d67b5a', cockpit:['#ffffff','#ffc99e','#ff7b3a'], lights:['#ff9e59','#ff4444']}, w:100, h:30, hp:55, speed:60, behavior:'bomber'},
-    {name:'TELEPORT', colors:{body:'#c0f0ff', belly:'#5ab4d6', cockpit:['#ffffff','#9ed9ff','#3ab4ff'], lights:['#59deff','#59a0ff']}, w:85, h:28, hp:40, speed:120, behavior:'teleport'},
-    {name:'BOSS TITAN', colors:{body:'#ffd700', belly:'#b89600', cockpit:['#ffffff','#ffec8a','#ffcc00'], lights:['#ff0000','#ffff00']}, w:160, h:48, hp:120, speed:45, behavior:'boss'},
+  // 1. Guardar posiciones actuales
+  const firstPos = new Map();
+  allLetters.forEach(el => firstPos.set(el, el.getBoundingClientRect()));
+
+  // 2. Mezclar solo las letras, NO el punto
+  const shuffledOthers = [...otherLetters].sort(()=>Math.random()-0.5);
+  
+  // 3. Reconstruir: 4 letras + punto + 4 letras
+  const newOrder = [
+    ...shuffledOthers.slice(0,4),
+    dot,
+    ...shuffledOthers.slice(4)
   ];
-  return configs[tier];
-}
-
-function createShip(level, index=0, total=1){
-  const cfg=getShipConfig(level);
-  const hpBase = cfg.hp + (level-1)* (cfg.behavior==='boss'?12:5);
-  const dir=Math.random()>0.5?1:-1;
-  const yBase = H*0.12 + (index*(H*0.25/total)) + Math.random()*H*0.15;
-  return {
-    x:dir===1?-120-index*150:W+120+index*150,
-    y:yBase,
-    w:cfg.w, h:cfg.h, hp:hpBase, maxHp:hpBase, dir, speed:cfg.speed+(level-1)*2,
-    hitFlash:0, type:Math.floor((level-1)/10), cfg, ghostTimer:0, zigTimer:0, teleportTimer:0,
-    originalY:yBase
-  };
-}
-
-function initShips(lvl){
-  const cfg=getShipConfig(lvl);
-  const count = cfg.count || (cfg.behavior==='duo' ? 2 : 1);
-  game.ships=[];
-  for(let i=0;i<count;i++) game.ships.push(createShip(lvl,i,count));
-  game.cross.speed=Math.max(80,(420+(lvl-1)*35)*(1-ups.c.main*0.012));
-  game.power.speed=Math.max(20,(82+(lvl-1)*8)*(1-ups.p.main*0.015));
-}
-
-function startGame(fromLevel=1){
-  game.level=fromLevel;game.points=fromLevel>1?(fromLevel-1)*100:0;game.misses=0;game.bullets=[];game.parts=[];
-  game.power={v:50,dir:1,speed:82*(1-ups.p.main*0.015),state:'moving',locked:50};
-  game.cross={x:W/2,y:H*0.62,dir:1,speed:420*(1-ups.c.main*0.012)};
-  initShips(fromLevel);game.levelStart=performance.now();state='playing';adUses=0;renderUI();
-}
-
-function drawShip(s){
-  if(s.cfg.behavior==='ghost'){
-    s.ghostTimer+=0.016;
-    if(Math.sin(s.ghostTimer*2)>0.7) return;
-  }
-  ctx.save();ctx.translate(s.x,s.y);
-  const alpha = s.cfg.behavior==='ghost' ? 0.6+Math.sin(s.ghostTimer*5)*0.4 : 1;
-  ctx.globalAlpha=alpha;
-  if(s.hitFlash>0){ctx.shadowColor="#ff4444";ctx.shadowBlur=30;}else{ctx.shadowColor=s.cfg.colors.body;ctx.shadowBlur=s.type>=3?22:18;}
-  ctx.fillStyle=s.hitFlash>0?"#ffaaaa":s.cfg.colors.body;ctx.beginPath();ctx.ellipse(0,6,s.w*0.52,s.h*0.72,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=s.hitFlash>0?"#ff5555":s.cfg.colors.belly;ctx.beginPath();ctx.ellipse(0,10,s.w*0.48,s.h*0.5,0,0,Math.PI);ctx.fill();
-  ctx.shadowBlur=0;
-  const g=ctx.createRadialGradient(-4,-6,2,0,-2,18);g.addColorStop(0,s.cfg.colors.cockpit[0]);g.addColorStop(0.3,s.cfg.colors.cockpit[1]);g.addColorStop(1,s.cfg.colors.cockpit[2]);
-  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,-4,s.w*0.28,s.h*0.85,0,Math.PI,Math.PI*2);ctx.fill();
-  for(let i=-2;i<=2;i++){
-    ctx.fillStyle=i%2===0?s.cfg.colors.lights[0]:s.cfg.colors.lights[1];
-    ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=8;ctx.beginPath();
-    const lx=i* (s.w/5.5);
-    ctx.arc(lx,10, s.type===9?4.5 : 3.2,0,Math.PI*2);ctx.fill();
-  }
-  if(s.type===9){
-    ctx.fillStyle="#ff0000";ctx.shadowColor="#ff0000";ctx.shadowBlur=12;ctx.fillRect(-s.w*0.4, -s.h*0.5, s.w*0.8, 4);
-  }
-  ctx.restore();
-  ctx.globalAlpha=1;
-}
-
-function drawCross(x,y,locked,t){
-  ctx.save();ctx.translate(x,y);const sc=1+Math.sin(t*0.01)*0.12;ctx.scale(sc,sc);
-  ctx.strokeStyle=locked?"rgba(255,222,89,0.95)":"rgba(255,255,255,0.92)";ctx.lineWidth=locked?2.2:1.8;ctx.shadowColor=locked?"#ffde59":"#ffffff";ctx.shadowBlur=locked?18:14;
-  ctx.beginPath();ctx.arc(0,0,40,0,Math.PI*2);ctx.stroke();
-  ctx.lineWidth=1.8;ctx.beginPath();ctx.arc(0,0,14,0,Math.PI*2);ctx.stroke();
-  ctx.lineWidth=locked?2.2:1.6;ctx.beginPath();ctx.moveTo(-62,0);ctx.lineTo(-22,0);ctx.moveTo(22,0);ctx.lineTo(62,0);ctx.moveTo(0,-62);ctx.lineTo(0,-22);ctx.moveTo(0,22);ctx.lineTo(0,62);ctx.stroke();
-  ctx.fillStyle=locked?"#ffde59":"#ffffff";ctx.shadowColor="#ffde59";ctx.shadowBlur=16;ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();
-  if(locked){ctx.shadowBlur=0;ctx.fillStyle="rgba(255,222,89,0.9)";ctx.font="900 10px monospace";ctx.textAlign="center";ctx.fillText("LOCK",0,-52);}
-  ctx.restore();
-}
-
-function renderUI(){
-  const ui=document.getElementById('ui');
-  const cfg=getShipConfig(game.level);
-  let h='';
-  h+=`<div class="absolute top-0 left-0 right-0 p-3 md:p-5 flex justify-between items-start pointer-events-auto">
-    <div><div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-white text-[#21418f] font-black text-[13px] flex items-center justify-center">W</div><span class="text-white font-black tracking-[0.18em] text-[11px]">wasa.chat</span><span class="ml-2 text-[8px] px-1.5 py-0.5 rounded bg-white/15 text-white/70 tracking-widest">${cfg.name} • NIVEL ${game.level}/100</span>
-    ${state==='playing'?`<button onclick="openPause()" class="ml-3 w-7 h-7 rounded-full bg-white/10 border border-white/20 text-white text-[12px] flex items-center justify-center hover:bg-white/20">⏸</button>`:''}
-    </div>
-    <div class="flex gap-2 mt-3"><div class="bg-black/35 backdrop-blur px-3.5 py-1.5 rounded-full text-white text-[11px] font-black border border-white/10">NIVEL ${game.level}</div><div class="bg-black/35 backdrop-blur px-3.5 py-1.5 rounded-full text-white text-[11px] font-black border border-white/10">${game.points} PTS</div><div class="bg-[#ffde59] text-black px-3 py-1.5 rounded-full text-[11px] font-black border-2 border-black">💰 ${coins}</div></div></div>
-    <div class="flex flex-col items-end gap-2"><div class="flex items-center gap-2 bg-black/30 backdrop-blur px-3 py-1.5 rounded-full border border-white/10"><span class="text-[9px] text-white/60 font-bold tracking-widest">TIROS</span><div class="flex gap-1.5">${Array.from({length:5}).map((_,i)=>`<div class="w-2.5 h-2.5 rounded-full ${i<5-game.misses?'bg-[#ffde59] shadow-[0_0_10px_#ffde59]':'bg-white/15'}"></div>`).join('')}</div></div><div class="flex flex-col gap-1.5 items-end">${game.ships.map(s=>`<div class="bg-black/50 backdrop-blur border border-white/15 rounded-full pl-1 pr-3 py-1 flex items-center gap-2"><div class="w-[56px] h-[6px] bg-black/40 rounded-full p-[1px]"><div class="h-full rounded-full" style="width:${Math.max(0,s.hp/s.maxHp*100)}%;background:${s.hp/s.maxHp>0.5?'linear-gradient(90deg,#4ade80,#22c55e)':'linear-gradient(90deg,#facc15,#f59e0b)'}"></div></div><span class="text-[11px] font-black ${s.hp/s.maxHp<0.3?'text-red-300':'text-white'}">${s.hp}</span><span class="text-[8px] text-white/40">/ ${s.maxHp}</span></div>`).join('')}</div>${state==='playing'?`<button onclick="openPause()" class="mt-1 text-[9px] text-white/50 border border-white/10 rounded-full px-2 py-1 bg-black/20 hover:bg-white/10">MENU • PAUSA</button>`:''}</div>
-  </div>`;
-
-  if(state==='playing'){
-    h+=`<div class="absolute top-[92px] left-1/2 -translate-x-1/2 pointer-events-none flex flex-col items-center gap-1">
-      ${game.power.state==='moving'?`<div class="bg-[#ffde59] text-black font-black text-[10px] tracking-[0.14em] px-4 py-2 rounded-full border-2 border-black shadow-[0_4px_0_#000] animate-pulse">1° CLICK: FIJAR POTENCIA → 2° CLICK: DISPARAR</div>`:`<div class="bg-white text-black font-black text-[11px] tracking-[0.14em] px-5 py-2 rounded-full border-2 border-black">POTENCIA ${Math.round(game.power.locked)}% FIJADA • ¡DISPARA! 🎯</div>`}
-      <div class="text-[8px] text-white/50 font-mono bg-black/20 px-2 py-1 rounded-full mt-1">${cfg.name} • ${game.ships.length} nave(s)</div>
-    </div>
-    <div class="absolute bottom-0 left-0 right-0 p-2 md:p-4 flex justify-between items-end pointer-events-none gap-2">
-      <!-- IZQUIERDA: BARRA POTENCIA CON ANCHO FIJO -->
-      <div class="pointer-events-auto flex flex-col items-center gap-2 w-[90px] shrink-0"><div id="power-label" class="text-[9px] font-black tracking-[0.22em] text-white/80 w-[90px] text-center whitespace-nowrap">POTENCIA ${Math.round(game.power.v)}%</div>
-      <div id="power-container" class="relative w-[40px] h-[160px] md:h-[180px] backdrop-blur-xl rounded-[18px] border p-1.5 flex flex-col justify-end overflow-hidden ${game.power.state==='locked'?'bg-[#ffde59]/15 border-[#ffde59]/60':'bg-black/45 border-white/15'}"><div id="power-fill" class="w-full rounded-[12px]" style="height:${game.power.state==='locked'?game.power.locked:game.power.v}%;background:${game.power.state==='locked'?'linear-gradient(180deg,#fffe8a,#ffde59 50%,#ff8a2a)':'linear-gradient(180deg,#fff7a0,#ffde59 60%,#ff6a2a)'}"></div><div id="power-line" class="absolute left-0 right-0 h-[3px] bg-white shadow-[0_0_12px_white]" style="bottom:${game.power.state==='locked'?game.power.locked:game.power.v}%"></div></div>
-      <button id="power-btn" onclick="togglePower()" class="pointer-events-auto w-[90px] px-1 py-2 rounded-full font-black text-[8px] tracking-[0.08em] border text-center whitespace-nowrap ${game.power.state==='locked'?'bg-[#ffde59] text-black border-black shadow-[0_3px_0_#000]':'bg-white/10 text-white border-white/20'}">${game.power.state==='locked'?Math.round(game.power.locked)+'% DESBLOQ':'FIJAR'}</button></div>
-      
-      <!-- CENTRO IZQUIERDA: INFO HORIZONTAL ABAJO A LA IZQUIERDA DEL CAÑON -->
-      <div class="pointer-events-auto flex items-end gap-2 flex-1 justify-start ml-2 md:ml-6 mb-1">
-        <div id="bullet-info-horizontal" class="bg-black/60 backdrop-blur-xl border border-white/15 rounded-full px-3.5 py-2 flex items-center gap-3">
-          <div class="flex items-center gap-1.5"><span class="text-[7px] font-black tracking-widest text-white/40">PODER BALA</span><span id="dmg-val" class="text-[11px] font-black text-[#ffde59]">${50+ups.d.main} DMG</span></div>
-          <div class="w-px h-3 bg-white/15"></div>
-          <div class="flex items-center gap-1.5"><span class="text-[7px] font-black tracking-widest text-white/40">POTENCIA</span><span id="pot-val" class="text-[11px] font-black text-white">${game.power.state==='locked'?Math.round(game.power.locked):Math.round(game.power.v)}%</span></div>
-          <div class="w-px h-3 bg-white/15"></div>
-          <div class="flex items-center gap-1.5"><span class="text-[7px] font-black tracking-widest text-white/40">VIDA ENEMIGA</span><span id="enemy-hp-val" class="text-[11px] font-black text-white">${game.ships.length>0?game.ships[0].hp:0}/${game.ships.length>0?game.ships[0].maxHp:0}</span></div>
-        </div>
-      </div>
-
-      <!-- DERECHA: BOTON DISPARAR LEJOS DEL CAÑON -->
-      <div class="pointer-events-auto flex flex-col items-center gap-2 shrink-0 mb-1">
-        <button id="shoot-btn" onclick="handleShoot()" class="font-black text-[13px] md:text-[15px] tracking-[0.12em] px-7 md:px-10 py-3.5 md:py-4 rounded-full border-[2.5px] border-black shadow-[0_6px_0_#000] active:translate-y-[5px] ${game.power.state==='locked'?'bg-[#ffde59] text-black shadow-[0_6px_0_#000,0_0_24px_rgba(255,222,89,0.5)]':'bg-white/20 text-white/70 border-white/20'}">${game.power.state==='moving'?'FIJAR POTENCIA':'DISPARAR ↗'}</button>
-      </div>
-    </div>`;
-  }
-
-  if(state==='menu'){
-    h+=`<div class="absolute inset-0 flex items-center justify-center p-4 bg-[#21418f]/55 backdrop-blur-[10px] pointer-events-auto"><div class="w-full max-w-[560px] rounded-[28px] bg-[#0f1b3e]/90 border border-white/15 shadow-[0_24px_80px_rgba(0,0,0,0.6)] overflow-hidden">
-      <div class="p-7 md:p-9"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full bg-white text-[#21418f] font-black flex items-center justify-center">W</div><span class="text-white font-black tracking-[0.2em] text-[12px]">wasa.chat</span></div><div class="text-[9px] tracking-[0.2em] text-white/50 font-bold border border-white/10 rounded-full px-2.5 py-1">100 NIVELES • 10 NAVES</div></div>
-      <h1 class="mt-6 text-white font-black text-[34px] md:text-[42px] leading-[0.9]">STAR<br><span class="text-[#ffde59]">SHOOTER WARS</span></h1>
-      <div class="mt-3 bg-white/5 border border-white/10 rounded-2xl p-3 flex justify-between items-center"><div><div class="text-[10px] text-white/40 font-bold tracking-widest">MAX NIVEL DESBLOQUEADO</div><div class="text-[#ffde59] font-black text-[18px]">NIVEL ${maxLevel} • ${getShipConfig(maxLevel).name}</div></div><div class="text-[20px]">🚀</div></div>
-      <div class="mt-6 flex flex-col gap-3">
-        <button onclick="startGame(1);renderUI()" class="w-full bg-white/10 text-white font-black tracking-[0.14em] text-[12px] py-3.5 rounded-full border border-white/15">JUGAR DESDE NIVEL 1 • FARMEAR MONEDAS</button>
-        <button onclick="continueFromCheckpoint()" class="w-full bg-[#ffde59] text-black font-black tracking-[0.18em] text-[13px] py-4 rounded-full border-[2.5px] border-black shadow-[0_6px_0_#000]">CONTINUAR DESDE NIVEL ${maxLevel} ${maxLevel>1?'• 100 💰 O ANUNCIO':''}</button>
-        <div class="grid grid-cols-2 gap-3"><button onclick="state='shop';renderUI()" class="bg-white/[0.08] text-white font-black tracking-[0.14em] text-[12px] py-3.5 rounded-full border border-white/15">MEJORAS • ${ups.d.main+ups.c.main+ups.p.main}/150</button><button onclick="state='ranking';renderUI()" class="bg-white/[0.08] text-white font-black tracking-[0.14em] text-[12px] py-3.5 rounded-full border border-white/15">RANKING TOP 10</button></div>
-      </div>
-      <div class="mt-4 grid grid-cols-5 gap-2">${Array.from({length:10}).map((_,i)=>{
-        const lvl=i*10+1;const unlocked=maxLevel>=lvl;const cfg2=getShipConfig(lvl);
-        // mini nave dibujada con los colores reales
-        const mini = `<div class="relative mx-auto w-[38px] h-[16px] flex items-center justify-center">
-          <div class="absolute w-[32px] h-[10px] rounded-full" style="background:${cfg2.colors.body};box-shadow:0 0 8px ${cfg2.colors.body};opacity:${unlocked?1:0.5}"></div>
-          <div class="absolute w-[32px] h-[5px] rounded-b-full top-[8px]" style="background:${cfg2.colors.belly};opacity:${unlocked?0.9:0.4}"></div>
-          <div class="absolute w-[10px] h-[6px] rounded-full top-[2px]" style="background:radial-gradient(circle, ${cfg2.colors.cockpit[0]} 0%, ${cfg2.colors.cockpit[1]} 40%, ${cfg2.colors.cockpit[2]} 100%);"></div>
-          <div class="absolute flex gap-[3px] top-[9px]">${[0,1,2].map(j=>`<div class="w-[3px] h-[3px] rounded-full" style="background:${j%2===0?cfg2.colors.lights[0]:cfg2.colors.lights[1]};box-shadow:0 0 4px ${j%2===0?cfg2.colors.lights[0]:cfg2.colors.lights[1]}"></div>`).join('')}</div>
-          ${cfg2.name==='BOSS TITAN'?`<div class="absolute w-[30px] h-[1.5px] top-[1px] bg-red-500 shadow-[0_0_4px_red]"></div>`:''}
-        </div>`;
-        return `<div class="rounded-xl border p-2 text-center transition-all ${unlocked?'bg-[#ffde59]/20 border-[#ffde59]/40 shadow-[0_0_12px_rgba(255,222,89,0.2)]':'bg-white/5 border-white/10 opacity-40'}">
-          ${mini}
-          <div class="text-[7px] text-white/40 mt-1">NVL ${lvl}</div>
-          <div class="text-[8px] font-black leading-none ${unlocked?'text-[#ffde59]':'text-white/30'}">${cfg2.name.split(' ')[0]}</div>
-          ${!unlocked?'<div class="text-[6px] mt-0.5">🔒</div>':''}
-        </div>`
-      }).join('')}</div>
-      </div><div class="h-[6px] w-full bg-gradient-to-r from-[#21418f] via-[#ffde59] to-[#5e80e1]"></div>
-    </div></div>`;
-  }
-
-  if(state==='shop'){
-    h+=`<div class="absolute inset-0 flex justify-center p-3 bg-[#0a1430]/80 backdrop-blur-[12px] overflow-y-auto pointer-events-auto"><div class="w-full max-w-[560px] bg-[#0f1b3e]/95 border border-white/15 rounded-[28px] p-6 my-6 h-fit">
-      <div class="flex justify-between items-center"><h2 class="text-white font-black text-[18px]">MEJORAS • 50 NIVELES / 250 SUBNIVELES</h2><button onclick="state='menu';renderUI()" class="w-8 h-8 bg-white/10 text-white rounded-full">✕</button></div>
-      <div class="mt-2 flex gap-2 items-center"><div class="bg-[#ffde59] text-black px-3 py-1 rounded-full text-[11px] font-black border-2 border-black">💰 ${coins}</div><div class="text-white/50 text-[11px]">5 sub = 1 nivel. No rompe nada.</div></div>
-      ${[
-        {id:'d',name:'DAÑO BALA',desc:`Base 50 + ${ups.d.main} daño`},
-        {id:'c',name:'MIRA LENTA',desc:`-${(ups.c.main*1.2).toFixed(1)}% vel mira`},
-        {id:'p',name:'POTENCIA LENTA',desc:`-${(ups.p.main*1.5).toFixed(1)}% vel barra`}
-      ].map(u=>{
-        const cur=ups[u.id];const cost=cur.main+1;const can=coins>=cost&&cur.main<50;
-        return `<div id="upgrade-${u.id}" class="mt-4 bg-white/[0.06] border border-white/10 rounded-2xl p-4 transition-all duration-300">
-          <div class="flex justify-between"><div><div class="text-white font-black text-[13px]">${u.name} <span class="text-[#ffde59]">NIVEL ${cur.main}/50</span></div><div class="text-white/60 text-[11px]">${u.desc}</div></div><div class="text-[10px] text-white/40">${cost} 💰</div></div>
-          <div class="mt-3 flex gap-1.5">${Array.from({length:5}).map((_,i)=>`<div class="flex-1 h-2 rounded-full transition-all duration-300 ${i<cur.sub?'bg-[#ffde59] shadow-[0_0_8px_#ffde59] scale-105':'bg-white/10'} ${cur.sub===5?'animate-pulse':''}"></div>`).join('')}</div>
-          ${cur.sub===5?`<div class="mt-1 text-[9px] text-[#ffde59] font-black animate-pulse">¡NIVEL COMPLETADO! → SUBIENDO A NIVEL ${cur.main+1}...</div>`:''}
-          <div class="mt-2 flex justify-between items-center"><span class="text-[10px] text-white/50">${cur.sub}/5 → nivel ${cur.main+1}</span><button onclick="buySub('${u.id}')" class="px-4 py-2 rounded-full text-[11px] font-black border-2 border-black ${can?'bg-[#ffde59] text-black':'bg-white/10 text-white/30'}">${cur.main>=50?'MAX':'COMPRAR SUB'}</button></div>
-        </div>`
-      }).join('')}
-    </div></div>`;
-  }
-
-  if(state==='ranking'){
-    h+=`<div class="absolute inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-[12px] pointer-events-auto"><div class="w-full max-w-[420px] bg-[#0f1b3e]/95 border border-white/15 rounded-[28px] p-7">
-      <div class="flex justify-between items-center"><h2 class="text-white font-black text-[18px]">RANKING TOP 10</h2><button onclick="state='menu';renderUI()" class="w-8 h-8 bg-white/10 text-white rounded-full">✕</button></div>
-      <div class="text-[10px] text-white/40 mt-1">MAX NIVEL: ${maxLevel}</div>
-      <div class="mt-4 flex flex-col gap-2">${ranking.length===0?`<div class="text-center text-white/30 py-8 text-[12px]">Sin puntajes aún</div>`:ranking.map((r,i)=>`<div class="flex justify-between items-center px-4 py-2.5 rounded-full border ${i===0?'bg-[#ffde59]/20 border-[#ffde59]/40 text-[#ffde59]':'bg-white/5 border-white/10 text-white/70'}"><span class="font-black text-[12px]">#${i+1} ${r.name} • ${getShipConfig(r.level).name}</span><span class="text-[11px]">${r.score} pts</span></div>`).join('')}</div>
-    </div></div>`;
-  }
-
-  if(state==='paused'){
-    h+=`<div class="absolute inset-0 flex items-center justify-center p-4 bg-[#0a1430]/80 backdrop-blur-[12px] pointer-events-auto"><div class="w-full max-w-[360px] bg-[#0f1b3e]/95 border border-white/15 rounded-[28px] p-7 text-center">
-      <div class="text-white/40 font-black tracking-[0.2em] text-[10px]">PAUSA • ${getShipConfig(game.level).name}</div><h2 class="text-white font-black text-[22px] mt-1">NIVEL ${game.level} • ${game.points} PTS</h2>
-      <div class="mt-6 flex flex-col gap-3">
-        <button onclick="closePause()" class="w-full bg-[#ffde59] text-black font-black text-[13px] py-4 rounded-full border-2 border-black shadow-[0_6px_0_#000]">CONTINUAR</button>
-        <button onclick="goToMenu()" class="w-full bg-white/10 text-white font-black text-[12px] py-3.5 rounded-full border border-white/15">IR AL MENU • GUARDAR PROGRESO</button>
-      </div>
-      <div class="mt-4 text-[9px] text-white/30">Progreso guardado • Max: ${maxLevel}</div>
-    </div></div>`;
-  }
-
-  if(state==='levelup'){
-    h+=`<div class="absolute inset-0 flex items-center justify-center p-4 bg-[#0a1430]/60 backdrop-blur-[10px] pointer-events-auto"><div class="bg-[#0f1b3e]/95 backdrop-blur-xl border border-white/15 rounded-[28px] px-8 py-7 text-center w-full max-w-[400px]">
-      <div class="text-[#ffde59] font-black tracking-[0.25em] text-[12px]">¡DESTRUIDA! • ${getShipConfig(game.level).name}</div><div class="text-white font-black text-[30px] mt-1">NIVEL ${levelUpInfo.level-1} → ${levelUpInfo.level}</div>
-      <div class="mt-2 flex flex-col items-center gap-1">
-        <div class="inline-flex gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-[11px]"><span class="text-white/60">+${tempPoints} PTS</span><span class="text-[#ffde59] font-black">+${tempCoins} 💰</span></div>
-        <div class="text-[9px] bg-black/30 rounded-full px-3 py-1 border border-white/10">
-          <span class="text-white/40">BASE ${Math.round((20+game.level*5)/15)} → </span>
-          <span class="text-white/60">${(game.lastTime||0).toFixed(1)}s</span>
-          <span class="text-white/40"> • x${(game.lastMult||1).toFixed(2)} = </span>
-          <span class="text-[#ffde59] font-black">${tempCoins} 💰</span>
-          <span class="ml-2 ${ (game.lastTime||99) < 10 ? 'text-green-400' : (game.lastTime||99) < 20 ? 'text-yellow-300' : (game.lastTime||99) < 30 ? 'text-orange-300' : 'text-white/30'}">${(game.lastTime||0)<10?'⚡ RAPIDO x2':(game.lastTime||0)<20?'🔥 x1.75':(game.lastTime||0)<30?'⏱ x1.5':'🐢 x1'}</span>
-        </div>
-        <div class="text-[8px] text-white/30">Si tardás &lt;10s = x2 • &lt;20s = x1.75 • &lt;30s = x1.5 • &gt;30s = x1</div>
-      </div>
-      ${levelUpInfo.level % 10 === 1 ? `<div class="mt-3 bg-[#ffde59]/20 border border-[#ffde59]/30 rounded-full px-3 py-1.5 text-[10px] text-[#ffde59] font-black">🚀 CHECKPOINT • NUEVA NAVE: ${getShipConfig(levelUpInfo.level).name}</div>` : ''}
-      <div class="mt-5 flex flex-col gap-2.5">
-        <button onclick="continueWithoutDouble()" class="w-full bg-white text-black font-black text-[12px] py-3.5 rounded-full border-2 border-black">CONTINUAR SIN DUPLICAR</button>
-        <button onclick="openAd('double')" class="w-full bg-[#ffde59] text-black font-black text-[12px] py-3.5 rounded-full border-2 border-black shadow-[0_4px_0_#000,0_0_24px_rgba(255,222,89,0.5)]">🎬 DUPLICAR x2 VIENDO ANUNCIO</button>
-        <button onclick="goToMenu()" class="w-full bg-white/10 text-white/70 font-black text-[11px] py-2.5 rounded-full border border-white/10">IR AL MENU • USAR MONEDAS</button>
-      </div>
-      <div class="mt-3 w-full h-1 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-[#ffde59]" style="width:100%;animation:load 5s linear"></div></div>
-    </div></div>`;
-  }
-
-  if(state==='gameover'){
-    h+=`<div class="absolute inset-0 flex items-center justify-center p-4 bg-[#0a1430]/70 backdrop-blur-[12px] pointer-events-auto"><div class="w-full max-w-[440px] rounded-[28px] bg-[#0f1b3e]/95 border border-white/15 p-7 text-center">
-      <div class="w-14 h-14 mx-auto rounded-full bg-red-500/20 border border-red-400/30 flex items-center justify-center"><div class="w-8 h-8 rounded-full bg-red-500"></div></div>
-      <div class="mt-5 text-red-300 font-black tracking-[0.28em] text-[11px]">MISIÓN FALLIDA • ${getShipConfig(game.level).name}</div><h2 class="mt-2 text-white font-black text-[30px]">GAME OVER</h2>
-      <div class="mt-3 inline-flex gap-2 bg-white/[0.06] border border-white/10 rounded-full px-4 py-2"><span class="text-white/50 text-[10px] font-bold">PUNTOS</span><span class="text-white font-black text-[12px]">${game.points}</span><span class="w-px bg-white/10 mx-1"></span><span class="text-white/50 text-[10px] font-bold">NIVEL</span><span class="text-[#ffde59] font-black text-[12px]">${game.level}</span><span class="w-px bg-white/10 mx-1"></span><span class="text-white/50 text-[10px] font-bold">MAX</span><span class="text-white font-black text-[12px]">${maxLevel}</span></div>
-      <div class="mt-5 flex flex-col gap-3"><button ${adUses>=3?'disabled':''} onclick="openAd('lives')" class="w-full font-black text-[13px] py-4 rounded-full border-[2.5px] border-black ${adUses>=3?'bg-white/10 text-white/30':'bg-[#ffde59] text-black'}">🎬 VER ANUNCIO +3 TIROS (${adUses}/3)</button><button onclick="startGame(1);renderUI()" class="w-full bg-white/[0.08] text-white font-black text-[12px] py-3.5 rounded-full border border-white/15">REINICIAR DESDE NIVEL 1</button><button onclick="state='menu';renderUI()" class="w-full text-white/50 text-[11px] py-2">MENU • CHECKPOINT NIVEL ${maxLevel}</button></div>
-    </div></div>`;
-  }
-
-  if(state==='reward_modal' && _rewardPending){
-    const cfg = {
-      lives: {title:'¡+3 TIROS EXTRA!', desc:'Viste el anuncio completo. Tenés 3 intentos más.', icon:'🎯', btn:'CONTINUAR CON +3 TIROS', reward:'+3 TIROS'},
-      double: {title:'¡RECOMPENSA DUPLICADA!', desc:`Duplicaste ${tempPoints} PTS y ${tempCoins} 💰 x2 del nivel ${game.level}`, icon:'💰', btn:'RECLAMAR x2 Y SEGUIR', reward:`+${tempPoints} PTS +${tempCoins} 💰`},
-      checkpoint: {title:'¡CONTINUAS JUGANDO!', desc:`Continuás desde el nivel ${maxLevel} desbloqueado`, icon:'🚀', btn:'CONTINUAR JUGANDO', reward:'NIVEL '+maxLevel}
-    };
-    const c = cfg[_rewardPending] || cfg.lives;
-    h+=`<div class="absolute inset-0 z-[70] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 pointer-events-auto">
-      <div class="w-full max-w-[380px] bg-gradient-to-br from-[#1e1e1e] to-[#0f0f0f] border border-[#ffde59]/30 rounded-[24px] p-6 text-center">
-        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#ffde59] to-[#ff8a2a] flex items-center justify-center text-[36px]">${c.icon}</div>
-        <div class="mt-4 text-[#ffde59] font-black text-[18px]">${c.title}</div>
-        <div class="mt-2 text-white/70 text-[13px]">${c.desc}</div>
-        <div class="mt-5 bg-black/50 border border-white/10 rounded-xl p-3 flex items-center justify-center gap-2">
-          <span class="text-[10px] text-white/40">RECOMPENSA</span>
-          <span class="text-[#ffde59] font-black text-[14px]">${c.reward}</span>
-        </div>
-        <button onclick="claimReward()" class="mt-5 w-full py-4 rounded-full bg-[#ffde59] text-black font-black text-[14px] border-[2.5px] border-black">${c.btn} →</button>
-      </div>
-    </div>`;
-  }
-  if(ad.type && state!=='reward_modal'){
-    h+=`<div class="absolute inset-0 z-[50] bg-black/95 flex items-center justify-center pointer-events-auto">
-      <div class="text-center">
-        <div class="w-14 h-14 mx-auto border-3 border-[#ffde59] border-t-transparent rounded-full animate-spin"></div>
-        <div class="mt-4 text-white font-black text-[13px]">CARGANDO ANUNCIO REAL...</div>
-        <div class="mt-1 text-white/30 text-[10px]">${ad.type}</div>
-      </div>
-    </div>`;
-  }
-
-  ui.innerHTML=h;
-}
-
-function openPause(){if(state!=='playing')return;pauseBeforeState='playing';state='paused';renderUI();}
-function closePause(){if(state==='paused'){state=pauseBeforeState||'playing';pauseBeforeState=null;renderUI();}}
-function goToMenu(){state='menu';pauseBeforeState=null;ad={type:null};renderUI();}
-function continueWithoutDouble(){
-  if(state!=='levelup') return;
-  coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
-  maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
-  ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
-  game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';renderUI();
-}
-function continueFromCheckpoint(){
-  if(maxLevel<=1){startGame(1);return;}
-  if(coins>=100){
-    if(confirm(`Continuar desde nivel ${maxLevel} cuesta 100 monedas o ver anuncio. ¿Pagar 100 monedas?`)){
-      coins-=100;localStorage.setItem('wasa_coins_final',coins);
-      startGame(maxLevel);renderUI();
-    }else{openAd('checkpoint');}
-  }else{openAd('checkpoint');}
-}
-let buyingLock=false;
-function buySub(id){
-  if(buyingLock) return;
-  const cur=ups[id];if(cur.main>=50)return;const cost=cur.main+1;if(coins<cost)return;
-  buyingLock=true;
-  coins-=cost;localStorage.setItem('wasa_coins_final',coins);
-  cur.sub+=1;
-  ups[id]=cur;
-  localStorage.setItem('wasa_upgrades_final',JSON.stringify(ups));
-  renderUI(); // muestra 5/5 lleno
-  if(cur.sub>=5){
-    // Mostrar 5/5 durante 500ms con animación
-    setTimeout(()=>{
-      cur.main+=1;cur.sub=0;
-      ups[id]=cur;
-      localStorage.setItem('wasa_upgrades_final',JSON.stringify(ups));
-      // efecto flash de nivel up
-      const el=document.getElementById('upgrade-'+id);
-      if(el){ el.classList.add('ring-2','ring-[#ffde59]'); setTimeout(()=>el.classList.remove('ring-2','ring-[#ffde59]'),300); }
-      buyingLock=false;
-      renderUI();
-    },550);
-  }else{
-    buyingLock=false;
-  }
-}
-let _pendingAdType=null;
-let _rewardPending=null;
-let _gmTimer=null;
-
-window._gm_onAdFinished = function(){
-  console.log('[GM] onAdFinished -> reward modal');
-  if(_gmTimer) clearTimeout(_gmTimer);
-  window._gm_isAdPlaying=false;
-  document.getElementById('gamemonetize-video').classList.remove('active');
-  document.getElementById('gamemonetize-video').innerHTML='';
-  document.getElementById('gamemonetize-video').style.display='none';
-  let type = _pendingAdType || _rewardPending || (ad && ad.type ? ad.type : null);
-  if(!type) return;
-  _rewardPending=type;
-  _pendingAdType=null;
-  ad={type:null};
-  state='reward_modal';
-  renderUI();
-};
-
-window._gm_tryVideoFallback = function(){
-  console.log('[GM] Fallback a video.js - intentando mostrar anuncio real');
-  const container = document.getElementById('gamemonetize-video');
-  container.style.display='block';
-  container.classList.add('active');
-  container.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:sans-serif"><div style="text-align:center"><div style="width:40px;height:40px;border:3px solid #ffde59;border-top-color:transparent;border-radius:50%;margin:0 auto 12px;animation:spin 1s linear infinite"></div><div>CARGANDO VIDEO REAL...</div><div style="font-size:10px;opacity:0.5;margin-top:6px">GameMonetize video.js</div></div></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>';
   
-  // Intentar disparar el anuncio via video.js si existe
-  setTimeout(()=>{
-    // video.js normalmente crea su propio overlay, si no lo hace en 3s, dar recompensa igual
-    if(typeof window.showVideoAd !== 'undefined'){
-      try{ window.showVideoAd(); }catch(e){ console.log(e); }
-    }
-    // Si video.js tampoco muestra nada en 5s, forzar reward (sin anuncio disponible)
-    setTimeout(()=>{
-      if(window._gm_isAdPlaying || document.getElementById('gamemonetize-video').classList.contains('active')){
-        console.log('[GM] video.js no mostro anuncio, forzando recompensa');
-        window._gm_onAdFinished();
-      }
-    },5000);
-  },500);
-  
-  // Timeout final 30s
-  if(_gmTimer) clearTimeout(_gmTimer);
-  _gmTimer = setTimeout(()=>{ window._gm_onAdFinished(); },30000);
-};
+  newOrder.forEach(el => wrap.appendChild(el));
 
-function openAd(type){
-  console.log('[GM] openAd real', type);
-  _pendingAdType=type;
-  _rewardPending=null;
-  window._gm_isAdPlaying=true;
-  window._gm_adShown=false;
-  ad={type:type};
-  renderUI();
-  
-  setTimeout(()=>{
-    // Ocultar nuestro loader y mostrar anuncio real de GM
-    ad={type:null};
-    renderUI();
-    
-    if(typeof sdk !== 'undefined' && sdk.showBanner){
-      try{
-        console.log('[GM] sdk.showBanner()');
-        const result = sdk.showBanner();
-        console.log('[GM] showBanner result', result);
-        // Si no muestra nada en 2.5s, probar fallback video
-        setTimeout(()=>{
-          if(!window._gm_adShown && !window._gm_isAdPlaying){
-            console.log('[GM] SDK no mostro anuncio tras 2.5s, usando fallback video');
-            window._gm_tryVideoFallback();
-          }
-        },2500);
-      }catch(e){ 
-        console.log('[GM] error showBanner', e); 
-        window._gm_tryVideoFallback();
-      }
-    } else {
-      console.log('[GM] SDK no listo, directo a video fallback');
-      window._gm_tryVideoFallback();
-    }
-    
-    if(_gmTimer) clearTimeout(_gmTimer);
-    _gmTimer = setTimeout(()=>{ 
-      console.log('[GM] timeout 30s forzado');
-      window._gm_onAdFinished(); 
-    },30000);
-  },300);
+  // 4. Animar FLIP
+  const lastPos = new Map();
+  newOrder.forEach(el => lastPos.set(el, el.getBoundingClientRect()));
+
+  newOrder.forEach(el=>{
+    const first = firstPos.get(el);
+    const last = lastPos.get(el);
+    const dx = first.left - last.left;
+    const dy = first.top - last.top;
+    el.style.transition='none';
+    el.style.transform=`translate(${dx}px, ${dy}px)`;
+  });
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      newOrder.forEach(el=>{
+        el.style.transition='transform 0.7s cubic-bezier(0.34,1.56,0.64,1)';
+        el.style.transform='translate(0,0)';
+      });
+    });
+  });
+
+  // 5. Volver al orden original
+  clearTimeout(returnTimeout);
+  returnTimeout=setTimeout(()=>{
+    const firstReturn = new Map();
+    newOrder.forEach(el=>firstReturn.set(el, el.getBoundingClientRect()));
+
+    const ordered = [...allLetters].sort((a,b)=>a.dataset.original - b.dataset.original);
+    ordered.forEach(el=>wrap.appendChild(el));
+
+    const lastReturn = new Map();
+    ordered.forEach(el=>lastReturn.set(el, el.getBoundingClientRect()));
+
+    ordered.forEach(el=>{
+      const first = firstReturn.get(el);
+      const last = lastReturn.get(el);
+      const dx = first.left - last.left;
+      const dy = first.top - last.top;
+      el.style.transition='none';
+      el.style.transform=`translate(${dx}px, ${dy}px)`;
+    });
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        ordered.forEach(el=>{
+          el.style.transition='transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+          el.style.transform='translate(0,0)';
+        });
+        setTimeout(()=>{isAnimating=false;},700);
+      });
+    });
+  },1300);
 }
-
-function claimReward(){
-  const type=_rewardPending;
-  _rewardPending=null;
-  if(_gmTimer) clearTimeout(_gmTimer);
-  window._gm_isAdPlaying=false;
-  window._gm_adShown=false;
-  document.getElementById('gamemonetize-video').classList.remove('active');
-  document.getElementById('gamemonetize-video').style.display='none';
-  if(type==='lives'){
-    game.misses=Math.max(0,game.misses-3);game.bullets=[];game.power.state='moving';game.power.v=50;adUses++;state='playing';
-  }else if(type==='double'){
-    game.points+=tempPoints;coins+=tempCoins;localStorage.setItem('wasa_coins_final',coins);
-    maxLevel=Math.max(maxLevel,game.level+1);localStorage.setItem('wasa_max_level',maxLevel);
-    ranking.push({name:'Jugador',score:game.points,level:game.level});ranking.sort((a,b)=>b.score-a.score);ranking=ranking.slice(0,10);localStorage.setItem('wasa_ranking_final',JSON.stringify(ranking));
-    game.level+=1;game.misses=0;game.bullets=[];game.power.state='moving';game.power.v=20;initShips(game.level);game.levelStart=performance.now();state='playing';
-  }else if(type==='checkpoint'){
-    startGame(maxLevel);state='playing';
-  }
-  renderUI();
-}
-function claimAd(){ claimReward(); }
-
-function togglePower(){if(state!=='playing')return;if(game.power.state==='moving'){game.power.state='locked';game.power.locked=Math.round(game.power.v||65);}else{game.power.state='moving';}renderUI();}
-function handleShoot(){
-  if(state!=='playing')return;
-  if(game.power.state==='moving'){game.power.state='locked';game.power.locked=Math.round(game.power.v||65);renderUI();return;}
-  if(game.bullets.length>0)return;
-  const vel=260+game.power.locked*5.2+(game.level-1)*8;
-  const cx=W/2,cy=H-88;const tx=game.cross.x,ty=game.cross.y;const dy=cy-ty;const time=Math.max(dy/vel,0.18);const vx=(tx-cx)/time,vy=-vel;
-  game.bullets.push({x:cx,y:cy,vx,vy,trail:[]});
-}
-
-function loop(now){
-  if(window._gm_isAdPlaying || state==='reward_modal' || (ad && ad.type!==null)){
-    requestAnimationFrame(loop);
-    return;
-  }
-
-  const dt=Math.min((now-last)/1000,0.033);last=now;
-  if(state==='playing'){
-    for(let s of game.ships){
-      if(s.cfg.behavior==='zigzag' || s.cfg.behavior==='zigzag_fast'){
-        s.zigTimer+=dt* (s.cfg.behavior==='zigzag_fast'?4:2);
-        s.y = s.originalY + Math.sin(s.zigTimer)* (s.cfg.behavior==='zigzag_fast'?80:40);
-      }
-      if(s.cfg.behavior==='teleport'){
-        s.teleportTimer+=dt;
-        if(s.teleportTimer>2.5){s.teleportTimer=0; s.x = Math.random()*(W-100)+50; s.y = H*0.1+Math.random()*H*0.35;}
-      }
-      s.x+=s.dir*s.speed*dt;
-      if(s.dir===1&&s.x>W+140){s.x=-140;s.y=H*0.1+Math.random()*H*0.32;s.originalY=s.y;s.dir=Math.random()>0.5?1:-1;if(s.dir===-1)s.x=W+140;}
-      else if(s.dir===-1&&s.x<-140){s.x=W+140;s.y=H*0.1+Math.random()*H*0.32;s.originalY=s.y;s.dir=Math.random()>0.5?1:-1;if(s.dir===1)s.x=-140;}
-      if(s.hitFlash>0)s.hitFlash-=dt*4;
-    }
-    game.cross.x+=game.cross.dir*game.cross.speed*dt;
-    if(game.cross.x>W-30){game.cross.x=W-30;game.cross.dir=-1;}
-    if(game.cross.x<30){game.cross.x=30;game.cross.dir=1;}
-    if(game.power.state==='moving'){game.power.v+=game.power.dir*game.power.speed*dt;if(game.power.v>=100){game.power.v=100;game.power.dir=-1;}if(game.power.v<=0){game.power.v=0;game.power.dir=1;}}else game.power.v=game.power.locked;
-    for(let i=game.bullets.length-1;i>=0;i--){
-      const b=game.bullets[i];b.trail.push({x:b.x,y:b.y});if(b.trail.length>8)b.trail.shift();b.x+=b.vx*dt;b.y+=b.vy*dt;
-      let hit=false;
-      for(let sIdx=game.ships.length-1;sIdx>=0;sIdx--){
-        const sh=game.ships[sIdx];
-        if(Math.abs(b.y-sh.y)<28&&Math.abs(b.x-sh.x)<sh.w*0.5){
-          const dmg=50+ups.d.main;sh.hp-=dmg;sh.hitFlash=1;
-          for(let k=0;k<18;k++){const ang=Math.random()*Math.PI*2,sp=Math.random()*180+40;game.parts.push({x:sh.x,y:sh.y,vx:Math.cos(ang)*sp+sh.dir*20,vy:Math.sin(ang)*sp,life:1,size:Math.random()*3+1.5,color:Math.random()>0.5?"#ffde59":"#ff8a4d"});}
-          game.bullets.splice(i,1);game.power.state='moving';hit=true;
-          if(sh.hp<=0){
-            game.ships.splice(sIdx,1);
-            for(let k=0;k<32;k++){const ang=Math.random()*Math.PI*2,sp=Math.random()*320+40;game.parts.push({x:sh.x,y:sh.y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp,life:1,size:Math.random()*5+2,color:`hsl(${40+Math.random()*30},100%,60%)`});}
-            if(game.ships.length===0){
-              const elapsed = (performance.now() - game.levelStart)/1000;
-              tempPoints=100*game.level;
-              // base 1/4 de lo que daba antes
-              const baseCoins = (20+game.level*5)/15;
-              let mult = 1;
-              if(elapsed < 10) mult = 2;
-              else if(elapsed < 20) mult = 1.75;
-              else if(elapsed < 30) mult = 1.5;
-              else mult = 1;
-              tempCoins = Math.round(baseCoins * mult);
-              // guardar datos para mostrar
-              game.lastTime = elapsed;
-              game.lastMult = mult;
-              game.lastBase = Math.round(baseCoins);
-              game.points+=tempPoints;
-              levelUpInfo={level:game.level+1,points:game.points};
-              state='levelup';renderUI();
-              setTimeout(()=>{if(state==='levelup'){continueWithoutDouble();}},5000);
-            }
-          }
-          break;
-        }
-      }
-      if(hit) continue;
-      if(b.y<-30||b.x<-30||b.x>W+30){game.bullets.splice(i,1);game.misses+=1;game.power.state='moving';if(game.misses>=5){state='gameover';renderUI();}}
+wrap.addEventListener('mouseenter', shuffleLetters);
+wrap.addEventListener('mousemove', (e)=>{
+  // solo dispara si te moves mucho, para no spamear
+  if(!wrap._lastShuffle || Date.now() - wrap._lastShuffle > 2000){
+    const rect=wrap.getBoundingClientRect();
+    if(Math.hypot(e.clientX-(rect.left+rect.width/2), e.clientY-(rect.top+rect.height/2))<200){
+      wrap._lastShuffle=Date.now();
+      shuffleLetters();
     }
   }
-  for(let i=game.parts.length-1;i>=0;i--){const p=game.parts[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=0.98;p.vy+=80*dt;p.life-=dt*0.9;if(p.life<=0)game.parts.splice(i,1);}
+});
 
-  const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,"#21418f");grad.addColorStop(1,"#5e80e1");ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-  for(const s of game.stars){const a=0.5+Math.sin(now*0.001*s.tw+s.off)*0.5;ctx.fillStyle=`rgba(255,255,255,${0.3+a*0.7})`;ctx.beginPath();ctx.arc(s.x,s.y,s.size*(0.7+a*0.6),0,Math.PI*2);ctx.fill();}
-  const vign=ctx.createRadialGradient(W/2,H*0.35,H*0.2,W/2,H*0.35,H);vign.addColorStop(0,"rgba(0,0,0,0)");vign.addColorStop(1,"rgba(0,0,0,0.35)");ctx.fillStyle=vign;ctx.fillRect(0,0,W,H);
-  for(let sh of game.ships) drawShip(sh);
-  if(state==='playing'||state==='levelup'){
-    for(const b of game.bullets){for(let j=0;j<b.trail.length;j++){const t=b.trail[j],a=j/b.trail.length;ctx.fillStyle=`rgba(255,222,89,${a*0.6})`;ctx.beginPath();ctx.arc(t.x,t.y,2+a*2,0,Math.PI*2);ctx.fill();}ctx.shadowColor="#ffde59";ctx.shadowBlur=16;ctx.fillStyle="#fffe8a";ctx.beginPath();ctx.arc(b.x,b.y,5.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
-    for(const p of game.parts){ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.globalAlpha=1;}
-    if(state==='playing') drawCross(game.cross.x,game.cross.y,game.power.state==='locked',now);
-    const cx=W/2,cy=H-100;ctx.save();ctx.translate(cx,cy);ctx.shadowColor="#ffde59";ctx.shadowBlur=20;ctx.fillStyle="#1a2a5a";ctx.beginPath();ctx.ellipse(0,0,26,10,0,0,Math.PI*2);ctx.fill();if(state==='playing'){const ang=Math.atan2(game.cross.y-cy,game.cross.x-cx);ctx.rotate(ang);ctx.fillStyle="#e6e8ff";ctx.fillRect(0,-5,36,10);ctx.fillStyle="#ffde59";ctx.fillRect(32,-3,10,6);}ctx.restore();
-  }
-  if(state==='playing'){
-    const pl=document.getElementById('power-label');
-    const pf=document.getElementById('power-fill');
-    const pln=document.getElementById('power-line');
-    const potVal=document.getElementById('pot-val');
-    const dmgVal=document.getElementById('dmg-val');
-    const ehVal=document.getElementById('enemy-hp-val');
-    if(pl) pl.textContent = game.power.state==='locked' ? `POTENCIA • BLOQ ${Math.round(game.power.locked)}%` : `POTENCIA ${Math.round(game.power.v)}%`;
-    if(pf) pf.style.height = (game.power.state==='locked'?game.power.locked:game.power.v)+'%';
-    if(pln) pln.style.bottom = (game.power.state==='locked'?game.power.locked:game.power.v)+'%';
-    const curPow = game.power.state==='locked'?game.power.locked:game.power.v;
-    if(potVal) potVal.textContent = Math.round(curPow)+'%';
-    if(dmgVal) dmgVal.textContent = (50+ups.d.main)+' DMG';
-    if(ehVal && game.ships.length>0) ehVal.textContent = game.ships[0].hp+'/'+game.ships[0].maxHp;
-  }
-  requestAnimationFrame(loop);
-}
-renderUI();
-initShips(1);
-requestAnimationFrame(loop);
-canvas.addEventListener('pointerdown',e=>{if(e.target.closest('button')) return; if(state==='playing') handleShoot();});
-addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();if(state==='menu'){startGame(1);renderUI();}else if(state==='playing'){handleShoot();}} if(e.code==='Escape'){if(state==='playing') openPause(); else if(state==='paused') closePause();}});
+document.getElementById('cta').onclick=()=>{window.location.href='https://games.wasa.chat'};
+document.getElementById('ctminer').onclick=()=>{window.location.href='https://miner.wasa.chat'};
 </script>
 </body>
 </html>
